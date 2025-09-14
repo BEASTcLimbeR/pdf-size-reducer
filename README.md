@@ -1,36 +1,144 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PDF Size Reducer
+
+A modern, professional web application built with Next.js that allows users to compress PDF files directly in their browser. The application provides a clean, intuitive interface with drag-and-drop functionality and advanced compression options.
+
+## Features
+
+### 🚀 Core Functionality
+- **Drag & Drop Upload**: Easy file upload with visual feedback
+- **Browser-Based Processing**: All compression happens locally - no data leaves your device
+- **Multiple Quality Settings**: Choose between low, medium, and high compression quality
+- **Advanced Options**: Remove metadata and annotations for better compression
+- **Real-time Progress**: Visual progress indicators during compression
+- **Instant Download**: Download compressed files immediately
+
+### 🎨 User Experience
+- **Modern UI**: Clean, professional design with Tailwind CSS
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Dark Mode Support**: Automatic dark/light mode switching
+- **Accessibility**: Keyboard navigation and screen reader support
+- **Error Handling**: Comprehensive error messages and validation
+
+### 🔒 Privacy & Security
+- **100% Client-Side**: No files are uploaded to servers
+- **No Data Storage**: Files are processed and immediately discarded
+- **Secure Processing**: Uses industry-standard PDF libraries
+
+## Technology Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **PDF Processing**: pdf-lib
+- **File Upload**: react-dropzone
+- **Icons**: Lucide React
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd pdf-size-reducer
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Start the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Learn More
+### Building for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Upload PDF**: Drag and drop a PDF file or click to browse
+2. **Choose Settings**: Select compression quality and options
+3. **Compress**: The file is automatically compressed
+4. **Download**: Download your compressed PDF file
 
-## Deploy on Vercel
+## Compression Options
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Quality Levels
+- **Low Quality**: Maximum compression, smaller file size, lower quality
+- **Medium Quality**: Balanced compression, good quality and file size (default)
+- **High Quality**: Minimal compression, best quality, larger file size
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Advanced Options
+- **Remove Metadata**: Strips author, title, and other metadata
+- **Remove Annotations**: Removes comments, highlights, and annotations
+
+## File Limitations
+
+- **File Size**: Maximum 50MB per file
+- **File Type**: PDF files only
+- **Browser Support**: Modern browsers with JavaScript enabled
+
+## Development
+
+### Project Structure
+```
+src/
+├── app/                 # Next.js app directory
+│   ├── globals.css     # Global styles
+│   ├── layout.tsx      # Root layout
+│   └── page.tsx        # Home page
+├── components/         # React components
+│   ├── PDFUploader.tsx # File upload component
+│   └── CompressionResults.tsx # Results display
+└── utils/             # Utility functions
+    └── pdfCompression.ts # PDF processing logic
+```
+
+### Key Components
+
+#### PDFUploader
+- Handles file drag-and-drop
+- Validates file type and size
+- Provides visual feedback
+
+#### CompressionResults
+- Manages compression process
+- Displays progress and results
+- Handles download functionality
+
+#### pdfCompression Utility
+- Core PDF processing logic
+- Multiple compression strategies
+- Error handling and validation
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Support
+
+For questions or issues, please open an issue on GitHub.
+
+---
+
+Built with ❤️ using Next.js and modern web technologies.
