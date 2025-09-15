@@ -99,3 +99,150 @@ input:focus-visible,
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Advanced Icon Animations */
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-1deg);
+  }
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.6));
+  }
+}
+
+@keyframes iconSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-8px) scale(1.05);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.1);
+  }
+  75% {
+    transform: translateY(-8px) scale(1.05);
+  }
+}
+
+@keyframes iconWiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px) translateX(10px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(147, 51, 234, 0.4);
+  }
+}
+
+/* Icon animation classes */
+.icon-float {
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+.icon-pulse {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+.icon-spin {
+  animation: iconSpin 2s linear infinite;
+}
+
+.icon-bounce {
+  animation: iconBounce 1.5s ease-in-out infinite;
+}
+
+.icon-wiggle {
+  animation: iconWiggle 0.5s ease-in-out infinite;
+}
+
+.icon-glow {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.particle-float {
+  animation: particleFloat 2s ease-out infinite;
+}
+
+/* Hover state animations */
+.tool-card:hover .icon-float {
+  animation-duration: 1s;
+}
+
+.tool-card:hover .icon-pulse {
+  animation-duration: 0.8s;
+}
+
+.tool-card:hover .icon-bounce {
+  animation-duration: 0.6s;
+}
+
+/* Custom easing functions */
+.ease-bounce {
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.ease-elastic {
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ease-smooth {
+  transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
