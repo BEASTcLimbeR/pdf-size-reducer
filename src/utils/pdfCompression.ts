@@ -26,8 +26,7 @@ export async function compressPDF(
 ): Promise<CompressionResult> {
   const {
     quality = 'medium',
-    removeMetadata = true,
-    removeAnnotations = false
+    removeMetadata = true
   } = options;
 
   try {
@@ -115,7 +114,6 @@ export async function compressPDF(
       objectsPerTick: quality === 'low' ? 200 : quality === 'medium' ? 100 : 50,
       // Additional compression options
       updateFieldAppearances: false,
-      addPageNumbers: false,
     };
 
     const compressedBytes = await compressedPdf.save(saveOptions);
@@ -250,7 +248,6 @@ export async function advancedCompressPDF(
       addDefaultPage: false,
       objectsPerTick: 500, // Process more objects per tick for better compression
       updateFieldAppearances: false,
-      addPageNumbers: false,
     });
 
     const compressedSize = compressedBytes.length;

@@ -1,16 +1,26 @@
-# PDF Size Reducer
+# PDF Toolkit Pro
 
-A modern, professional web application built with Next.js that allows users to compress PDF files directly in their browser. The application provides a clean, intuitive interface with drag-and-drop functionality and advanced compression options.
+A comprehensive, modern web application built with Next.js that provides all PDF tools in one place. Similar to [iLovePDF](https://www.ilovepdf.com/) but with better features, this toolkit allows users to compress, merge, split, convert, edit, and secure PDF files directly in their browser. The application provides a clean, intuitive interface with drag-and-drop functionality and advanced processing options.
 
 ## Features
 
-### 🚀 Core Functionality
+### 🚀 Complete PDF Toolkit
+- **Compress PDF**: Reduce file size with 3 quality levels (50%, 70%, 90% size)
+- **Merge PDF**: Combine multiple PDFs with drag-and-drop reordering
+- **Split PDF**: Split into individual pages, ranges, or custom selections
+- **Convert PDF**: Convert to/from Word, PowerPoint, Excel, JPG, HTML
+- **Edit PDF**: Rotate, watermark, crop, add page numbers, edit content
+- **PDF Security**: Protect, unlock, sign, redact, and compare PDFs
+- **Optimize PDF**: Repair damaged files and OCR scanned documents
+
+### 🎨 Advanced Features
 - **Drag & Drop Upload**: Easy file upload with visual feedback
-- **Browser-Based Processing**: All compression happens locally - no data leaves your device
-- **Multiple Quality Settings**: Choose between low, medium, and high compression quality
+- **Browser-Based Processing**: All processing happens locally - no data leaves your device
+- **Multiple Quality Settings**: Choose compression levels with visual previews
 - **Advanced Options**: Remove metadata and annotations for better compression
-- **Real-time Progress**: Visual progress indicators during compression
-- **Instant Download**: Download compressed files immediately
+- **Real-time Progress**: Visual progress indicators during processing
+- **Instant Download**: Download processed files immediately
+- **Mobile Responsive**: Works perfectly on all devices
 
 ### 🎨 User Experience
 - **Modern UI**: Clean, professional design with Tailwind CSS

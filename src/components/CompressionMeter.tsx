@@ -110,7 +110,7 @@ export default function CompressionMeter({
             <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-2 flex-shrink-0" />
             <div className="text-sm text-yellow-800 dark:text-yellow-200">
               <p className="font-medium mb-1">Low compression achieved</p>
-              <p>Try using "Low Quality" setting for better compression, or the PDF may already be optimized.</p>
+              <p>Try using &quot;Low Quality&quot; setting for better compression, or the PDF may already be optimized.</p>
             </div>
           </div>
         </div>

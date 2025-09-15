@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PDF Size Reducer - Compress PDF Files Online",
-  description: "Reduce PDF file size quickly and securely. Compress PDFs online for free with our professional PDF size reducer tool.",
+  title: "PDF Toolkit Pro - All PDF Tools in One Place",
+  description: "Complete PDF toolkit with compress, merge, split, convert, edit, and secure PDFs. 100% free, secure, and easy to use. No registration required.",
 };
 
 export default function RootLayout({

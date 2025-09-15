@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, FileRejection } from 'react-dropzone';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
 import { validatePDFFile } from '@/utils/pdfCompression';
 
@@ -20,7 +20,7 @@ export default function PDFUploader({ onFileUpload }: PDFUploaderProps) {
   };
 
   // Handle file drop/selection
-  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
+  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
     setError(null);
     
     // Handle rejected files

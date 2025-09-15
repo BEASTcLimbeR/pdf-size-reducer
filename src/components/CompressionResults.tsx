@@ -1,13 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FileText, Download, RotateCcw, Loader2, CheckCircle, AlertCircle, Settings } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { FileText, Download, RotateCcw, Loader2, AlertCircle, Settings } from 'lucide-react';
 import { compressPDF, advancedCompressPDF, simpleCompressPDF, formatFileSize, validatePDFFile, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
 import CompressionMeter from './CompressionMeter';
 
 interface CompressionResultsProps {
   file: File;
-  onCompression: (compressedData: Uint8Array, stats: any) => void;
+  onCompression: (compressedData: Uint8Array, stats: {
+    originalSize: number;
+    compressedSize: number;
+    reductionPercentage: number;
+    pagesCount: number;
+  }) => void;
   onError: (error: string) => void;
   onReset: () => void;
   isCompressing: boolean;
@@ -41,7 +46,7 @@ export default function CompressionResults({
   const [showSettings, setShowSettings] = useState(false);
 
   // Compress PDF function using the utility with fallback
-  const handleCompressPDF = async () => {
+  const handleCompressPDF = useCallback(async () => {
     try {
       setIsCompressing(true);
       setCompressionProgress(0);
@@ -115,20 +120,20 @@ export default function CompressionResults({
       console.error('Compression error:', err);
       onError(err instanceof Error ? err.message : 'Failed to compress PDF. Please try again.');
     }
-  };
+  }, [file, compressionOptions, onError, setIsCompressing]);
 
   // Auto-compress when component mounts
   useEffect(() => {
     if (file && !compressedFile && !error) {
       handleCompressPDF();
     }
-  }, [file]);
+  }, [file, compressedFile, error, handleCompressPDF]);
 
   // Download compressed file
   const downloadCompressedFile = () => {
     if (!compressedFile) return;
 
-    const blob = new Blob([compressedFile], { type: 'application/pdf' });
+    const blob = new Blob([compressedFile as BlobPart], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -205,7 +210,7 @@ export default function CompressionResults({
                         name="quality"
                         value={quality}
                         checked={isSelected}
-                        onChange={(e) => setCompressionOptions(prev => ({ ...prev, quality: e.target.value as any }))}
+                        onChange={(e) => setCompressionOptions(prev => ({ ...prev, quality: e.target.value as 'low' | 'medium' | 'high' }))}
                         className="mr-3 text-blue-600 focus:ring-blue-500"
                       />
                       <div className="flex-1">
