@@ -332,7 +332,7 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Comparison Type:
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 <button
                   onClick={() => setComparisonType('side-by-side')}
                   className={`p-4 border-2 rounded-lg text-center transition-colors ${
@@ -374,7 +374,7 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
 
             {/* Highlight Options */}
             {comparisonType === 'highlight' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Highlight Color:
@@ -404,7 +404,7 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
         )}
 
         {/* File Upload Areas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
           {/* First PDF */}
           <div
             className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
@@ -537,7 +537,7 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
 
                 {/* File Info */}
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-sm">
                     <div>
                       <span className="font-medium text-gray-900 dark:text-white">Total Size:</span>
                       <span className="ml-2 text-gray-600 dark:text-gray-300">

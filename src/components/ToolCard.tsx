@@ -15,8 +15,8 @@ export default function ToolCard({ icon: Icon, title, description, status, onCli
     <div
       onClick={onClick}
       className={`
-        relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 group
-        ${status === 'available' ? 'hover:scale-105' : 'opacity-75'}
+        relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 group touch-manipulation
+        ${status === 'available' ? 'hover:scale-105 active:scale-95' : 'opacity-75'}
       `}
     >
       {/* Status Badge */}
@@ -50,7 +50,7 @@ export default function ToolCard({ icon: Icon, title, description, status, onCli
       {/* Content */}
       <div>
         <h3 className={`
-          text-lg font-semibold mb-2 transition-colors
+          text-base sm:text-lg font-semibold mb-2 transition-colors
           ${status === 'available' 
             ? 'text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400' 
             : 'text-gray-500 dark:text-gray-400'
@@ -59,7 +59,7 @@ export default function ToolCard({ icon: Icon, title, description, status, onCli
           {title}
         </h3>
         <p className={`
-          text-sm leading-relaxed
+          text-xs sm:text-sm leading-relaxed
           ${status === 'available' 
             ? 'text-gray-600 dark:text-gray-300' 
             : 'text-gray-400 dark:text-gray-500'

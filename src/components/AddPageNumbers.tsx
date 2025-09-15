@@ -276,7 +276,7 @@ export default function AddPageNumbers({ onReset }: { onReset: () => void }) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Page Number Position:
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { value: 'top-left', label: 'Top Left' },
                   { value: 'top-center', label: 'Top Center' },
@@ -301,7 +301,7 @@ export default function AddPageNumbers({ onReset }: { onReset: () => void }) {
             </div>
 
             {/* Format and Styling */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Number Format:
@@ -333,7 +333,7 @@ export default function AddPageNumbers({ onReset }: { onReset: () => void }) {
             </div>
 
             {/* Color and Range */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Font Color:

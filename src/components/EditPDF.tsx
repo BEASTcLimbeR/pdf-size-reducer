@@ -269,7 +269,7 @@ export default function EditPDF({ onReset }: { onReset: () => void }) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Choose Edit Type:
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 <button
                   onClick={() => setEditType('text')}
                   className={`p-4 border-2 rounded-lg text-left transition-colors ${
@@ -311,7 +311,7 @@ export default function EditPDF({ onReset }: { onReset: () => void }) {
 
             {/* Text Options */}
             {editType === 'text' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Text Content:
@@ -353,7 +353,7 @@ export default function EditPDF({ onReset }: { onReset: () => void }) {
 
             {/* Shape Options */}
             {editType === 'shape' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Shape Type:
@@ -427,7 +427,7 @@ export default function EditPDF({ onReset }: { onReset: () => void }) {
             />
             <label
               htmlFor="pdf-upload"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 cursor-pointer transition-colors"
+                  className="inline-flex items-center px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 cursor-pointer transition-colors touch-manipulation min-h-[44px]"
             >
               <Upload className="h-5 w-5 mr-2" />
               Choose PDF File
@@ -501,7 +501,7 @@ export default function EditPDF({ onReset }: { onReset: () => void }) {
 
                 {/* File Info */}
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 text-sm">
                     <div>
                       <span className="font-medium text-gray-900 dark:text-white">Original Size:</span>
                       <span className="ml-2 text-gray-600 dark:text-gray-300">
@@ -527,14 +527,14 @@ export default function EditPDF({ onReset }: { onReset: () => void }) {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={downloadEditedFile}
-                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors"
+                    className="inline-flex items-center px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors touch-manipulation min-h-[44px]"
                   >
                     <Download className="h-5 w-5 mr-2" />
                     Download Edited PDF
                   </button>
                   <button
                     onClick={reset}
-                    className="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className="inline-flex items-center px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors touch-manipulation min-h-[44px]"
                   >
                     <RotateCcw className="h-5 w-5 mr-2" />
                     Edit Another PDF

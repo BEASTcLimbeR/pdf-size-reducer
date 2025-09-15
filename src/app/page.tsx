@@ -205,7 +205,7 @@ export default function Home() {
                   
                   {/* Dropdown Menu */}
                   {activeDropdown === category.id && (
-                    <div className={`absolute top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto ${
+                    <div className={`absolute top-full mt-2 w-72 sm:w-80 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
                     }`}>
                       <div className="p-4">
@@ -239,7 +239,7 @@ export default function Home() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="md:hidden p-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px]"
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -247,7 +247,7 @@ export default function Home() {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-4">
+            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-3 sm:py-4">
               <div className="space-y-4">
                 {tools.map((category) => (
                   <div key={category.id}>
@@ -263,7 +263,7 @@ export default function Home() {
                             setActiveTool(tool.id);
                             setMobileMenuOpen(false);
                           }}
-                          className="block w-full text-left p-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                          className="block w-full text-left p-3 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg touch-manipulation min-h-[44px]"
                         >
                           {tool.name}
                         </button>
@@ -282,14 +282,14 @@ export default function Home() {
         {/* Hero Section - Show when no specific tool is selected */}
         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Every tool you need to work with PDFs in one place
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-6 sm:mb-8">
               Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use! 
               Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               <span className="flex items-center">
                 <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
                 100% Free
@@ -326,15 +326,15 @@ export default function Home() {
               </button>
             </div>
             
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {currentTool?.name || 'PDF Tools'}
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
               {currentTool?.description || 'Choose a tool from the menu above to get started'}
             </p>
             
             {/* Quick Stats */}
-            <div className="flex justify-center space-x-8 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               <span className="flex items-center">
                 <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
                 100% Free
@@ -353,14 +353,14 @@ export default function Home() {
 
         {/* Tool Categories - Show when no specific tool is selected */}
         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {/* Organize PDF */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-blue-600" />
                 Organize PDF
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <ToolCard
                   icon={Merge}
                   title="Merge PDF"
@@ -408,11 +408,11 @@ export default function Home() {
 
             {/* Optimize PDF */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-green-600" />
                 Optimize PDF
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <ToolCard
                   icon={Zap}
                   title="Compress PDF"
@@ -439,11 +439,11 @@ export default function Home() {
 
             {/* Convert PDF */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-purple-600" />
                 Convert PDF
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <ToolCard
                   icon={FileText}
                   title="PDF to Word"
@@ -505,11 +505,11 @@ export default function Home() {
 
             {/* Edit PDF */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-orange-600" />
                 Edit PDF
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <ToolCard
                   icon={Edit}
                   title="Edit PDF"
@@ -550,11 +550,11 @@ export default function Home() {
 
             {/* PDF Security */}
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-red-600" />
                 PDF Security
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <ToolCard
                   icon={Unlock}
                   title="Unlock PDF"
