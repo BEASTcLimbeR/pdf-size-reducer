@@ -9,6 +9,8 @@ import SplitPDF from '@/components/SplitPDF';
 import RemovePages from '@/components/RemovePages';
 import ExtractPages from '@/components/ExtractPages';
 import RotatePDF from '@/components/RotatePDF';
+import OrganizePDF from '@/components/OrganizePDF';
+import ScanToPDF from '@/components/ScanToPDF';
 import ToolCard from '@/components/ToolCard';
 
 export default function Home() {
@@ -259,7 +261,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && (
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Every tool you need to work with PDFs in one place
@@ -290,8 +292,21 @@ export default function Home() {
         )}
 
         {/* Tool Header - Show when specific tool is selected */}
-        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf'].includes(activeTool) && (
+        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && (
           <div className="text-center mb-8">
+            {/* Back Button */}
+            <div className="flex justify-start mb-4">
+              <button
+                onClick={() => setActiveTool('home')}
+                className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to All Tools
+              </button>
+            </div>
+            
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {currentTool?.name || 'PDF Tools'}
             </h2>
@@ -318,7 +333,7 @@ export default function Home() {
         )}
 
         {/* Tool Categories - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && (
           <div className="space-y-12">
             {/* Organize PDF */}
             <div>
@@ -359,14 +374,14 @@ export default function Home() {
                   icon={FileText}
                   title="Organize PDF"
                   description="Sort and rearrange pages in your PDF documents however you like."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('organize-pdf')}
                 />
                 <ToolCard
                   icon={Scan}
                   title="Scan to PDF"
                   description="Convert scanned documents and images into searchable PDF files."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('scan-to-pdf')}
                 />
               </div>
@@ -607,8 +622,18 @@ export default function Home() {
           <RotatePDF onReset={() => setActiveTool('compress')} />
         )}
 
+        {/* Organize PDF Tool */}
+        {activeTool === 'organize-pdf' && (
+          <OrganizePDF onReset={() => setActiveTool('compress')} />
+        )}
+
+        {/* Scan to PDF Tool */}
+        {activeTool === 'scan-to-pdf' && (
+          <ScanToPDF onReset={() => setActiveTool('compress')} />
+        )}
+
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
