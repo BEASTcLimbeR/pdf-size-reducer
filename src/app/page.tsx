@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, FileText as WordIcon, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2 } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2 } from 'lucide-react';
 import PDFUploader from '@/components/PDFUploader';
 import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
@@ -11,6 +11,25 @@ import ExtractPages from '@/components/ExtractPages';
 import RotatePDF from '@/components/RotatePDF';
 import OrganizePDF from '@/components/OrganizePDF';
 import ScanToPDF from '@/components/ScanToPDF';
+import RepairPDF from '@/components/RepairPDF';
+import OCRPDF from '@/components/OCRPDF';
+import PDFToWord from '@/components/PDFToWord';
+import PDFToPowerPoint from '@/components/PDFToPowerPoint';
+import PDFToExcel from '@/components/PDFToExcel';
+import PDFToJPG from '@/components/PDFToJPG';
+import WordToPDF from '@/components/WordToPDF';
+import PowerPointToPDF from '@/components/PowerPointToPDF';
+import ExcelToPDF from '@/components/ExcelToPDF';
+import JPGToPDF from '@/components/JPGToPDF';
+import EditPDF from '@/components/EditPDF';
+import AddPageNumbers from '@/components/AddPageNumbers';
+import AddWatermark from '@/components/AddWatermark';
+import CropPDF from '@/components/CropPDF';
+import UnlockPDF from '@/components/UnlockPDF';
+import ProtectPDF from '@/components/ProtectPDF';
+import SignPDF from '@/components/SignPDF';
+import RedactPDF from '@/components/RedactPDF';
+import ComparePDF from '@/components/ComparePDF';
 import ToolCard from '@/components/ToolCard';
 
 export default function Home() {
@@ -104,11 +123,11 @@ export default function Home() {
       icon: RotateCcw,
       color: 'purple',
       tools: [
-        { id: 'pdf-to-word', name: 'PDF to Word', icon: WordIcon, description: 'Convert PDF to editable Word documents' },
+        { id: 'pdf-to-word', name: 'PDF to Word', icon: FileText, description: 'Convert PDF to editable Word documents' },
         { id: 'pdf-to-powerpoint', name: 'PDF to PowerPoint', icon: Presentation, description: 'Convert PDF to PowerPoint presentations' },
         { id: 'pdf-to-excel', name: 'PDF to Excel', icon: FileSpreadsheet, description: 'Convert PDF to Excel spreadsheets' },
         { id: 'pdf-to-jpg', name: 'PDF to JPG', icon: Image, description: 'Convert PDF pages to JPG images' },
-        { id: 'word-to-pdf', name: 'Word to PDF', icon: WordIcon, description: 'Convert Word documents to PDF' },
+        { id: 'word-to-pdf', name: 'Word to PDF', icon: FileText, description: 'Convert Word documents to PDF' },
         { id: 'powerpoint-to-pdf', name: 'PowerPoint to PDF', icon: Presentation, description: 'Convert PowerPoint to PDF' },
         { id: 'excel-to-pdf', name: 'Excel to PDF', icon: FileSpreadsheet, description: 'Convert Excel to PDF' },
         { id: 'jpg-to-pdf', name: 'JPG to PDF', icon: Image, description: 'Convert JPG images to PDF' },
@@ -261,7 +280,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Every tool you need to work with PDFs in one place
@@ -292,7 +311,7 @@ export default function Home() {
         )}
 
         {/* Tool Header - Show when specific tool is selected */}
-        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && (
+        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
           <div className="text-center mb-8">
             {/* Back Button */}
             <div className="flex justify-start mb-4">
@@ -333,7 +352,7 @@ export default function Home() {
         )}
 
         {/* Tool Categories - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
           <div className="space-y-12">
             {/* Organize PDF */}
             <div>
@@ -405,14 +424,14 @@ export default function Home() {
                   icon={Shield}
                   title="Repair PDF"
                   description="Fix damaged PDF files and recover data from corrupt documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('repair-pdf')}
                 />
                 <ToolCard
                   icon={Eye}
                   title="OCR PDF"
                   description="Convert scanned PDFs into searchable and selectable documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('ocr-pdf')}
                 />
               </div>
@@ -426,59 +445,59 @@ export default function Home() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <ToolCard
-                  icon={WordIcon}
+                  icon={FileText}
                   title="PDF to Word"
                   description="Convert PDF files into easy to edit DOC and DOCX documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('pdf-to-word')}
                 />
                 <ToolCard
                   icon={Presentation}
                   title="PDF to PowerPoint"
                   description="Turn PDF files into easy to edit PPT and PPTX slideshows."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('pdf-to-powerpoint')}
                 />
                 <ToolCard
                   icon={FileSpreadsheet}
                   title="PDF to Excel"
                   description="Extract data from PDFs into Excel spreadsheets in seconds."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('pdf-to-excel')}
                 />
                 <ToolCard
                   icon={Image}
                   title="PDF to JPG"
                   description="Convert each PDF page into JPG images or extract all images."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('pdf-to-jpg')}
                 />
                 <ToolCard
-                  icon={WordIcon}
+                  icon={FileText}
                   title="Word to PDF"
                   description="Convert DOC and DOCX files to PDF for easy viewing."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('word-to-pdf')}
                 />
                 <ToolCard
                   icon={Presentation}
                   title="PowerPoint to PDF"
                   description="Convert PPT and PPTX slideshows to PDF format."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('powerpoint-to-pdf')}
                 />
                 <ToolCard
                   icon={FileSpreadsheet}
                   title="Excel to PDF"
                   description="Convert Excel spreadsheets to PDF for easy sharing."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('excel-to-pdf')}
                 />
                 <ToolCard
                   icon={Image}
                   title="JPG to PDF"
                   description="Convert JPG images to PDF in seconds with custom orientation."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('jpg-to-pdf')}
                 />
               </div>
@@ -495,7 +514,7 @@ export default function Home() {
                   icon={Edit}
                   title="Edit PDF"
                   description="Add text, images, shapes or annotations to PDF documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('edit-pdf')}
                 />
                 <ToolCard
@@ -509,21 +528,21 @@ export default function Home() {
                   icon={Hash}
                   title="Add Page Numbers"
                   description="Add page numbers to PDFs with custom positions and styling."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('add-page-numbers')}
                 />
                 <ToolCard
                   icon={Droplets}
                   title="Add Watermark"
                   description="Stamp images or text over your PDF with custom transparency."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('add-watermark')}
                 />
                 <ToolCard
                   icon={Crop}
                   title="Crop PDF"
                   description="Crop margins or select specific areas in your PDF documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('crop-pdf')}
                 />
               </div>
@@ -540,35 +559,35 @@ export default function Home() {
                   icon={Unlock}
                   title="Unlock PDF"
                   description="Remove PDF password security and use your PDFs freely."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('unlock-pdf')}
                 />
                 <ToolCard
                   icon={Lock}
                   title="Protect PDF"
                   description="Protect PDF files with passwords and encrypt documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('protect-pdf')}
                 />
                 <ToolCard
-                  icon={Edit}
+                  icon={FileText}
                   title="Sign PDF"
                   description="Sign yourself or request electronic signatures from others."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('sign-pdf')}
                 />
                 <ToolCard
                   icon={Trash2}
                   title="Redact PDF"
                   description="Permanently remove sensitive information from PDF documents."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('redact-pdf')}
                 />
                 <ToolCard
                   icon={GitCompare}
                   title="Compare PDF"
                   description="Show side-by-side comparison and spot changes between versions."
-                  status="coming-soon"
+                  status="available"
                   onClick={() => setActiveTool('compare-pdf')}
                 />
               </div>
@@ -632,8 +651,103 @@ export default function Home() {
           <ScanToPDF onReset={() => setActiveTool('compress')} />
         )}
 
+        {/* Repair PDF Tool */}
+        {activeTool === 'repair-pdf' && (
+          <RepairPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* OCR PDF Tool */}
+        {activeTool === 'ocr-pdf' && (
+          <OCRPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* PDF to Word Tool */}
+        {activeTool === 'pdf-to-word' && (
+          <PDFToWord onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* PDF to PowerPoint Tool */}
+        {activeTool === 'pdf-to-powerpoint' && (
+          <PDFToPowerPoint onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* PDF to JPG Tool */}
+        {activeTool === 'pdf-to-jpg' && (
+          <PDFToJPG onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* PDF to Excel Tool */}
+        {activeTool === 'pdf-to-excel' && (
+          <PDFToExcel onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Word to PDF Tool */}
+        {activeTool === 'word-to-pdf' && (
+          <WordToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* PowerPoint to PDF Tool */}
+        {activeTool === 'powerpoint-to-pdf' && (
+          <PowerPointToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Excel to PDF Tool */}
+        {activeTool === 'excel-to-pdf' && (
+          <ExcelToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* JPG to PDF Tool */}
+        {activeTool === 'jpg-to-pdf' && (
+          <JPGToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Edit PDF Tool */}
+        {activeTool === 'edit-pdf' && (
+          <EditPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Add Page Numbers Tool */}
+        {activeTool === 'add-page-numbers' && (
+          <AddPageNumbers onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Add Watermark Tool */}
+        {activeTool === 'add-watermark' && (
+          <AddWatermark onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Crop PDF Tool */}
+        {activeTool === 'crop-pdf' && (
+          <CropPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Unlock PDF Tool */}
+        {activeTool === 'unlock-pdf' && (
+          <UnlockPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Protect PDF Tool */}
+        {activeTool === 'protect-pdf' && (
+          <ProtectPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Sign PDF Tool */}
+        {activeTool === 'sign-pdf' && (
+          <SignPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Redact PDF Tool */}
+        {activeTool === 'redact-pdf' && (
+          <RedactPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Compare PDF Tool */}
+        {activeTool === 'compare-pdf' && (
+          <ComparePDF onReset={() => setActiveTool('home')} />
+        )}
+
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock-pdf', 'protect-pdf', 'sign-pdf', 'redact-pdf', 'compare-pdf'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
