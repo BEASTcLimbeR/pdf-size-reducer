@@ -205,12 +205,12 @@ export default function Home() {
                   
                   {/* Dropdown Menu */}
                   {activeDropdown === category.id && (
-                    <div className={`absolute top-full mt-2 w-72 sm:w-80 md:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto ${
+                    <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
-                    }`}>
-                      <div className="p-4">
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{category.name}</h3>
-                        <div className="grid grid-cols-1 gap-2">
+                    }`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">{category.name}</h3>
+                        <div className="grid grid-cols-1 gap-1 sm:gap-2">
                           {category.tools.map((tool) => (
                             <button
                               key={tool.id}
@@ -219,11 +219,11 @@ export default function Home() {
                                 setActiveDropdown(null);
                                 setMobileMenuOpen(false);
                               }}
-                              className="flex items-start p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors w-full"
+                              className="flex items-start p-2 sm:p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors w-full"
                             >
                               <tool.icon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                               <div className="flex-1">
-                                <div className="text-sm font-medium text-gray-900 dark:text-white">{tool.name}</div>
+                                <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{tool.name}</div>
                                 <div className="text-xs text-gray-500 dark:text-gray-400">{tool.description}</div>
                               </div>
                             </button>
