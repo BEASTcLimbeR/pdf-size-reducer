@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PDF Toolkit Pro - All PDF Tools in One Place",
+  title: "DocNestly - All PDF Tools in One Place",
   description: "Complete PDF toolkit with compress, merge, split, convert, edit, and secure PDFs. 100% free, secure, and easy to use. No registration required.",
 };
 

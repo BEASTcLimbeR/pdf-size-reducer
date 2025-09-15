@@ -91,7 +91,7 @@ export default function RepairPDF({ onReset }: { onReset: () => void }) {
         if (!title && !author && !subject && !creator && !producer) {
           issuesFound.push('Missing metadata');
           pdfDoc.setTitle('Repaired PDF');
-          pdfDoc.setCreator('PDF Toolkit Pro');
+          pdfDoc.setCreator('DocNestly');
           issuesFixed.push('Added basic metadata');
         }
       } catch (metadataError) {

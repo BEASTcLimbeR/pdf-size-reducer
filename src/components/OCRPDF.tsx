@@ -99,7 +99,7 @@ export default function OCRPDF({ onReset }: { onReset: () => void }) {
 
       // Add metadata indicating OCR processing
       newPdf.setTitle(`OCR Processed - ${pdfDoc.getTitle() || 'Document'}`);
-      newPdf.setCreator('PDF Toolkit Pro - OCR');
+      newPdf.setCreator('DocNestly - OCR');
       newPdf.setSubject('OCR processed document');
 
       setProcessingProgress(90);
