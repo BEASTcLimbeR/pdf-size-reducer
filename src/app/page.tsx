@@ -247,15 +247,17 @@ export default function Home() {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-3 sm:py-4">
-              <div className="space-y-4">
+            <div className="md:hidden border-t border-gray-200 dark:border-gray-700 py-3 sm:py-4 max-h-[70vh] overflow-y-auto scroll-smooth">
+              {/* Scroll indicator */}
+              <div className="sticky top-0 bg-gradient-to-b from-white dark:from-gray-800 to-transparent h-4 -mt-3 mb-2 pointer-events-none z-10"></div>
+              <div className="space-y-3 sm:space-y-4 -mt-2">
                 {tools.map((category) => (
                   <div key={category.id}>
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
                       <category.icon className="h-4 w-4 mr-2" />
                       {category.name}
                     </h3>
-                    <div className="ml-6 space-y-1">
+                    <div className="ml-4 sm:ml-6 space-y-1">
                       {category.tools.map((tool) => (
                         <button
                           key={tool.id}
@@ -263,7 +265,7 @@ export default function Home() {
                             setActiveTool(tool.id);
                             setMobileMenuOpen(false);
                           }}
-                          className="block w-full text-left p-3 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg touch-manipulation min-h-[44px]"
+                          className="block w-full text-left p-2 sm:p-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg touch-manipulation min-h-[40px]"
                         >
                           {tool.name}
                         </button>
@@ -272,6 +274,8 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+              {/* Bottom scroll indicator */}
+              <div className="sticky bottom-0 bg-gradient-to-t from-white dark:from-gray-800 to-transparent h-4 -mb-3 mt-2 pointer-events-none z-10"></div>
             </div>
           )}
         </div>
