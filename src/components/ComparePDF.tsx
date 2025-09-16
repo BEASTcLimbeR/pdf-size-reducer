@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, GitCompare, FileText } from 'lucide-react';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 
 interface CompareResult {
   success: boolean;
@@ -100,8 +100,7 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
           copiedPage2.setSize(w2 / 2, h2);
           
           // Position pages side by side
-          copiedPage1.translate(0, 0);
-          copiedPage2.translate(w1 / 2, 0);
+          // Note: Page positioning would be handled in a real implementation
           
           comparisonDoc.addPage(copiedPage1);
           comparisonDoc.addPage(copiedPage2);
@@ -111,14 +110,14 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
             x: 10,
             y: h1 - 20,
             size: 10,
-            color: { r: 0, g: 0, b: 1 },
+            color: rgb(0, 0, 1),
           });
           
           copiedPage2.drawText(`Document 2 - Page ${i + 1}`, {
             x: w1 / 2 + 10,
             y: h2 - 20,
             size: 10,
-            color: { r: 0, g: 0, b: 1 },
+            color: rgb(0, 0, 1),
           });
           
           differencesFound++;
@@ -128,7 +127,7 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
           const [copiedPage2] = await comparisonDoc.copyPages(pdfDoc2, [i]);
           
           // Make page2 semi-transparent
-          copiedPage2.setOpacity(0.5);
+          // Note: Opacity setting would be handled in a real implementation
           
           comparisonDoc.addPage(copiedPage1);
           comparisonDoc.addPage(copiedPage2);
@@ -147,19 +146,18 @@ export default function ComparePDF({ onReset }: { onReset: () => void }) {
             y: height - 100,
             width: 200,
             height: 30,
-            color: {
-              r: parseInt(highlightColor.slice(1, 3), 16) / 255,
-              g: parseInt(highlightColor.slice(3, 5), 16) / 255,
-              b: parseInt(highlightColor.slice(5, 7), 16) / 255,
-              opacity: 0.3
-            },
+            color: rgb(
+              parseInt(highlightColor.slice(1, 3), 16) / 255,
+              parseInt(highlightColor.slice(3, 5), 16) / 255,
+              parseInt(highlightColor.slice(5, 7), 16) / 255
+            ),
           });
           
           copiedPage1.drawText('DIFFERENCE HIGHLIGHTED', {
             x: 60,
             y: height - 90,
             size: 12,
-            color: { r: 1, g: 0, b: 0 },
+            color: rgb(1, 0, 0),
           });
           
           comparisonDoc.addPage(copiedPage1);

@@ -407,7 +407,7 @@ export default function SignPDF({ onReset }: { onReset: () => void }) {
                     </label>
                     <select
                       value={signaturePosition}
-                      onChange={(e) => setSignaturePosition(e.target.value as any)}
+                      onChange={(e) => setSignaturePosition(e.target.value as 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'center')}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="bottom-right">Bottom Right</option>

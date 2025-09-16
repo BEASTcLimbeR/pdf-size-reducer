@@ -21,7 +21,7 @@ export default function AddPageNumbers({ onReset }: { onReset: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [position, setPosition] = useState<'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'>('bottom-center');
-  const [format, setFormat] = useState<'1' | '1 of 10' | 'Page 1' | '1 / 10'>('1');
+  const [format, setFormat] = useState<'1' | '1 of 10' | 'Page 1' | 'Page 1 of 10' | '1 / 10'>('1');
   const [fontSize, setFontSize] = useState(12);
   const [fontColor, setFontColor] = useState('#000000');
   const [startPage, setStartPage] = useState(1);
@@ -287,7 +287,7 @@ export default function AddPageNumbers({ onReset }: { onReset: () => void }) {
                 ].map((pos) => (
                   <button
                     key={pos.value}
-                    onClick={() => setPosition(pos.value as any)}
+                    onClick={() => setPosition(pos.value as 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right')}
                     className={`p-3 border-2 rounded-lg text-center transition-colors ${
                       position === pos.value
                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
@@ -308,7 +308,7 @@ export default function AddPageNumbers({ onReset }: { onReset: () => void }) {
                 </label>
                 <select
                   value={format}
-                  onChange={(e) => setFormat(e.target.value as any)}
+                  onChange={(e) => setFormat(e.target.value as '1' | '1 of 10' | 'Page 1' | 'Page 1 of 10' | '1 / 10')}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="1">1</option>

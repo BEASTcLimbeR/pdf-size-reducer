@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2 } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type } from 'lucide-react';
 import PDFUploader from '@/components/PDFUploader';
 import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
@@ -30,6 +30,11 @@ import ProtectPDF from '@/components/ProtectPDF';
 import SignPDF from '@/components/SignPDF';
 import RedactPDF from '@/components/RedactPDF';
 import ComparePDF from '@/components/ComparePDF';
+import HTMLToPDF from '@/components/HTMLToPDF';
+import CSVToPDF from '@/components/CSVToPDF';
+import PNGWebPToPDF from '@/components/PNGWebPToPDF';
+import TXTToPDF from '@/components/TXTToPDF';
+import RTFToPDF from '@/components/RTFToPDF';
 import ToolCard from '@/components/ToolCard';
 
 export default function Home() {
@@ -131,7 +136,11 @@ export default function Home() {
         { id: 'powerpoint-to-pdf', name: 'PowerPoint to PDF', icon: Presentation, description: 'Convert PowerPoint to PDF' },
         { id: 'excel-to-pdf', name: 'Excel to PDF', icon: FileSpreadsheet, description: 'Convert Excel to PDF' },
         { id: 'jpg-to-pdf', name: 'JPG to PDF', icon: Image, description: 'Convert JPG images to PDF' },
-        { id: 'html-to-pdf', name: 'HTML to PDF', icon: FileText, description: 'Convert web pages to PDF' }
+        { id: 'html-to-pdf', name: 'HTML to PDF', icon: Globe, description: 'Convert web pages to PDF' },
+        { id: 'csv-to-pdf', name: 'CSV to PDF', icon: FileSpreadsheet, description: 'Convert CSV files to PDF tables' },
+        { id: 'png-webp-to-pdf', name: 'PNG/WebP to PDF', icon: Image, description: 'Convert PNG/WebP images to PDF' },
+        { id: 'txt-to-pdf', name: 'TXT to PDF', icon: Type, description: 'Convert text files to PDF' },
+        { id: 'rtf-to-pdf', name: 'RTF to PDF', icon: Type, description: 'Convert RTF files to PDF' }
       ]
     },
     {
@@ -284,7 +293,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf'].includes(activeTool) && (
           <div className="text-center mb-12">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Every tool you need to work with PDFs in one place
@@ -356,7 +365,7 @@ export default function Home() {
         )}
 
         {/* Tool Categories - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf'].includes(activeTool) && (
           <div className="space-y-8 sm:space-y-12">
             {/* Organize PDF */}
             <div>
@@ -503,6 +512,41 @@ export default function Home() {
                   description="Convert JPG images to PDF in seconds with custom orientation."
                   status="available"
                   onClick={() => setActiveTool('jpg-to-pdf')}
+                />
+                <ToolCard
+                  icon={Globe}
+                  title="HTML to PDF"
+                  description="Convert HTML content or web pages to PDF documents."
+                  status="available"
+                  onClick={() => setActiveTool('html-to-pdf')}
+                />
+                <ToolCard
+                  icon={FileSpreadsheet}
+                  title="CSV to PDF"
+                  description="Convert CSV files to PDF tables with customizable formatting."
+                  status="available"
+                  onClick={() => setActiveTool('csv-to-pdf')}
+                />
+                <ToolCard
+                  icon={Image}
+                  title="PNG/WebP to PDF"
+                  description="Convert PNG, WebP, and JPEG images to PDF documents."
+                  status="available"
+                  onClick={() => setActiveTool('png-webp-to-pdf')}
+                />
+                <ToolCard
+                  icon={Type}
+                  title="TXT to PDF"
+                  description="Convert plain text files to PDF documents with custom formatting."
+                  status="available"
+                  onClick={() => setActiveTool('txt-to-pdf')}
+                />
+                <ToolCard
+                  icon={Type}
+                  title="RTF to PDF"
+                  description="Convert Rich Text Format files to PDF documents."
+                  status="available"
+                  onClick={() => setActiveTool('rtf-to-pdf')}
                 />
               </div>
             </div>
@@ -750,8 +794,33 @@ export default function Home() {
           <ComparePDF onReset={() => setActiveTool('home')} />
         )}
 
+        {/* HTML to PDF Tool */}
+        {activeTool === 'html-to-pdf' && (
+          <HTMLToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* CSV to PDF Tool */}
+        {activeTool === 'csv-to-pdf' && (
+          <CSVToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* PNG/WebP to PDF Tool */}
+        {activeTool === 'png-webp-to-pdf' && (
+          <PNGWebPToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* TXT to PDF Tool */}
+        {activeTool === 'txt-to-pdf' && (
+          <TXTToPDF onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* RTF to PDF Tool */}
+        {activeTool === 'rtf-to-pdf' && (
+          <RTFToPDF onReset={() => setActiveTool('home')} />
+        )}
+
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock-pdf', 'protect-pdf', 'sign-pdf', 'redact-pdf', 'compare-pdf'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock-pdf', 'protect-pdf', 'sign-pdf', 'redact-pdf', 'compare-pdf'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">

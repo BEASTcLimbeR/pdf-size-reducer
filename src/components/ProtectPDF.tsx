@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, Lock, Eye, EyeOff } from 'lucide-react';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 
 interface ProtectResult {
   success: boolean;
@@ -115,7 +115,7 @@ export default function ProtectPDF({ onReset }: { onReset: () => void }) {
         x: width - 150,
         y: height - 30,
         size: 12,
-        color: { r: 1, g: 0, b: 0 },
+        color: rgb(1, 0, 0),
       });
 
       setProcessProgress(85);

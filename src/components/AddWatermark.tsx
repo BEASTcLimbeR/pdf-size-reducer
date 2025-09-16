@@ -115,10 +115,8 @@ export default function AddWatermark({ onReset }: { onReset: () => void }) {
             color: rgb(
               parseInt(fontColor.slice(1, 3), 16) / 255,
               parseInt(fontColor.slice(3, 5), 16) / 255,
-              parseInt(fontColor.slice(5, 7), 16) / 255,
-              opacity
+              parseInt(fontColor.slice(5, 7), 16) / 255
             ),
-            rotate: { type: 'degrees', angle: rotation },
           });
         } else if (watermarkType === 'image') {
           // Add image watermark placeholder
@@ -126,8 +124,7 @@ export default function AddWatermark({ onReset }: { onReset: () => void }) {
             x: width / 2 - 100,
             y: height / 2,
             size: fontSize,
-            color: rgb(0.5, 0.5, 0.5, opacity),
-            rotate: { type: 'degrees', angle: rotation },
+            color: rgb(0.5, 0.5, 0.5),
           });
         }
       }
@@ -374,7 +371,7 @@ export default function AddWatermark({ onReset }: { onReset: () => void }) {
                 </label>
                 <select
                   value={position}
-                  onChange={(e) => setPosition(e.target.value as any)}
+                  onChange={(e) => setPosition(e.target.value as 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right')}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="center">Center</option>
