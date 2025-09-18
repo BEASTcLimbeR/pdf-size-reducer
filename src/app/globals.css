@@ -66,6 +66,29 @@ body {
   transition-duration: 150ms;
 }
 
+/* Smooth scrolling for the entire page */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Better scrollbar for Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Dark mode scrollbar for Firefox */
+@media (prefers-color-scheme: dark) {
+  * {
+    scrollbar-color: #555 #2d2d2d;
+  }
+}
+
 /* Custom focus styles */
 button:focus-visible,
 input:focus-visible,
@@ -98,4 +121,78 @@ input:focus-visible,
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Hide scrollbar for navigation */
+nav.overflow-x-auto {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+nav.overflow-x-auto::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  /* Ensure touch targets are at least 44px */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improve text readability on small screens */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Better spacing for mobile */
+  .mobile-spacing {
+    padding: 0.75rem;
+  }
+  
+  /* Ensure proper viewport handling */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+}
+
+/* Tablet-specific improvements */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Better spacing for tablet */
+  .tablet-spacing {
+    padding: 1rem;
+  }
+  
+  /* Tablet navigation improvements */
+  nav.overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+  
+  /* Tablet form improvements */
+  .tablet-form {
+    max-width: 100%;
+    padding: 0.75rem;
+  }
+  
+  /* Tablet grid improvements */
+  .tablet-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  /* Better touch targets for tablet */
+  button, [role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  
+  /* Tablet text sizing */
+  .tablet-text {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
 }

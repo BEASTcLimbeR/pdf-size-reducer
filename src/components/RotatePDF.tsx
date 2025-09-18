@@ -123,9 +123,19 @@ export default function RotatePDF({ onReset }: RotatePDFProps) {
         const shouldRotate = rotateAllPages || selectedPages.includes(pageNumber);
         
         if (shouldRotate) {
-          // For now, we'll add a note that rotation is not fully implemented
-          // In a real implementation, you would need to handle the page transformation matrix
-          console.log(`Page ${pageNumber} would be rotated ${rotationAngle} degrees`);
+          // Apply rotation to the page
+          const { width, height } = page.getSize();
+          const radians = (rotationAngle * Math.PI) / 180;
+          
+          // Set the page rotation
+          page.setRotation(radians);
+          
+          // Apply transformation matrix for proper rotation
+          page.pushGraphicsState();
+          page.translateContent(width / 2, height / 2);
+          page.rotateContent(radians);
+          page.translateContent(-width / 2, -height / 2);
+          page.popGraphicsState();
         }
         
         newPdf.addPage(page);
@@ -180,18 +190,6 @@ export default function RotatePDF({ onReset }: RotatePDFProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Back Button */}
-      <div className="mb-6">
-        <button
-          onClick={() => onReset && onReset()}
-          className="flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to All Tools
-        </button>
-      </div>
 
       {/* Upload Section */}
       {!uploadedFile && (
