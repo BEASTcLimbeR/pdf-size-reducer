@@ -46,7 +46,7 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('unavailable');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,8 +54,12 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
   // Check AI backend status on component mount
   useEffect(() => {
     const checkBackend = async () => {
-      const isAvailable = aiBackendService.isBackendAvailable();
-      setBackendStatus(isAvailable ? 'available' : 'unavailable');
+      try {
+        const isAvailable = aiBackendService.isBackendAvailable();
+        setBackendStatus(isAvailable ? 'available' : 'unavailable');
+      } catch (error) {
+        setBackendStatus('unavailable');
+      }
     };
     checkBackend();
   }, []);
@@ -163,14 +167,14 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
         type: 'ai',
         content: `📄 **Document Analysis Complete!**
 
-I've successfully analyzed "${file.name}" (${context.pages} pages, ${context.analysis.wordCount} words).
+I've successfully analyzed "${file.name}" (${context.pages} pages, ${context.analysis.word_count} words).
 
 **Key Topics Identified:**
-${context.analysis.keyTopics.map(topic => `• ${topic}`).join('\n')}
+${context.analysis.key_topics.map(topic => `• ${topic}`).join('\n')}
 
-**Document Type:** ${context.analysis.documentType}
+**Document Type:** ${context.analysis.document_type}
 **Complexity:** ${context.analysis.complexity}
-**Reading Time:** ~${context.analysis.readingTime} minutes
+**Reading Time:** ~${context.analysis.reading_time} minutes
 
 **Quick Summary:**
 ${context.analysis.summary}
@@ -366,7 +370,7 @@ ${context.analysis.summary}
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">{uploadedDoc.file.name}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {uploadedDoc.pages} pages • {uploadedDoc.analysis.wordCount.toLocaleString()} words • {uploadedDoc.analysis.documentType}
+                    {uploadedDoc.pages} pages • {uploadedDoc.analysis.word_count.toLocaleString()} words • {uploadedDoc.analysis.document_type}
                   </p>
                 </div>
               </div>
