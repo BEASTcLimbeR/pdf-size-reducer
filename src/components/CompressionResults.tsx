@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FileText, Download, RotateCcw, Loader2, AlertCircle, Settings } from 'lucide-react';
 import { compressPDF, advancedCompressPDF, simpleCompressPDF, formatFileSize, validatePDFFile, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
+import { webhookService } from '@/utils/webhookService';
 import CompressionMeter from './CompressionMeter';
 
 interface CompressionResultsProps {
@@ -47,6 +48,7 @@ export default function CompressionResults({
 
   // Compress PDF function using the utility with fallback
   const handleCompressPDF = useCallback(async () => {
+    const compressionStartTime = Date.now();
     try {
       setIsCompressing(true);
       setCompressionProgress(0);

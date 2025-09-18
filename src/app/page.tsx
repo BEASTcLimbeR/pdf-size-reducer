@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles } from 'lucide-react';
 import PDFUploader from '@/components/PDFUploader';
 import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
@@ -37,6 +37,10 @@ import TXTToPDF from '@/components/TXTToPDF';
 import RTFToPDF from '@/components/RTFToPDF';
 import BatchProcessing from '@/components/BatchProcessing';
 import PDFForms from '@/components/PDFForms';
+import WebhookSettings from '@/components/WebhookSettings';
+import AIDocumentChat from '@/components/AIDocumentChat';
+import SmartDocumentRelationships from '@/components/SmartDocumentRelationships';
+import PredictiveProcessing from '@/components/PredictiveProcessing';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToolCard from '@/components/ToolCard';
 
@@ -101,17 +105,8 @@ export default function Home() {
 
   const tools = [
     {
-      id: 'batch',
-      name: 'Batch Process',
-      icon: Archive,
-      color: 'purple',
-      tools: [
-        { id: 'batch-processing', name: 'Batch Process PDFs', icon: Archive, description: 'Process multiple PDFs at once' }
-      ]
-    },
-    {
       id: 'organize',
-      name: 'Organize PDF',
+      name: 'Organize',
       icon: FileText,
       color: 'blue',
       tools: [
@@ -120,12 +115,13 @@ export default function Home() {
         { id: 'remove-pages', name: 'Remove Pages', icon: Trash2, description: 'Delete unwanted pages from PDF' },
         { id: 'extract-pages', name: 'Extract Pages', icon: Download, description: 'Extract specific pages from PDF' },
         { id: 'organize', name: 'Organize PDF', icon: FileText, description: 'Sort and arrange PDF pages' },
-        { id: 'scan', name: 'Scan to PDF', icon: Scan, description: 'Convert scans to PDF documents' }
+        { id: 'scan', name: 'Scan to PDF', icon: Scan, description: 'Convert scans to PDF documents' },
+        { id: 'batch-processing', name: 'Batch Process PDFs', icon: Archive, description: 'Process multiple PDFs at once' }
       ]
     },
     {
       id: 'optimize',
-      name: 'Optimize PDF',
+      name: 'Optimize',
       icon: Zap,
       color: 'green',
       tools: [
@@ -136,7 +132,7 @@ export default function Home() {
     },
     {
       id: 'convert',
-      name: 'Convert PDF',
+      name: 'Convert',
       icon: RotateCcw,
       color: 'purple',
       tools: [
@@ -157,7 +153,7 @@ export default function Home() {
     },
     {
       id: 'edit',
-      name: 'Edit PDF',
+      name: 'Edit',
       icon: Edit,
       color: 'orange',
       tools: [
@@ -165,21 +161,13 @@ export default function Home() {
         { id: 'watermark', name: 'Add Watermark', icon: Droplets, description: 'Add text or image watermarks' },
         { id: 'crop', name: 'Crop PDF', icon: Crop, description: 'Crop margins or specific areas' },
         { id: 'page-numbers', name: 'Add Page Numbers', icon: Hash, description: 'Add page numbers to PDF' },
-        { id: 'edit-pdf', name: 'Edit PDF', icon: Edit, description: 'Add text, images, and annotations' }
-      ]
-    },
-    {
-      id: 'forms',
-      name: 'PDF Forms',
-      icon: FileText,
-      color: 'indigo',
-      tools: [
+        { id: 'edit-pdf', name: 'Edit PDF', icon: Edit, description: 'Add text, images, and annotations' },
         { id: 'pdf-forms', name: 'Create & Edit Forms', icon: FileText, description: 'Create fillable forms and edit existing ones' }
       ]
     },
     {
       id: 'security',
-      name: 'PDF Security',
+      name: 'Security',
       icon: Shield,
       color: 'red',
       tools: [
@@ -188,6 +176,18 @@ export default function Home() {
         { id: 'sign', name: 'Sign PDF', icon: FileText, description: 'Add digital signatures' },
         { id: 'redact', name: 'Redact PDF', icon: Trash2, description: 'Permanently remove sensitive information' },
         { id: 'compare', name: 'Compare PDF', icon: GitCompare, description: 'Compare different PDF versions' }
+      ]
+    },
+    {
+      id: 'ai_tools',
+      name: 'AI Tools',
+      icon: Brain,
+      color: 'purple',
+      tools: [
+        { id: 'ai-chat', name: 'AI Document Chat', icon: Brain, description: 'Chat with your PDFs - ask questions about content, get summaries' },
+        { id: 'smart-relationships', name: 'Smart Document Relationships', icon: Network, description: 'AI detects related documents and suggests connections' },
+        { id: 'predictive-processing', name: 'Predictive Processing', icon: Sparkles, description: 'AI learns your patterns and suggests operations' },
+        { id: 'webhooks', name: 'Webhook Notifications', icon: Zap, description: 'Get real-time notifications when operations complete' }
       ]
     }
   ];
@@ -207,45 +207,45 @@ export default function Home() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-4 xl:px-8">
           <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-4">
             <button 
               onClick={() => setActiveTool('home')}
-              className="flex items-center space-x-1 sm:space-x-2 hover:opacity-80 transition-opacity flex-shrink-0"
+              className="flex items-center space-x-1 sm:space-x-2 hover:opacity-80 transition-opacity flex-shrink-0 xl:mr-8"
             >
               <div className="bg-blue-600 p-1 sm:p-1.5 rounded-lg">
-                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 lg:h-4 lg:w-4 xl:h-5 xl:w-5 text-white" />
               </div>
               <div className="text-left">
-                <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold">
+                <h1 className="text-base sm:text-lg md:text-xl lg:text-lg xl:text-2xl font-bold">
                   <span className="text-blue-800 dark:text-blue-600">Doc</span>
                   <span className="text-green-500 dark:text-green-400">Nestly</span>
                 </h1>
-                <p className="text-xs sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 font-medium italic -mt-1 hidden sm:block">
+                <p className="text-xs sm:text-xs md:text-sm lg:text-xs xl:text-sm text-gray-500 dark:text-gray-400 font-medium italic -mt-1">
                   Where documents find their flow.
                 </p>
               </div>
             </button>
             
             {/* Desktop Navigation */}
-            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto">
+            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 xl:space-x-0.5 flex-shrink-0 overflow-x-auto max-w-none">
               {tools.map((category, index) => (
                 <div key={category.id} className="relative flex-shrink-0">
                   <button 
                     onClick={() => setActiveDropdown(activeDropdown === category.id ? null : category.id)}
-                    className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-w-0 ${
+                    className={`flex items-center px-0.5 lg:px-2 xl:px-3 py-1.5 lg:py-2 text-xs lg:text-sm xl:text-sm font-normal lg:font-medium xl:font-medium rounded transition-colors whitespace-nowrap min-w-0 ${
                       activeDropdown === category.id
                         ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
                         : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <category.icon className="h-4 w-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">{category.name}</span>
+                    <category.icon className="h-3 w-3 lg:h-4 lg:w-4 xl:h-4 xl:w-4 mr-0.5 lg:mr-1 xl:mr-1 flex-shrink-0" />
+                    <span className="truncate text-xs lg:text-sm xl:text-sm font-normal lg:font-medium xl:font-medium">{category.name}</span>
                   </button>
                   
                   {/* Dropdown Menu */}
                   {activeDropdown === category.id && (
-                    <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-[32rem] overflow-y-auto ${
+                    <div className={`absolute top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-[9999] max-h-96 overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
                     }`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
                       <div className="p-3 sm:p-4">
@@ -276,39 +276,24 @@ export default function Home() {
               ))}
             </nav>
 
-            {/* Tablet Navigation */}
-            <nav className="hidden md:flex lg:hidden space-x-1 flex-shrink-0 overflow-x-auto max-w-[calc(100vw-200px)]">
-              {tools.slice(0, 5).map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveTool(category.tools[0].id)}
-                  className="flex items-center px-2 py-2 text-xs font-medium rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 whitespace-nowrap flex-shrink-0 min-w-0"
-                >
-                  <category.icon className="h-3 w-3 mr-1 flex-shrink-0" />
-                  <span className="truncate">{category.name.split(' ')[0]}</span>
-                </button>
-              ))}
-              {tools.length > 5 && (
-                <button
-                  onClick={() => setMobileMenuOpen(true)}
-                  className="flex items-center px-2 py-2 text-xs font-medium rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 whitespace-nowrap flex-shrink-0"
-                >
-                  <Menu className="h-3 w-3 mr-1" />
-                  <span>More</span>
-                </button>
-              )}
-            </nav>
+            {/* Tablet Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="hidden md:flex lg:hidden items-center p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0"
+              className="md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
 
-          {/* Mobile Navigation */}
+          {/* Mobile & Tablet Navigation */}
           {mobileMenuOpen && (
             <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-2 max-h-[80vh] overflow-y-auto scroll-smooth">
               <div className="space-y-2 px-2">
@@ -373,7 +358,7 @@ export default function Home() {
         )}
 
         {/* Tool Header - Show when specific tool is selected */}
-        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf'].includes(activeTool) && (
+        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing'].includes(activeTool) && (
           <div className="text-center mb-8">
             {/* Back Button */}
             <div className="flex justify-start mb-4">
@@ -414,30 +399,13 @@ export default function Home() {
         )}
 
         {/* Tool Categories - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing'].includes(activeTool) && (
           <div className="space-y-8 sm:space-y-12">
-            {/* Batch Process */}
+            {/* Organize */}
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
-                <Archive className="h-6 w-6 mr-2 text-purple-600" />
-                Batch Process
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
-                <ToolCard
-                  icon={Archive}
-                  title="Batch Process PDFs"
-                  description="Process multiple PDFs at once with compression, conversion, watermarking, and more."
-                  status="available"
-                  onClick={() => setActiveTool('batch-processing')}
-                />
-              </div>
-            </div>
-
-            {/* Organize PDF */}
-            <div>
-              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
-                <FileStack className="h-6 w-6 mr-2 text-blue-600" />
-                Organize PDF
+                <FileText className="h-6 w-6 mr-2 text-blue-600" />
+                Organize
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
@@ -482,14 +450,21 @@ export default function Home() {
                   status="available"
                   onClick={() => setActiveTool('scan-to-pdf')}
                 />
+                <ToolCard
+                  icon={Archive}
+                  title="Batch Process PDFs"
+                  description="Process multiple PDFs at once with compression, conversion, watermarking, and more."
+                  status="available"
+                  onClick={() => setActiveTool('batch-processing')}
+                />
               </div>
             </div>
 
-            {/* Optimize PDF */}
+            {/* Optimize */}
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-green-600" />
-                Optimize PDF
+                Optimize
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
@@ -516,11 +491,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Convert PDF */}
+            {/* Convert */}
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
-                <Zap className="h-6 w-6 mr-2 text-purple-600" />
-                Convert PDF
+                <RotateCcw className="h-6 w-6 mr-2 text-purple-600" />
+                Convert
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
@@ -617,11 +592,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Edit PDF */}
+            {/* Edit */}
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
-                <Zap className="h-6 w-6 mr-2 text-orange-600" />
-                Edit PDF
+                <Edit className="h-6 w-6 mr-2 text-orange-600" />
+                Edit
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
@@ -659,16 +634,6 @@ export default function Home() {
                   status="available"
                   onClick={() => setActiveTool('crop-pdf')}
                 />
-              </div>
-            </div>
-
-            {/* PDF Forms */}
-            <div>
-              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
-                <FileText className="h-6 w-6 mr-2 text-indigo-600" />
-                PDF Forms
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={FileText}
                   title="Create & Edit Forms"
@@ -679,11 +644,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* PDF Security */}
+            {/* Security */}
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
-                <Zap className="h-6 w-6 mr-2 text-red-600" />
-                PDF Security
+                <Shield className="h-6 w-6 mr-2 text-red-600" />
+                Security
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
@@ -720,6 +685,47 @@ export default function Home() {
                   description="Show side-by-side comparison and spot changes between versions."
                   status="available"
                   onClick={() => setActiveTool('compare')}
+                />
+              </div>
+            </div>
+
+            {/* AI Tools */}
+            <div>
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+                <Brain className="h-6 w-6 mr-2 text-purple-600" />
+                AI Tools
+                <span className="ml-3 px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full animate-pulse">
+                  NEW
+                </span>
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
+                <ToolCard
+                  icon={Brain}
+                  title="AI Document Chat"
+                  description="Chat with your PDFs - ask questions about content, get summaries, find specific information."
+                  status="available"
+                  onClick={() => setActiveTool('ai-chat')}
+                />
+                <ToolCard
+                  icon={Network}
+                  title="Smart Document Relationships"
+                  description="AI automatically detects related documents and suggests smart connections and merging opportunities."
+                  status="available"
+                  onClick={() => setActiveTool('smart-relationships')}
+                />
+                <ToolCard
+                  icon={Sparkles}
+                  title="Predictive Processing"
+                  description="AI learns your patterns and suggests operations before you even think of them."
+                  status="available"
+                  onClick={() => setActiveTool('predictive-processing')}
+                />
+                <ToolCard
+                  icon={Zap}
+                  title="Webhook Notifications"
+                  description="Get real-time notifications when your PDF operations complete."
+                  status="available"
+                  onClick={() => setActiveTool('webhooks')}
                 />
               </div>
             </div>
@@ -912,8 +918,28 @@ export default function Home() {
           <PDFForms onReset={() => setActiveTool('home')} />
         )}
 
+        {/* Webhook Settings */}
+        {activeTool === 'webhooks' && (
+          <WebhookSettings onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* AI Document Chat */}
+        {activeTool === 'ai-chat' && (
+          <AIDocumentChat onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Smart Document Relationships */}
+        {activeTool === 'smart-relationships' && (
+          <SmartDocumentRelationships onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Predictive Processing */}
+        {activeTool === 'predictive-processing' && (
+          <PredictiveProcessing onReset={() => setActiveTool('home')} />
+        )}
+
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
