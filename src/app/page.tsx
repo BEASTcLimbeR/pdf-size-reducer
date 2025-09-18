@@ -39,6 +39,7 @@ import BatchProcessing from '@/components/BatchProcessing';
 import PDFForms from '@/components/PDFForms';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToolCard from '@/components/ToolCard';
+import DropdownTest from '@/components/DropdownTest';
 
 export default function Home() {
   const [activeTool, setActiveTool] = useState('home');
@@ -220,10 +221,10 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 overflow-visible">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative">
           <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-4">
             <button 
               onClick={() => setActiveTool('home')}
@@ -244,7 +245,7 @@ export default function Home() {
             </button>
             
             {/* Desktop Navigation */}
-            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto relative">
+            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto overflow-y-visible relative">
               {tools.map((category, index) => (
                 <div key={category.id} className="relative flex-shrink-0">
                   <button 
@@ -266,7 +267,7 @@ export default function Home() {
                   {activeDropdown === category.id && (
                     <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border-2 border-red-500 dark:border-red-400 z-[9999] max-h-[32rem] overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
-                    }`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+                    }`} style={{ maxWidth: 'calc(100vw - 2rem)', position: 'absolute', top: '100%', left: index >= tools.length - 2 ? 'auto' : '0', right: index >= tools.length - 2 ? '0' : 'auto' }}>
                       <div className="p-3 sm:p-4">
                         <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">{category.name}</h3>
                         <div className="grid grid-cols-1 gap-1 sm:gap-2">
@@ -387,6 +388,11 @@ export default function Home() {
                 <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                 Secure & Private
               </div>
+            </div>
+            
+            {/* Test Dropdown */}
+            <div className="mt-8">
+              <DropdownTest />
             </div>
           </div>
         )}
