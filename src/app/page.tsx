@@ -63,11 +63,27 @@ export default function Home() {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveDropdown(null);
+      }
+    };
+
+    if (activeDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
-  }, []);
+  }, [activeDropdown]);
+
+  // Debug dropdown state
+  useEffect(() => {
+    console.log('Active dropdown changed to:', activeDropdown);
+  }, [activeDropdown]);
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
@@ -206,7 +222,7 @@ export default function Home() {
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-4">
             <button 
@@ -228,11 +244,14 @@ export default function Home() {
             </button>
             
             {/* Desktop Navigation */}
-            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto">
+            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto relative">
               {tools.map((category, index) => (
                 <div key={category.id} className="relative flex-shrink-0">
                   <button 
-                    onClick={() => setActiveDropdown(activeDropdown === category.id ? null : category.id)}
+                    onClick={() => {
+                      console.log('Dropdown clicked:', category.id, 'Current active:', activeDropdown);
+                      setActiveDropdown(activeDropdown === category.id ? null : category.id);
+                    }}
                     className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-w-0 ${
                       activeDropdown === category.id
                         ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -245,7 +264,7 @@ export default function Home() {
                   
                   {/* Dropdown Menu */}
                   {activeDropdown === category.id && (
-                    <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-[32rem] overflow-y-auto ${
+                    <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border-2 border-red-500 dark:border-red-400 z-[9999] max-h-[32rem] overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
                     }`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
                       <div className="p-3 sm:p-4">
