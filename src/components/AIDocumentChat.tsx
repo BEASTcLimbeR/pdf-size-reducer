@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, Upload, FileText, Brain, Sparkles, Download, Search, BookOpen, Zap, User, Bot, Loader2, Trash2, Copy, ThumbsUp, ThumbsDown, Wifi, WifiOff } from 'lucide-react';
-import { CustomAI, analyzeDocument as analyzeDocumentFile } from '@/utils/customAI_clean';
+import { AccurateAI, analyzeDocument as analyzeDocumentFile } from '@/utils/accurateAI';
 import { chatGPT5AI } from '@/utils/chatgpt5AI';
 
 interface ChatMessage {
@@ -22,6 +22,7 @@ interface DocumentContext {
   content: string;
   pages: number;
   documentId: string;
+  realContent?: any; // Store real PDF content for accurate responses
   analysis: {
     document_type: string;
     key_topics: string[];
@@ -87,8 +88,17 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
       // Step 1: Upload to AI backend
       setAnalysisProgress(25);
       
-      // Step 2: Accurate AI processing
+      // Step 2: REAL PDF content extraction
       setAnalysisProgress(50);
+      let realContent = null;
+      try {
+        const { SimplePDFReader } = await import('@/utils/simplePDFReader');
+        realContent = await SimplePDFReader.analyzePDF(file);
+        console.log('✅ Real PDF content extracted successfully');
+      } catch (extractionError) {
+        console.log('⚠️ Real extraction failed, using analysis fallback');
+      }
+      
       const analysis = await analyzeDocumentFile(file);
       
       // Step 3: Process results
@@ -97,9 +107,10 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
 
       const documentContext: DocumentContext = {
         file,
-        content: `Advanced AI analysis of ${file.name}`,
-        pages: analysis.word_count > 0 ? Math.max(1, Math.ceil(analysis.word_count / 300)) : Math.max(1, Math.floor(file.size / 50000)),
+        content: realContent ? `Real content extracted from ${file.name}` : `Advanced AI analysis of ${file.name}`,
+        pages: realContent ? realContent.pages : (analysis.word_count > 0 ? Math.max(1, Math.ceil(analysis.word_count / 300)) : Math.max(1, Math.floor(file.size / 50000))),
         documentId: `doc_${Date.now()}`,
+        realContent: realContent, // Store real content for accurate responses
         analysis: {
           document_type: analysis.document_type,
           key_topics: analysis.key_topics,
@@ -124,8 +135,8 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
   // Advanced AI chat response using real AI logic
   const generateAIResponse = async (question: string, context: DocumentContext): Promise<ChatMessage> => {
     try {
-      // Use ChatGPT-5 level AI for advanced responses
-      const result = await CustomAI.generateCustomResponse(question, context.analysis);
+      // Use Accurate AI with REAL content for precise responses
+      const result = await AccurateAI.generateAccurateResponse(question, context.analysis, context.realContent);
       
       // Add ChatGPT-5 level enhancements
       const enhancedResponse = `${result.response}
