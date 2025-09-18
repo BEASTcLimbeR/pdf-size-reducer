@@ -39,7 +39,6 @@ import BatchProcessing from '@/components/BatchProcessing';
 import PDFForms from '@/components/PDFForms';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToolCard from '@/components/ToolCard';
-import DropdownTest from '@/components/DropdownTest';
 
 export default function Home() {
   const [activeTool, setActiveTool] = useState('home');
@@ -64,27 +63,11 @@ export default function Home() {
       }
     };
 
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setActiveDropdown(null);
-      }
-    };
-
-    if (activeDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
-    }
-
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
     };
-  }, [activeDropdown]);
-
-  // Debug dropdown state
-  useEffect(() => {
-    console.log('Active dropdown changed to:', activeDropdown);
-  }, [activeDropdown]);
+  }, []);
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
@@ -223,18 +206,18 @@ export default function Home() {
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 overflow-visible">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative">
+      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
           <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-4">
             <button 
               onClick={() => setActiveTool('home')}
-              className="flex items-center space-x-2 hover:opacity-80 transition-opacity flex-shrink-0"
+              className="flex items-center space-x-1 sm:space-x-2 hover:opacity-80 transition-opacity flex-shrink-0"
             >
-              <div className="bg-blue-600 p-1.5 rounded-lg">
-                <FileText className="h-5 w-5 text-white" />
+              <div className="bg-blue-600 p-1 sm:p-1.5 rounded-lg">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div className="text-left">
-                <h1 className="text-lg sm:text-xl md:text-xl lg:text-2xl font-bold">
+                <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold">
                   <span className="text-blue-800 dark:text-blue-600">Doc</span>
                   <span className="text-green-500 dark:text-green-400">Nestly</span>
                 </h1>
@@ -245,14 +228,11 @@ export default function Home() {
             </button>
             
             {/* Desktop Navigation */}
-            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto overflow-y-visible relative">
+            <nav ref={dropdownRef} className="hidden lg:flex space-x-1 flex-shrink-0 overflow-x-auto">
               {tools.map((category, index) => (
                 <div key={category.id} className="relative flex-shrink-0">
                   <button 
-                    onClick={() => {
-                      console.log('Dropdown clicked:', category.id, 'Current active:', activeDropdown);
-                      setActiveDropdown(activeDropdown === category.id ? null : category.id);
-                    }}
+                    onClick={() => setActiveDropdown(activeDropdown === category.id ? null : category.id)}
                     className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap min-w-0 ${
                       activeDropdown === category.id
                         ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -265,9 +245,9 @@ export default function Home() {
                   
                   {/* Dropdown Menu */}
                   {activeDropdown === category.id && (
-                    <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border-2 border-red-500 dark:border-red-400 z-[9999] max-h-[32rem] overflow-y-auto ${
+                    <div className={`absolute top-full mt-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-[32rem] overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
-                    }`} style={{ maxWidth: 'calc(100vw - 2rem)', position: 'absolute', top: '100%', left: index >= tools.length - 2 ? 'auto' : '0', right: index >= tools.length - 2 ? '0' : 'auto' }}>
+                    }`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
                       <div className="p-3 sm:p-4">
                         <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">{category.name}</h3>
                         <div className="grid grid-cols-1 gap-1 sm:gap-2">
@@ -328,13 +308,13 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Mobile/Tablet Navigation */}
+          {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-3 max-h-[80vh] overflow-y-auto scroll-smooth">
-              <div className="space-y-3 px-3">
+            <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-2 max-h-[80vh] overflow-y-auto scroll-smooth">
+              <div className="space-y-2 px-2">
                 {tools.map((category) => (
                   <div key={category.id}>
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 flex items-center px-2">
                       <category.icon className="h-4 w-4 mr-2" />
                       {category.name}
                     </h3>
@@ -365,34 +345,29 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-8">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8 lg:py-8">
         {/* Hero Section - Show when no specific tool is selected */}
         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
-          <div className="text-center mb-6 sm:mb-8 lg:mb-12 px-2 sm:px-4">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 leading-tight">
+          <div className="text-center mb-4 sm:mb-8 lg:mb-12 px-1 sm:px-4">
+            <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 leading-tight">
               Work with PDFs the way they were meant to be — fast, secure, and effortless.
             </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-4 sm:mb-6 lg:mb-8 leading-relaxed px-2">
+            <p className="text-xs sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-3 sm:mb-6 lg:mb-8 leading-relaxed px-1">
               From batch processing to advanced protection, DocNestly delivers enterprise-level solutions that keep your workflow moving smoothly. All in your browser. No uploads, no registrations. Just powerful tools, always in flow.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 lg:gap-6 text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400">
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
                 100% Free
               </div>
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
                 No Registration Required
               </div>
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
                 Secure & Private
               </div>
-            </div>
-            
-            {/* Test Dropdown */}
-            <div className="mt-8">
-              <DropdownTest />
             </div>
           </div>
         )}
@@ -443,7 +418,7 @@ export default function Home() {
           <div className="space-y-8 sm:space-y-12">
             {/* Batch Process */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Archive className="h-6 w-6 mr-2 text-purple-600" />
                 Batch Process
               </h2>
@@ -460,7 +435,7 @@ export default function Home() {
 
             {/* Organize PDF */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <FileStack className="h-6 w-6 mr-2 text-blue-600" />
                 Organize PDF
               </h2>
@@ -512,7 +487,7 @@ export default function Home() {
 
             {/* Optimize PDF */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-green-600" />
                 Optimize PDF
               </h2>
@@ -543,7 +518,7 @@ export default function Home() {
 
             {/* Convert PDF */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-purple-600" />
                 Convert PDF
               </h2>
@@ -644,7 +619,7 @@ export default function Home() {
 
             {/* Edit PDF */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-orange-600" />
                 Edit PDF
               </h2>
@@ -689,7 +664,7 @@ export default function Home() {
 
             {/* PDF Forms */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <FileText className="h-6 w-6 mr-2 text-indigo-600" />
                 PDF Forms
               </h2>
@@ -706,7 +681,7 @@ export default function Home() {
 
             {/* PDF Security */}
             <div>
-              <h2 className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
+              <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-red-600" />
                 PDF Security
               </h2>

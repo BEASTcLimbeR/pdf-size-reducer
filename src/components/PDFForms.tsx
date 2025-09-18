@@ -323,41 +323,41 @@ export default function PDFForms({ onReset }: PDFFormsProps) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-2 sm:px-4 md:px-6">
+    <div className="max-w-6xl mx-auto px-1 sm:px-4 md:px-6">
       {/* Mode Selection */}
       <div className="mb-8">
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center">
           <button
             onClick={() => setMode('create')}
-            className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-xs sm:text-base ${
               mode === 'create'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2 inline" />
+            <Plus className="h-3 w-3 sm:h-5 sm:w-5 mr-1 sm:mr-2 inline" />
             Create Forms
           </button>
           <button
             onClick={() => setMode('edit')}
-            className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-xs sm:text-base ${
               mode === 'edit'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <Edit className="h-4 w-4 sm:h-5 sm:w-5 mr-2 inline" />
+            <Edit className="h-3 w-3 sm:h-5 sm:w-5 mr-1 sm:mr-2 inline" />
             Edit Forms
           </button>
           <button
             onClick={() => setMode('fill')}
-            className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+            className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors text-xs sm:text-base ${
               mode === 'fill'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
           >
-            <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2 inline" />
+            <FileText className="h-3 w-3 sm:h-5 sm:w-5 mr-1 sm:mr-2 inline" />
             Fill Forms
           </button>
         </div>
