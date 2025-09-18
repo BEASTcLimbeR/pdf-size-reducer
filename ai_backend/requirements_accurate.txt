@@ -1,0 +1,11 @@
+# Ultra-Accurate PDF Analysis Requirements
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
+python-multipart>=0.0.6
+
+# PyMuPDF for ultra-accurate PDF analysis
+PyMuPDF>=1.23.0
+
+# Additional utilities
+python-dotenv>=1.0.0
+requests>=2.31.0

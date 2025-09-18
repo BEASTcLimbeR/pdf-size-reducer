@@ -41,6 +41,7 @@ import WebhookSettings from '@/components/WebhookSettings';
 import AIDocumentChat from '@/components/AIDocumentChat';
 import SmartDocumentRelationships from '@/components/SmartDocumentRelationships';
 import PredictiveProcessing from '@/components/PredictiveProcessing';
+import AdvancedSecurity from '@/components/AdvancedSecurity';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToolCard from '@/components/ToolCard';
 
@@ -175,7 +176,8 @@ export default function Home() {
         { id: 'unlock', name: 'Unlock PDF', icon: Unlock, description: 'Remove password protection' },
         { id: 'sign', name: 'Sign PDF', icon: FileText, description: 'Add digital signatures' },
         { id: 'redact', name: 'Redact PDF', icon: Trash2, description: 'Permanently remove sensitive information' },
-        { id: 'compare', name: 'Compare PDF', icon: GitCompare, description: 'Compare different PDF versions' }
+        { id: 'compare', name: 'Compare PDF', icon: GitCompare, description: 'Compare different PDF versions' },
+        { id: 'advanced-security', name: 'Advanced Security', icon: Shield, description: 'Blockchain verification, military encryption, and audit trails' }
       ]
     },
     {
@@ -358,7 +360,7 @@ export default function Home() {
         )}
 
         {/* Tool Header - Show when specific tool is selected */}
-        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing'].includes(activeTool) && (
+        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && (
           <div className="text-center mb-8">
             {/* Back Button */}
             <div className="flex justify-start mb-4">
@@ -399,7 +401,7 @@ export default function Home() {
         )}
 
         {/* Tool Categories - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && (
           <div className="space-y-8 sm:space-y-12">
             {/* Organize */}
             <div>
@@ -686,6 +688,13 @@ export default function Home() {
                   status="available"
                   onClick={() => setActiveTool('compare')}
                 />
+                <ToolCard
+                  icon={Shield}
+                  title="Advanced Security"
+                  description="Blockchain verification, military-grade encryption, and comprehensive audit trails."
+                  status="available"
+                  onClick={() => setActiveTool('advanced-security')}
+                />
               </div>
             </div>
 
@@ -938,8 +947,13 @@ export default function Home() {
           <PredictiveProcessing onReset={() => setActiveTool('home')} />
         )}
 
+        {/* Advanced Security */}
+        {activeTool === 'advanced-security' && (
+          <AdvancedSecurity onReset={() => setActiveTool('home')} />
+        )}
+
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">

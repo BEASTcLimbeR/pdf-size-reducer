@@ -333,8 +333,9 @@ document_store: Dict[str, Dict[str, Any]] = {}
 async def startup_event():
     """Load AI models on startup"""
     try:
+        print("🤖 Loading AI models... This may take a few minutes.")
         await ai_models.load_models()
-        print("🚀 AI Backend ready!")
+        print("🚀 AI Backend ready with real ChatGPT-like intelligence!")
     except Exception as e:
         print(f"⚠️ AI models failed to load: {e}")
         print("📝 Continuing with fallback analysis...")
@@ -537,4 +538,9 @@ if __name__ == "__main__":
     import uvicorn
     print("🚀 Starting DocNestly AI Backend...")
     print("📖 This will provide real ChatGPT-like intelligence using FREE models!")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    print("🌐 Server will be available at: http://localhost:8000")
+    print("📚 API docs will be at: http://localhost:8000/docs")
+    print("🤖 Loading AI models... This may take 2-3 minutes on first startup.")
+    print("=" * 60)
+    
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
