@@ -1,4 +1,5 @@
 // Simple PDF Reader - Browser-only, no external dependencies
+import { LanguageDetector, LanguageInfo } from './languageDetector';
 
 export interface SimplePDFAnalysis {
   pages: number;
@@ -11,6 +12,9 @@ export interface SimplePDFAnalysis {
     amounts: string[];
     names: string[];
   };
+  topics?: string[];
+  documentType?: string;
+  languageInfo?: LanguageInfo;
   confidence: number;
 }
 
@@ -52,11 +56,30 @@ export class SimplePDFReader {
       console.log(`✅ PDF analysis complete: ${pageCount} pages, ${wordCount} words`);
       console.log(`📊 Found: ${entities.dates.length} dates, ${entities.emails.length} emails, ${entities.amounts.length} amounts`);
       
+      // Detect language and generate localized content
+      const languageInfo = LanguageDetector.detectLanguage(extractedText);
+      console.log(`🌍 Detected language: ${languageInfo.name} (${languageInfo.nativeName}) - Confidence: ${(languageInfo.confidence * 100).toFixed(1)}%`);
+      
+      // Generate topics from content
+      const topics = this.extractTopicsFromText(extractedText, this.detectDocumentTypeFromFilename(file.name));
+      
+      // Generate localized content
+      const localizedContent = LanguageDetector.generateLocalizedContent(
+        extractedText,
+        this.detectDocumentTypeFromFilename(file.name),
+        entities,
+        topics,
+        languageInfo
+      );
+      
       return {
         pages: pageCount,
         estimatedWordCount: wordCount,
-        extractedText: extractedText.substring(0, 2000), // First 2000 chars for analysis
-        entities,
+        extractedText: localizedContent.summary,
+        entities: localizedContent.entities,
+        topics: localizedContent.topics,
+        documentType: localizedContent.documentType,
+        languageInfo,
         confidence: extractedText.length > 100 ? 0.90 : 0.75
       };
       
@@ -587,19 +610,22 @@ ${mainPoint}
     const estimatedPages = Math.max(1, Math.floor(file.size / 60000));
     const estimatedWords = estimatedPages * 300;
     
-    return {
-      pages: estimatedPages,
-      estimatedWordCount: estimatedWords,
-      extractedText: `Analysis of ${file.name}`,
-      entities: {
-        dates: [],
-        emails: [],
-        phones: [],
-        amounts: [],
-        names: []
-      },
-      confidence: 0.70
-    };
+      return {
+        pages: estimatedPages,
+        estimatedWordCount: estimatedWords,
+        extractedText: `Analysis of ${file.name}`,
+        entities: {
+          dates: [],
+          emails: [],
+          phones: [],
+          amounts: [],
+          names: []
+        },
+        topics: [],
+        documentType: this.detectDocumentTypeFromFilename(file.name),
+        languageInfo: { code: 'en', name: 'English', nativeName: 'English', confidence: 0.5, direction: 'ltr' },
+        confidence: 0.70
+      };
   }
 
   // Generate accurate response based on real content

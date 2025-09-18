@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, Upload, FileText, Brain, Sparkles, Download, Search, BookOpen, Zap, User, Bot, Loader2, Trash2, Copy, ThumbsUp, ThumbsDown, Wifi, WifiOff } from 'lucide-react';
 import { AccurateAI, analyzeDocument as analyzeDocumentFile } from '@/utils/accurateAI';
+import { LanguageDetector } from '@/utils/languageDetector';
 import { chatGPT5AI } from '@/utils/chatgpt5AI';
 
 interface ChatMessage {
