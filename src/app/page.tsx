@@ -58,13 +58,15 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [dropdownAnimating, setDropdownAnimating] = useState(false);
+  const [mobileMenuAnimating, setMobileMenuAnimating] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setActiveDropdown(null);
+        handleDropdownClose();
       }
     };
 
@@ -73,6 +75,48 @@ export default function Home() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Animation handlers
+  const handleDropdownOpen = (categoryId: string) => {
+    if (activeDropdown === categoryId) {
+      handleDropdownClose();
+      return;
+    }
+    
+    setDropdownAnimating(true);
+    setActiveDropdown(categoryId);
+    
+    // Reset animation state after animation completes
+    setTimeout(() => {
+      setDropdownAnimating(false);
+    }, 200);
+  };
+
+  const handleDropdownClose = () => {
+    setDropdownAnimating(true);
+    
+    // Start exit animation
+    setTimeout(() => {
+      setActiveDropdown(null);
+      setDropdownAnimating(false);
+    }, 150);
+  };
+
+  const handleMobileMenuToggle = () => {
+    if (mobileMenuOpen) {
+      setMobileMenuAnimating(true);
+      setTimeout(() => {
+        setMobileMenuOpen(false);
+        setMobileMenuAnimating(false);
+      }, 200);
+    } else {
+      setMobileMenuAnimating(true);
+      setMobileMenuOpen(true);
+      setTimeout(() => {
+        setMobileMenuAnimating(false);
+      }, 300);
+    }
+  };
 
   const handleFileUpload = (file: File) => {
     setUploadedFile(file);
@@ -206,9 +250,9 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-4 xl:px-8">
           <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-4">
             <button 
@@ -234,10 +278,10 @@ export default function Home() {
               {tools.map((category, index) => (
                 <div key={category.id} className="relative flex-shrink-0">
                   <button 
-                    onClick={() => setActiveDropdown(activeDropdown === category.id ? null : category.id)}
-                    className={`flex items-center px-0.5 lg:px-2 xl:px-3 py-1.5 lg:py-2 text-xs lg:text-sm xl:text-sm font-normal lg:font-medium xl:font-medium rounded transition-colors whitespace-nowrap min-w-0 ${
+                    onClick={() => handleDropdownOpen(category.id)}
+                    className={`navbar-button flex items-center px-0.5 lg:px-2 xl:px-3 py-1.5 lg:py-2 text-xs lg:text-sm xl:text-sm font-normal lg:font-medium xl:font-medium rounded transition-all duration-200 whitespace-nowrap min-w-0 ${
                       activeDropdown === category.id
-                        ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                        ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 shadow-sm'
                         : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
@@ -247,9 +291,16 @@ export default function Home() {
                   
                   {/* Dropdown Menu */}
                   {activeDropdown === category.id && (
-                    <div className={`absolute top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-[9999] max-h-96 overflow-y-auto ${
+                    <div className={`navbar-dropdown absolute top-full mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-[99999] max-h-96 overflow-y-auto ${
                       index >= tools.length - 2 ? 'right-0' : 'left-0'
-                    }`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+                    } ${dropdownAnimating ? 'dropdown-enter' : ''}`} style={{ 
+                      maxWidth: 'calc(100vw - 2rem)', 
+                      zIndex: 99999,
+                      position: 'absolute',
+                      top: '100%',
+                      left: index >= tools.length - 2 ? 'auto' : '0',
+                      right: index >= tools.length - 2 ? '0' : 'auto'
+                    }}>
                       <div className="p-3 sm:p-4">
                         <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3">{category.name}</h3>
                         <div className="grid grid-cols-1 gap-1 sm:gap-2">
@@ -258,10 +309,10 @@ export default function Home() {
                               key={tool.id}
                               onClick={() => {
                                 setActiveTool(tool.id);
-                                setActiveDropdown(null);
+                                handleDropdownClose();
                                 setMobileMenuOpen(false);
                               }}
-                              className="flex items-start p-2 sm:p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors w-full"
+                              className="navbar-button flex items-start p-2 sm:p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 w-full hover:scale-[1.02] active:scale-[0.98]"
                             >
                               <tool.icon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                               <div className="flex-1">
@@ -280,24 +331,28 @@ export default function Home() {
 
             {/* Tablet Menu Button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="hidden md:flex lg:hidden items-center p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0"
+              onClick={handleMobileMenuToggle}
+              className="navbar-button hidden md:flex lg:hidden items-center p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0 transition-all duration-200"
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <div className={`transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : 'rotate-0'}`}>
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </div>
             </button>
 
             {/* Mobile Menu Button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0"
+              onClick={handleMobileMenuToggle}
+              className="navbar-button md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0 transition-all duration-200"
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <div className={`transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : 'rotate-0'}`}>
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </div>
             </button>
           </div>
 
           {/* Mobile & Tablet Navigation */}
           {mobileMenuOpen && (
-            <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 py-2 max-h-[80vh] overflow-y-auto scroll-smooth">
+            <div className={`lg:hidden border-t border-gray-200 dark:border-gray-700 py-2 max-h-[80vh] overflow-y-auto scroll-smooth ${mobileMenuAnimating ? 'mobile-menu-enter' : ''}`}>
               <div className="space-y-2 px-2">
                 {tools.map((category) => (
                   <div key={category.id}>
@@ -311,9 +366,9 @@ export default function Home() {
                           key={tool.id}
                           onClick={() => {
                             setActiveTool(tool.id);
-                            setMobileMenuOpen(false);
+                            handleMobileMenuToggle();
                           }}
-                          className="flex items-start p-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors w-full touch-manipulation min-h-[44px]"
+                          className="navbar-button flex items-start p-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 w-full touch-manipulation min-h-[44px] hover:scale-[1.02] active:scale-[0.98]"
                         >
                           <tool.icon className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
                           <div className="flex-1">
