@@ -39,6 +39,7 @@ import BatchProcessing from '@/components/BatchProcessing';
 import PDFForms from '@/components/PDFForms';
 import WebhookSettings from '@/components/WebhookSettings';
 import AIDocumentChat from '@/components/AIDocumentChat';
+import AdobeStyleAIChat from '@/components/AdobeStyleAIChat';
 import SmartDocumentRelationships from '@/components/SmartDocumentRelationships';
 import PredictiveProcessing from '@/components/PredictiveProcessing';
 import AdvancedSecurity from '@/components/AdvancedSecurity';
@@ -231,6 +232,7 @@ export default function Home() {
       color: 'purple',
       tools: [
         { id: 'ai-chat', name: 'AI Document Chat', icon: Brain, description: 'Chat with your PDFs - ask questions about content, get summaries' },
+        { id: 'adobe-ai-chat', name: 'Adobe-Style AI Assistant', icon: Sparkles, description: 'Advanced AI assistant with Adobe-level intelligence and document understanding' },
         { id: 'smart-relationships', name: 'Smart Document Relationships', icon: Network, description: 'AI detects related documents and suggests connections' },
         { id: 'predictive-processing', name: 'Predictive Processing', icon: Sparkles, description: 'AI learns your patterns and suggests operations' },
         { id: 'webhooks', name: 'Webhook Notifications', icon: Zap, description: 'Get real-time notifications when operations complete' }
@@ -990,6 +992,11 @@ export default function Home() {
         {/* AI Document Chat */}
         {activeTool === 'ai-chat' && (
           <AIDocumentChat onReset={() => setActiveTool('home')} />
+        )}
+
+        {/* Adobe-Style AI Assistant */}
+        {activeTool === 'adobe-ai-chat' && (
+          <AdobeStyleAIChat onReset={() => setActiveTool('home')} />
         )}
 
         {/* Smart Document Relationships */}

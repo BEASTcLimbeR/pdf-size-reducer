@@ -459,6 +459,66 @@ export class SimplePDFReader {
     return topics.length > 0 ? topics : ['General Analysis'];
   }
 
+  // Extract topics from text with document type context
+  private static extractTopicsFromText(text: string, documentType: string): string[] {
+    const topics: string[] = [];
+    const lowerText = text.toLowerCase();
+    const lowerDocType = documentType.toLowerCase();
+    
+    // Document type specific topics
+    if (lowerDocType.includes('metro') || lowerDocType.includes('ticketing')) {
+      topics.push('Metro Operations', 'Ticketing Systems', 'Passenger Data');
+    } else if (lowerDocType.includes('financial') || lowerDocType.includes('budget')) {
+      topics.push('Financial Analysis', 'Budget Planning', 'Revenue Management');
+    } else if (lowerDocType.includes('quarterly') || lowerDocType.includes('annual')) {
+      topics.push('Performance Review', 'Quarterly Analysis', 'Annual Reporting');
+    } else if (lowerDocType.includes('proposal')) {
+      topics.push('Project Proposal', 'Business Development', 'Strategic Planning');
+    } else if (lowerDocType.includes('contract') || lowerDocType.includes('agreement')) {
+      topics.push('Legal Documentation', 'Contract Terms', 'Agreement Analysis');
+    } else if (lowerDocType.includes('manual') || lowerDocType.includes('guide')) {
+      topics.push('Technical Documentation', 'User Guide', 'Process Instructions');
+    } else if (lowerDocType.includes('invoice') || lowerDocType.includes('bill')) {
+      topics.push('Financial Transactions', 'Billing Information', 'Payment Processing');
+    }
+    
+    // Content-based topics
+    if (lowerText.includes('revenue') || lowerText.includes('profit') || lowerText.includes('financial')) {
+      topics.push('Financial Analysis');
+    }
+    if (lowerText.includes('customer') || lowerText.includes('user') || lowerText.includes('client')) {
+      topics.push('Customer Relations');
+    }
+    if (lowerText.includes('performance') || lowerText.includes('metrics') || lowerText.includes('kpi')) {
+      topics.push('Performance Metrics');
+    }
+    if (lowerText.includes('strategy') || lowerText.includes('plan') || lowerText.includes('objective')) {
+      topics.push('Strategic Planning');
+    }
+    if (lowerText.includes('operation') || lowerText.includes('process') || lowerText.includes('workflow')) {
+      topics.push('Operations');
+    }
+    if (lowerText.includes('technology') || lowerText.includes('system') || lowerText.includes('platform')) {
+      topics.push('Technology');
+    }
+    if (lowerText.includes('market') || lowerText.includes('competition') || lowerText.includes('industry')) {
+      topics.push('Market Analysis');
+    }
+    if (lowerText.includes('data') || lowerText.includes('analytics') || lowerText.includes('statistics')) {
+      topics.push('Data Analysis');
+    }
+    if (lowerText.includes('risk') || lowerText.includes('security') || lowerText.includes('compliance')) {
+      topics.push('Risk Management');
+    }
+    if (lowerText.includes('quality') || lowerText.includes('standard') || lowerText.includes('benchmark')) {
+      topics.push('Quality Assurance');
+    }
+    
+    // Remove duplicates and return
+    const uniqueTopics = [...new Set(topics)];
+    return uniqueTopics.length > 0 ? uniqueTopics : ['General Analysis'];
+  }
+
   // Generate executive summary
   private static generateExecutiveSummary(keySentences: string[], documentType: string, wordCount: number): string {
     const firstSentence = keySentences[0] || `This ${documentType.toLowerCase()} provides comprehensive analysis and insights.`;
@@ -751,25 +811,6 @@ ${extractedText.length > 100 ? `"${extractedText.substring(0, 300)}..."` : 'Cont
 **Accuracy Note:** This response is based on real PDF analysis, not filename assumptions.`;
   }
 
-  // Fallback when PDF reading fails
-  private static fallbackAnalysis(file: File): SimplePDFAnalysis {
-    const estimatedPages = Math.max(1, Math.floor(file.size / 60000));
-    const estimatedWords = estimatedPages * 300;
-    
-    return {
-      pages: estimatedPages,
-      estimatedWordCount: estimatedWords,
-      extractedText: `Intelligent analysis of ${file.name}`,
-      entities: {
-        dates: [],
-        emails: [],
-        phones: [],
-        amounts: [],
-        names: []
-      },
-      confidence: 0.70
-    };
-  }
 
   // Detect document type from filename
   private static detectDocumentTypeFromFilename(filename: string): string {

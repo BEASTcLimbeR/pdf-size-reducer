@@ -185,7 +185,7 @@ export default function BatchProcessing({ onReset }: BatchProcessingProps) {
   };
 
   // Batch convert to JPG
-  const batchConvertToJPG = async () => {
+  const handleBatchConvertToJPG = async () => {
     setIsProcessing(true);
     setOverallProgress(0);
     
@@ -250,7 +250,7 @@ export default function BatchProcessing({ onReset }: BatchProcessingProps) {
         await batchCompress();
         break;
       case 'convert-jpg':
-        await batchConvertToJPG();
+        await handleBatchConvertToJPG();
         break;
       case 'watermark':
         await batchWatermark();
@@ -269,7 +269,7 @@ export default function BatchProcessing({ onReset }: BatchProcessingProps) {
     // Create a ZIP file with all results
     // In a real implementation, you'd use a library like JSZip
     completedFiles.forEach((file, index) => {
-      const blob = new Blob([file.result!], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(file.result!)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
