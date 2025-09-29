@@ -300,9 +300,18 @@ class RealAIService {
     
     return entityMap[documentType] || ['Document Title', 'Creation Date', 'Author', 'Content Summary', 'File Information'];
   }
-      entities = ['Invoice #INV-2024-001', 'Due Date: Net 30', 'Amount: $2,500.00', 'Tax Rate: 8%', 'Customer ID'];
-      sentiment = 'neutral';
-    } else if (filename.includes('contract') || filename.includes('agreement')) {
+
+  private generateInvoiceEntities(): string[] {
+    return ['Invoice #INV-2024-001', 'Due Date: Net 30', 'Amount: $2,500.00', 'Tax Rate: 8%', 'Customer ID'];
+  }
+
+  private generateDocumentAnalysis(filename: string, fileSize: number = 0): { documentType: string; keyTopics: string[]; entities: string[]; sentiment: string } {
+    let documentType = 'General Document';
+    let keyTopics: string[] = [];
+    let entities: string[] = [];
+    let sentiment = 'neutral';
+
+    if (filename.includes('contract') || filename.includes('agreement')) {
       documentType = 'Legal Contract';
       keyTopics = ['Legal Terms', 'Contractual Obligations', 'Payment Terms', 'Termination Clauses', 'Liability Provisions'];
       entities = ['Effective Date', 'Contract Duration', 'Party A', 'Party B', 'Governing Law'];
@@ -368,21 +377,11 @@ class RealAIService {
       }
     }
 
-    // Use actual PDF analysis results
-    const summary = this.generateAdvancedSummary(documentType, keyTopics, actualWordCount);
-    const complexity = PDFAnalyzer.analyzeComplexity(actualPages, actualWordCount, documentType);
-    const readingTime = PDFAnalyzer.calculateReadingTime(actualWordCount);
-    
     return {
-      document_type: documentType,
-      key_topics: keyTopics,
+      documentType,
+      keyTopics,
       entities,
-      summary,
-      word_count: actualWordCount,
-      reading_time: readingTime,
-      complexity,
-      sentiment,
-      confidence: 0.92 // Higher confidence for accurate analysis
+      sentiment
     };
   }
 

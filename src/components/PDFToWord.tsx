@@ -2,6 +2,8 @@
 
 import { useState, useCallback } from 'react';
 import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, FileText } from 'lucide-react';
+import FileRenameModal from './FileRenameModal';
+import { useFileDownload } from '@/hooks/useFileDownload';
 import { PDFDocument } from 'pdf-lib';
 
 interface ConversionResult {
@@ -21,6 +23,17 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [conversionFormat, setConversionFormat] = useState<'docx' | 'doc'>('docx');
+
+  // File download with rename functionality
+  const {
+    isRenameModalOpen,
+    pendingDownload,
+    downloadFile,
+    handleRenameConfirm,
+    handleRenameClose,
+    getFileExtension,
+    getFileNameWithoutExtension
+  } = useFileDownload();
 
   // Validate PDF file
   const validatePDFFile = (file: File): { isValid: boolean; error?: string } => {
@@ -188,23 +201,24 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
     }
   }, [handleFileUpload]);
 
-  // Download converted file
+  // Download converted file with rename functionality
   const downloadConvertedFile = useCallback(() => {
     if (conversionResult?.convertedFile) {
-      const arrayBuffer = conversionResult.convertedFile.buffer.slice(0) as ArrayBuffer;
-      const blob = new Blob([arrayBuffer], { 
-        type: conversionFormat === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/msword'
+      const originalFileName = uploadedFile?.name || 'document';
+      const fileExtension = `.${conversionFormat}`;
+      const fileNameWithoutExt = getFileNameWithoutExtension(originalFileName);
+      const defaultFileName = `${fileNameWithoutExt}_converted${fileExtension}`;
+
+      downloadFile({
+        fileName: defaultFileName,
+        fileData: conversionResult.convertedFile,
+        mimeType: conversionFormat === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/msword',
+        operationType: 'pdf-to-word',
+        showRenameModal: true,
+        fileSize: conversionResult.convertedFile.length
       });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${uploadedFile?.name?.replace('.pdf', '') || 'document'}.${conversionFormat}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     }
-  }, [conversionResult, uploadedFile, conversionFormat]);
+  }, [conversionResult, uploadedFile, conversionFormat, downloadFile, getFileNameWithoutExtension]);
 
   // Reset function
   const reset = useCallback(() => {
@@ -425,6 +439,19 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
               </div>
             )}
           </div>
+        )}
+
+        {/* File Rename Modal */}
+        {pendingDownload && (
+          <FileRenameModal
+            isOpen={isRenameModalOpen}
+            onClose={handleRenameClose}
+            onConfirm={handleRenameConfirm}
+            currentFileName={pendingDownload.fileName}
+            fileExtension={getFileExtension(pendingDownload.fileName)}
+            operationType={pendingDownload.operationType}
+            fileSize={pendingDownload.fileSize}
+          />
         )}
 
       </div>

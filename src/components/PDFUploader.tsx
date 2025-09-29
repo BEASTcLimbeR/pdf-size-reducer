@@ -1,17 +1,25 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { useDropzone, FileRejection } from 'react-dropzone';
-import { Upload, FileText, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { validatePDFFile } from '@/utils/pdfCompression';
+import { useUserActivityTracker } from '@/hooks/useUserActivityTracker';
+import UniversalFileDropZone from './UniversalFileDropZone';
+import EnhancedProgressBar from './EnhancedProgressBar';
 
 interface PDFUploaderProps {
   onFileUpload: (file: File) => void;
 }
 
 export default function PDFUploader({ onFileUpload }: PDFUploaderProps) {
-  const [isDragActive, setIsDragActive] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [processingSteps, setProcessingSteps] = useState([
+    { id: 'validate', label: 'Validating PDF file', status: 'pending' as const, estimatedTime: 2 },
+    { id: 'process', label: 'Processing file', status: 'pending' as const, estimatedTime: 3 },
+    { id: 'complete', label: 'Upload complete', status: 'pending' as const, estimatedTime: 1 }
+  ]);
+  const { trackFileOperation, trackError } = useUserActivityTracker();
 
   // Function to validate file type and size using utility
   const validateFile = (file: File): string | null => {
@@ -19,113 +27,130 @@ export default function PDFUploader({ onFileUpload }: PDFUploaderProps) {
     return validation.isValid ? null : validation.error || 'Invalid file';
   };
 
-  // Handle file drop/selection
-  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+  // Handle file processing with enhanced progress tracking
+  const processFile = useCallback(async (file: File) => {
     setError(null);
+    setIsProcessing(true);
+    const startTime = Date.now();
     
-    // Handle rejected files
-    if (rejectedFiles.length > 0) {
-      const rejection = rejectedFiles[0];
-      if (rejection.errors[0]?.code === 'file-invalid-type') {
-        setError('Please upload a PDF file only.');
-      } else if (rejection.errors[0]?.code === 'file-too-large') {
-        setError('File size must be less than 50MB.');
-      } else {
-        setError('File upload failed. Please try again.');
-      }
-      return;
-    }
-
-    // Handle accepted files
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      const validationError = validateFile(file);
+    try {
+      // Step 1: Validate file
+      setProcessingSteps(prev => prev.map(step => 
+        step.id === 'validate' ? { ...step, status: 'active', startTime: Date.now() } : step
+      ));
       
+      const validationError = validateFile(file);
       if (validationError) {
         setError(validationError);
+        setProcessingSteps(prev => prev.map(step => 
+          step.id === 'validate' ? { ...step, status: 'error', error: validationError } : step
+        ));
         return;
       }
       
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setProcessingSteps(prev => prev.map(step => 
+        step.id === 'validate' ? { ...step, status: 'completed', endTime: Date.now() } : step
+      ));
+      
+      // Step 2: Process file
+      setProcessingSteps(prev => prev.map(step => 
+        step.id === 'process' ? { ...step, status: 'active', startTime: Date.now() } : step
+      ));
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setProcessingSteps(prev => prev.map(step => 
+        step.id === 'process' ? { ...step, status: 'completed', endTime: Date.now() } : step
+      ));
+      
+      // Step 3: Complete
+      setProcessingSteps(prev => prev.map(step => 
+        step.id === 'complete' ? { ...step, status: 'active', startTime: Date.now() } : step
+      ));
+      
+      const processingTime = Date.now() - startTime;
+      
+      // Track successful file operation
+      trackFileOperation('pdf-uploader', 'file_uploaded', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        success: true,
+        processingTime
+      });
+      
       onFileUpload(file);
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setProcessingSteps(prev => prev.map(step => 
+        step.id === 'complete' ? { ...step, status: 'completed', endTime: Date.now() } : step
+      ));
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Processing failed';
+      setError(errorMessage);
+      setProcessingSteps(prev => prev.map(step => 
+        step.status === 'active' ? { ...step, status: 'error', error: errorMessage } : step
+      ));
+      
+      trackError('pdf-uploader', 'processing_failed', errorMessage, {
+        fileName: file.name,
+        fileSize: file.size,
+        processingTime: Date.now() - startTime
+      });
+    } finally {
+      setIsProcessing(false);
     }
-  }, [onFileUpload]);
+  }, [onFileUpload, trackFileOperation, trackError]);
 
-  // Configure dropzone
-  const { getRootProps, getInputProps, isDragReject } = useDropzone({
-    onDrop,
-    accept: {
-      'application/pdf': ['.pdf']
-    },
-    maxFiles: 1,
-    maxSize: 50 * 1024 * 1024, // 50MB
-    onDragEnter: () => setIsDragActive(true),
-    onDragLeave: () => setIsDragActive(false),
-    onDropAccepted: () => setIsDragActive(false),
-    onDropRejected: () => setIsDragActive(false),
-  });
+  // Handle files from drop zone
+  const handleFilesAccepted = useCallback((files: File[]) => {
+    if (files.length > 0) {
+      processFile(files[0]);
+    }
+  }, [processFile]);
+
+  // Handle errors from drop zone
+  const handleError = useCallback((error: string) => {
+    setError(error);
+    trackError('pdf-uploader', 'drop_zone_error', error);
+  }, [trackError]);
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div
-        {...getRootProps()}
-        className={`
-          relative border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-all duration-200
-          ${isDragActive && !isDragReject
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-            : isDragReject
-            ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700'
-          }
-        `}
-      >
-        <input {...getInputProps()} />
-        
-        <div className="space-y-4">
-          {/* Upload Icon */}
-          <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-            {isDragReject ? (
-              <AlertCircle className="w-8 h-8 text-red-500" />
-            ) : (
-              <Upload className="w-8 h-8 text-gray-400" />
-            )}
-          </div>
-          
-          {/* Upload Text */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {isDragActive
-                ? isDragReject
-                  ? 'Invalid file type'
-                  : 'Drop your PDF here'
-                : 'Upload your PDF file'
-              }
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Drag and drop your PDF file here, or click to browse
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500">
-              Maximum file size: 50MB
-            </p>
-          </div>
-          
-          {/* Browse Button */}
-          <button
-            type="button"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-          >
-            <FileText className="w-5 h-5 mr-2" />
-            Choose PDF File
-          </button>
-        </div>
-      </div>
-      
-      {/* Error Message */}
+      {/* Progress Bar */}
+      {isProcessing && (
+        <EnhancedProgressBar
+          steps={processingSteps}
+          currentStepIndex={processingSteps.findIndex(step => step.status === 'active')}
+          isProcessing={isProcessing}
+          showTimeEstimate={true}
+          showCancelButton={false}
+          variant="detailed"
+          className="mb-6"
+        />
+      )}
+
+      {/* File Drop Zone */}
+      <UniversalFileDropZone
+        accept={{ 'application/pdf': ['.pdf'] }}
+        maxSize={50 * 1024 * 1024} // 50MB
+        maxFiles={1}
+        onFilesAccepted={handleFilesAccepted}
+        onError={handleError}
+        disabled={isProcessing}
+        title="Upload your PDF file"
+        description="Drag and drop your PDF file here, or click to browse"
+        showPreview={true}
+        showFileTypes={true}
+        variant="card"
+      />
+
+      {/* Error Display */}
       {error && (
-        <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <div className="flex items-center">
-            <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-            <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
-          </div>
+        <div className="mt-4 flex items-center p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
+          <span className="text-red-700 dark:text-red-300 text-sm">{error}</span>
         </div>
       )}
       

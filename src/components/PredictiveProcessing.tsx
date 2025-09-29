@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Zap, Brain, TrendingUp, Clock, Target, Sparkles, CheckCircle, ArrowRight, FileText, Settings, BarChart3, Lightbulb, Star, Calendar, User } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Zap, Brain, TrendingUp, Clock, Target, Sparkles, CheckCircle, ArrowRight, FileText, Settings, BarChart3, Lightbulb, Star, Calendar, User, AlertCircle, RotateCcw, Loader2 } from 'lucide-react';
+import { predictiveProcessingAI, PredictivePattern, SuggestedAction, UserInsights } from '@/utils/predictiveProcessingAI';
+import { useUserActivityTracker } from '@/hooks/useUserActivityTracker';
 
 interface UserPattern {
   id: string;
@@ -41,21 +43,61 @@ interface PredictiveProcessingProps {
 }
 
 export default function PredictiveProcessing({ onReset }: PredictiveProcessingProps) {
-  const [userPatterns, setUserPatterns] = useState<UserPattern[]>([]);
-  const [suggestions, setSuggestions] = useState<PredictiveSuggestion[]>([]);
+  const [userPatterns, setUserPatterns] = useState<PredictivePattern[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestedAction[]>([]);
+  const [userInsights, setUserInsights] = useState<UserInsights | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [learningEnabled, setLearningEnabled] = useState(true);
   const [showInsights, setShowInsights] = useState(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'week' | 'month' | 'all'>('month');
+  const [isOnline, setIsOnline] = useState(false);
+  
+  const { trackAction } = useUserActivityTracker();
 
-  // Simulate loading user patterns and generating suggestions
+  // Load real data from AI backend
   useEffect(() => {
-    loadUserPatterns();
-    generatePredictiveSuggestions();
+    fetchPredictiveData();
   }, [selectedTimeframe]);
 
+  const fetchPredictiveData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    setIsOnline(predictiveProcessingAI.getConnectionStatus());
+    
+    try {
+      trackAction('predictive-processing', 'data_fetch_started');
+      
+      const [patterns, suggestedActions, insights] = await Promise.all([
+        predictiveProcessingAI.getPredictivePatterns(),
+        predictiveProcessingAI.getSuggestedActions(),
+        predictiveProcessingAI.getUserInsights()
+      ]);
+      
+      setUserPatterns(patterns);
+      setSuggestions(suggestedActions);
+      setUserInsights(insights);
+      
+      trackAction('predictive-processing', 'data_fetch_completed', {
+        patternsCount: patterns.length,
+        suggestionsCount: suggestedActions.length,
+        isOnline
+      });
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load predictive data';
+      setError(errorMessage);
+      trackAction('predictive-processing', 'data_fetch_failed', { error: errorMessage });
+      console.error('Error fetching predictive data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedTimeframe, trackAction, isOnline]);
+
   const loadUserPatterns = () => {
-    // Simulate loading patterns from user behavior analysis
+    // This is now handled by fetchPredictiveData
+    // Keeping for backward compatibility
     const mockPatterns: UserPattern[] = [
       {
         id: 'pattern_1',
@@ -215,7 +257,58 @@ export default function PredictiveProcessing({ onReset }: PredictiveProcessingPr
     }
   };
 
-  const totalTimeSavings = suggestions.reduce((sum, s) => sum + s.estimatedTimeSaving, 0);
+  const totalTimeSavings = suggestions.reduce((sum, s) => sum + (s.estimatedSavings ? parseInt(s.estimatedSavings) : 0), 0);
+
+  const handleReset = useCallback(() => {
+    onReset();
+    trackAction('predictive-processing', 'tool_reset');
+  }, [onReset, trackAction]);
+
+  const handleRefresh = useCallback(() => {
+    fetchPredictiveData();
+    trackAction('predictive-processing', 'manual_refresh');
+  }, [fetchPredictiveData, trackAction]);
+
+  const handleSuggestionClick = useCallback((suggestion: SuggestedAction) => {
+    trackAction('predictive-processing', 'suggestion_clicked', {
+      suggestionId: suggestion.id,
+      toolId: suggestion.toolId,
+      confidence: suggestion.confidence
+    });
+    
+    // In a real app, this would navigate to the suggested tool
+    console.log(`Executing suggestion: ${suggestion.name} (${suggestion.toolId})`);
+  }, [trackAction]);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 text-center">
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+        <p className="text-gray-700 dark:text-gray-300 text-lg">Loading AI insights...</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+          {isOnline ? 'Analyzing your usage patterns...' : 'Using offline mode with local data...'}
+        </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-red-200 dark:border-red-800 text-center">
+        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <p className="text-red-700 dark:text-red-300 text-lg">Error: {error}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+          {isOnline ? 'Please ensure the AI backend is running and accessible.' : 'Using offline mode with limited functionality.'}
+        </p>
+        <button
+          onClick={handleRefresh}
+          className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800"
+        >
+          <RotateCcw className="h-4 w-4 mr-2" /> Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -226,12 +319,30 @@ export default function PredictiveProcessing({ onReset }: PredictiveProcessingPr
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
               <Brain className="h-8 w-8 mr-3 text-purple-600" />
               Predictive Processing
+              {isOnline ? (
+                <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-1.5"></div>
+                  Online
+                </span>
+              ) : (
+                <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full mr-1.5"></div>
+                  Offline
+                </span>
+              )}
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               AI learns your patterns and suggests operations before you think of them
             </p>
           </div>
           <div className="flex items-center space-x-3">
+            <button
+              onClick={handleRefresh}
+              className="px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors flex items-center"
+            >
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Refresh
+            </button>
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               <button
                 onClick={() => setSelectedTimeframe('week')}

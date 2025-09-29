@@ -56,6 +56,17 @@ export const FILE_CONFIGS = {
       'text/html'
     ],
     extensions: ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.txt', '.rtf', '.csv', '.html']
+  },
+  VECTOR: {
+    maxSize: 100 * 1024 * 1024, // 100MB
+    allowedTypes: [
+      'application/x-coreldraw',
+      'image/x-coreldraw',
+      'image/svg+xml',
+      'application/postscript',
+      'application/illustrator'
+    ],
+    extensions: ['.cdr', '.svg', '.eps', '.ai']
   }
 } as const;
 

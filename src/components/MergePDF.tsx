@@ -4,6 +4,9 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, Download, RotateCcw, Loader2, CheckCircle, AlertCircle, Trash2, ArrowUp, ArrowDown, Plus } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
+import ProgressIndicator from './ProgressIndicator';
+import SuccessAnimation from './SuccessAnimation';
+import { useProgress } from '@/hooks/useProgress';
 
 interface MergePDFProps {
   onReset?: () => void;
@@ -19,10 +22,35 @@ interface PDFFile {
 
 export default function MergePDF({ onReset }: MergePDFProps) {
   const [pdfFiles, setPdfFiles] = useState<PDFFile[]>([]);
-  const [isMerging, setIsMerging] = useState(false);
   const [mergedFile, setMergedFile] = useState<Uint8Array | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [mergeProgress, setMergeProgress] = useState(0);
+
+  const {
+    steps,
+    isProcessing,
+    error,
+    startProcessing,
+    completeStep,
+    setStepError,
+    cancelProcessing,
+    resetProgress
+  } = useProgress({
+    steps: [
+      { id: 'validate', label: 'Validating PDF files', estimatedTime: 2 },
+      { id: 'load-pdfs', label: 'Loading PDF documents', estimatedTime: 4 },
+      { id: 'merge-pages', label: 'Merging pages', estimatedTime: 6 },
+      { id: 'optimize', label: 'Optimizing merged PDF', estimatedTime: 3 },
+      { id: 'finalize', label: 'Finalizing output', estimatedTime: 2 }
+    ],
+    onComplete: () => {
+      // Merge completed successfully
+    },
+    onError: (err) => {
+      console.error('Merge error:', err);
+    },
+    onCancel: async () => {
+      resetProgress();
+    }
+  });
 
   // Format file size for display
   const formatFileSize = (bytes: number): string => {
@@ -119,12 +147,20 @@ export default function MergePDF({ onReset }: MergePDFProps) {
     }
 
     try {
-      setIsMerging(true);
+      startProcessing();
       setError(null);
-      setMergeProgress(0);
+
+      // Step 1: Validate PDF files
+      completeStep('validate');
+      
+      // Step 2: Load PDF documents
+      completeStep('load-pdfs');
 
       // Create new PDF document
       const mergedPdf = await PDFDocument.create();
+
+      // Step 3: Merge pages
+      completeStep('merge-pages');
 
       // Process each PDF
       for (let i = 0; i < pdfFiles.length; i++) {
@@ -138,13 +174,14 @@ export default function MergePDF({ onReset }: MergePDFProps) {
           
           // Add pages to merged PDF
           copiedPages.forEach(page => mergedPdf.addPage(page));
-          
-          setMergeProgress(((i + 1) / pdfFiles.length) * 100);
         } catch (err) {
           console.error(`Error processing PDF ${pdfFiles[i].name}:`, err);
           throw new Error(`Failed to process ${pdfFiles[i].name}. The file may be corrupted.`);
         }
       }
+
+      // Step 4: Optimize merged PDF
+      completeStep('optimize');
 
       // Save merged PDF
       const mergedBytes = await mergedPdf.save({
@@ -153,12 +190,13 @@ export default function MergePDF({ onReset }: MergePDFProps) {
       });
 
       setMergedFile(mergedBytes);
-      setMergeProgress(100);
+
+      // Step 5: Finalize
+      completeStep('finalize');
     } catch (err) {
       console.error('Merge error:', err);
       setError(err instanceof Error ? err.message : 'Failed to merge PDFs. Please try again.');
-    } finally {
-      setIsMerging(false);
+      setStepError('merge-pages', err instanceof Error ? err.message : 'Merge failed');
     }
   };
 
@@ -182,7 +220,7 @@ export default function MergePDF({ onReset }: MergePDFProps) {
     setPdfFiles([]);
     setMergedFile(null);
     setError(null);
-    setMergeProgress(0);
+    resetProgress();
   };
 
   return (
@@ -292,10 +330,10 @@ export default function MergePDF({ onReset }: MergePDFProps) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={mergePDFs}
-              disabled={isMerging || pdfFiles.length < 2}
+              disabled={isProcessing || pdfFiles.length < 2}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
             >
-              {isMerging ? (
+              {isProcessing ? (
                 <>
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                   Merging PDFs...
@@ -320,28 +358,17 @@ export default function MergePDF({ onReset }: MergePDFProps) {
       )}
 
       {/* Merge Progress */}
-      {isMerging && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Loader2 className="h-8 w-8 text-blue-600 animate-spin mr-3" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Merging PDFs...
-              </h3>
-            </div>
-            
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
-              <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${mergeProgress}%` }}
-              />
-            </div>
-            
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Processing {pdfFiles.length} PDF files...
-            </p>
-          </div>
-        </div>
+      {isProcessing && (
+        <ProgressIndicator
+          steps={steps}
+          currentStepIndex={steps.findIndex(step => step.status === 'active')}
+          isProcessing={isProcessing}
+          showTimeEstimate={true}
+          showCancelButton={true}
+          onCancel={cancelProcessing}
+          variant="detailed"
+          className="mb-6"
+        />
       )}
 
       {/* Error Message */}
@@ -361,40 +388,29 @@ export default function MergePDF({ onReset }: MergePDFProps) {
 
       {/* Success State */}
       {mergedFile && (
-        <div className="space-y-6">
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
-            <div className="flex items-center mb-4">
-              <CheckCircle className="h-6 w-6 text-green-500 mr-3" />
-              <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
-                PDFs Merged Successfully!
-              </h3>
-            </div>
-            
-            <div className="text-center">
-              <p className="text-green-700 dark:text-green-400 mb-4">
-                Your {pdfFiles.length} PDF files have been merged into one document.
-              </p>
-              
-              <button
-                onClick={downloadMergedFile}
-                className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
-              >
-                <Download className="h-5 w-5 mr-2" />
-                Download Merged PDF
-              </button>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <button
-              onClick={resetAll}
-              className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-medium transition-colors flex items-center"
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Merge More PDFs
-            </button>
-          </div>
-        </div>
+        <SuccessAnimation
+          title="PDFs Merged Successfully!"
+          message={`Your ${pdfFiles.length} PDF files have been merged into one document.`}
+          stats={[
+            { label: 'Files Merged', value: pdfFiles.length.toString() },
+            { label: 'Total Pages', value: pdfFiles.reduce((sum, file) => sum + file.pages, 0).toString() },
+            { label: 'File Size', value: formatFileSize(mergedFile.length) }
+          ]}
+          actions={[
+            {
+              label: 'Download Merged PDF',
+              onClick: downloadMergedFile,
+              variant: 'primary' as const,
+              icon: <Download className="h-5 w-5 mr-2" />
+            },
+            {
+              label: 'Merge More PDFs',
+              onClick: resetAll,
+              variant: 'secondary' as const,
+              icon: <RotateCcw className="h-4 w-4 mr-2" />
+            }
+          ]}
+        />
       )}
     </div>
   );

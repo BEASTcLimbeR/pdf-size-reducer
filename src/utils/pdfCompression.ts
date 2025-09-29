@@ -168,9 +168,9 @@ export function formatFileSize(bytes: number): string {
  * @returns Validation result
  */
 export function validatePDFFile(file: File): { isValid: boolean; error?: string } {
-  // Check file type
-  if (file.type !== 'application/pdf') {
-    return { isValid: false, error: 'Please upload a PDF file only.' };
+  // Check if file exists
+  if (!file) {
+    return { isValid: false, error: 'No file provided.' };
   }
 
   // Check file size (max 50MB)
@@ -181,10 +181,55 @@ export function validatePDFFile(file: File): { isValid: boolean; error?: string 
 
   // Check if file is empty
   if (file.size === 0) {
-    return { isValid: false, error: 'The uploaded file is empty.' };
+    return { isValid: false, error: 'File is empty.' };
+  }
+
+  // Check file type - be more flexible with MIME type detection
+  const fileName = file.name.toLowerCase();
+  const fileExtension = fileName.split('.').pop();
+  const mimeType = file.type.toLowerCase();
+  
+  // Check both MIME type and file extension
+  const isValidMimeType = mimeType === 'application/pdf' || mimeType === '';
+  const isValidExtension = fileExtension === 'pdf';
+  
+  if (!isValidMimeType && !isValidExtension) {
+    return { isValid: false, error: 'Please upload a PDF file only.' };
   }
 
   return { isValid: true };
+}
+
+/**
+ * Enhanced PDF validation that actually tries to load the PDF
+ * @param file - File to validate
+ * @returns Promise<ValidationResult>
+ */
+export async function validatePDFFileAsync(file: File): Promise<{ isValid: boolean; error?: string }> {
+  // First do basic validation
+  const basicValidation = validatePDFFile(file);
+  if (!basicValidation.isValid) {
+    return basicValidation;
+  }
+
+  try {
+    // Try to load the PDF to verify it's actually a valid PDF
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(arrayBuffer);
+    
+    // Check if PDF has pages
+    if (pdfDoc.getPageCount() === 0) {
+      return { isValid: false, error: 'The PDF file appears to be empty or has no pages.' };
+    }
+
+    return { isValid: true };
+  } catch (error) {
+    console.error('PDF validation error:', error);
+    return { 
+      isValid: false, 
+      error: 'The file appears to be corrupted or not a valid PDF. Please try a different file.' 
+    };
+  }
 }
 
 /**

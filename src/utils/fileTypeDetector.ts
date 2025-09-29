@@ -1,7 +1,7 @@
 // Smart File Type Detection and Suggestions
 export interface FileTypeInfo {
   type: string;
-  category: 'document' | 'image' | 'spreadsheet' | 'presentation' | 'text' | 'archive' | 'other';
+  category: 'document' | 'image' | 'spreadsheet' | 'presentation' | 'text' | 'archive' | 'vector' | 'other';
   icon: string;
   color: string;
   description: string;
@@ -127,8 +127,80 @@ export const FILE_TYPES: Record<string, FileTypeInfo> = {
     color: 'text-purple-600',
     description: 'WebP Image (.webp)',
     supported: true,
-    suggestedTools: ['convert-to-pdf', 'merge'],
+    suggestedTools: ['convert-to-pdf', 'merge', 'compress'],
     maxSize: 25
+  },
+  'image/avif': {
+    type: 'AVIF Image',
+    category: 'image',
+    icon: '🖼️',
+    color: 'text-purple-600',
+    description: 'AVIF Image (.avif) - Next-gen format',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'compress'],
+    maxSize: 25
+  },
+  'image/tiff': {
+    type: 'TIFF Image',
+    category: 'image',
+    icon: '🖼️',
+    color: 'text-purple-600',
+    description: 'TIFF Image (.tiff, .tif) - Professional format',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'compress'],
+    maxSize: 50
+  },
+  'image/bmp': {
+    type: 'BMP Image',
+    category: 'image',
+    icon: '🖼️',
+    color: 'text-purple-600',
+    description: 'BMP Image (.bmp) - Windows bitmap',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'compress'],
+    maxSize: 25
+  },
+  'image/x-icon': {
+    type: 'ICO Icon',
+    category: 'image',
+    icon: '🖼️',
+    color: 'text-purple-600',
+    description: 'ICO Icon (.ico) - Windows icon',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge'],
+    maxSize: 5
+  },
+  'image/svg+xml': {
+    type: 'SVG Vector',
+    category: 'image',
+    icon: '🎨',
+    color: 'text-pink-600',
+    description: 'SVG Vector Graphics (.svg)',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
+    maxSize: 10
+  },
+
+  // CorelDRAW Files
+  'application/x-coreldraw': {
+    type: 'CorelDRAW File',
+    category: 'vector',
+    icon: '🎨',
+    color: 'text-pink-600',
+    description: 'CorelDRAW Vector Graphics (.cdr)',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'convert-to-png', 'edit'],
+    maxSize: 100
+  },
+  'image/x-coreldraw': {
+    type: 'CorelDRAW File',
+    category: 'vector',
+    icon: '🎨',
+    color: 'text-pink-600',
+    description: 'CorelDRAW Vector Graphics (.cdr)',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'convert-to-png', 'edit'],
+    maxSize: 100
   },
 
   // Text Files
@@ -151,6 +223,70 @@ export const FILE_TYPES: Record<string, FileTypeInfo> = {
     supported: true,
     suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
     maxSize: 10
+  },
+  'text/markdown': {
+    type: 'Markdown File',
+    category: 'text',
+    icon: '📝',
+    color: 'text-gray-600',
+    description: 'Markdown File (.md)',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
+    maxSize: 10
+  },
+
+  // OpenDocument Formats
+  'application/vnd.oasis.opendocument.text': {
+    type: 'OpenDocument Text',
+    category: 'document',
+    icon: '📝',
+    color: 'text-blue-600',
+    description: 'OpenDocument Text (.odt) - LibreOffice',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
+    maxSize: 50
+  },
+  'application/vnd.oasis.opendocument.spreadsheet': {
+    type: 'OpenDocument Spreadsheet',
+    category: 'spreadsheet',
+    icon: '📊',
+    color: 'text-green-600',
+    description: 'OpenDocument Spreadsheet (.ods) - LibreOffice',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
+    maxSize: 50
+  },
+  'application/vnd.oasis.opendocument.presentation': {
+    type: 'OpenDocument Presentation',
+    category: 'presentation',
+    icon: '📽️',
+    color: 'text-orange-600',
+    description: 'OpenDocument Presentation (.odp) - LibreOffice',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
+    maxSize: 50
+  },
+
+  // Additional PowerPoint Formats
+  'application/vnd.ms-powerpoint.presentation.macroEnabled.12': {
+    type: 'PowerPoint Macro',
+    category: 'presentation',
+    icon: '📽️',
+    color: 'text-orange-600',
+    description: 'PowerPoint with Macros (.pptm)',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge', 'edit'],
+    maxSize: 50
+  },
+  'application/vnd.ms-powerpoint.slideshow.macroEnabled.12': {
+    type: 'PowerPoint Slideshow',
+    category: 'presentation',
+    icon: '📽️',
+    color: 'text-orange-600',
+    description: 'PowerPoint Slideshow (.ppsm)',
+    supported: true,
+    suggestedTools: ['convert-to-pdf', 'merge'],
+    maxSize: 50
   },
 
   // HTML
@@ -184,8 +320,8 @@ export const FILE_TYPES: Record<string, FileTypeInfo> = {
     icon: '📦',
     color: 'text-yellow-600',
     description: 'ZIP Archive (.zip)',
-    supported: false,
-    suggestedTools: ['extract-first'],
+    supported: true,
+    suggestedTools: ['extract-first', 'convert-to-pdf'],
     maxSize: 100
   },
   'application/x-rar-compressed': {
@@ -194,8 +330,48 @@ export const FILE_TYPES: Record<string, FileTypeInfo> = {
     icon: '📦',
     color: 'text-yellow-600',
     description: 'RAR Archive (.rar)',
-    supported: false,
-    suggestedTools: ['extract-first'],
+    supported: true,
+    suggestedTools: ['extract-first', 'convert-to-pdf'],
+    maxSize: 100
+  },
+  'application/x-7z-compressed': {
+    type: '7Z Archive',
+    category: 'archive',
+    icon: '📦',
+    color: 'text-yellow-600',
+    description: '7Z Archive (.7z) - High compression',
+    supported: true,
+    suggestedTools: ['extract-first', 'convert-to-pdf'],
+    maxSize: 100
+  },
+  'application/x-tar': {
+    type: 'TAR Archive',
+    category: 'archive',
+    icon: '📦',
+    color: 'text-yellow-600',
+    description: 'TAR Archive (.tar) - Unix/Linux',
+    supported: true,
+    suggestedTools: ['extract-first', 'convert-to-pdf'],
+    maxSize: 100
+  },
+  'application/gzip': {
+    type: 'GZ Archive',
+    category: 'archive',
+    icon: '📦',
+    color: 'text-yellow-600',
+    description: 'GZ Archive (.gz) - Compressed file',
+    supported: true,
+    suggestedTools: ['extract-first', 'convert-to-pdf'],
+    maxSize: 100
+  },
+  'application/x-bzip2': {
+    type: 'BZ2 Archive',
+    category: 'archive',
+    icon: '📦',
+    color: 'text-yellow-600',
+    description: 'BZ2 Archive (.bz2) - Compressed file',
+    supported: true,
+    suggestedTools: ['extract-first', 'convert-to-pdf'],
     maxSize: 100
   }
 };
@@ -215,25 +391,63 @@ export class FileTypeDetector {
 
     // Fallback to extension-based detection
     const extensionMap: Record<string, string> = {
+      // PDF Documents
       '.pdf': 'application/pdf',
+      
+      // Microsoft Word
       '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       '.doc': 'application/msword',
+      
+      // Microsoft Excel
       '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       '.xls': 'application/vnd.ms-excel',
+      
+      // Microsoft PowerPoint
       '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
       '.ppt': 'application/vnd.ms-powerpoint',
+      '.pptm': 'application/vnd.ms-powerpoint.presentation.macroEnabled.12',
+      '.ppsm': 'application/vnd.ms-powerpoint.slideshow.macroEnabled.12',
+      
+      // Images
       '.jpg': 'image/jpeg',
       '.jpeg': 'image/jpeg',
       '.png': 'image/png',
       '.gif': 'image/gif',
       '.webp': 'image/webp',
+      '.avif': 'image/avif',
+      '.tiff': 'image/tiff',
+      '.tif': 'image/tiff',
+      '.bmp': 'image/bmp',
+      '.ico': 'image/x-icon',
+      '.svg': 'image/svg+xml',
+      
+      // CorelDRAW
+      '.cdr': 'application/x-coreldraw',
+      
+      // Text Files
       '.txt': 'text/plain',
       '.rtf': 'text/rtf',
+      '.md': 'text/markdown',
+      
+      // OpenDocument
+      '.odt': 'application/vnd.oasis.opendocument.text',
+      '.ods': 'application/vnd.oasis.opendocument.spreadsheet',
+      '.odp': 'application/vnd.oasis.opendocument.presentation',
+      
+      // Web
       '.html': 'text/html',
       '.htm': 'text/html',
+      
+      // Spreadsheets
       '.csv': 'text/csv',
+      
+      // Archives
       '.zip': 'application/zip',
-      '.rar': 'application/x-rar-compressed'
+      '.rar': 'application/x-rar-compressed',
+      '.7z': 'application/x-7z-compressed',
+      '.tar': 'application/x-tar',
+      '.gz': 'application/gzip',
+      '.bz2': 'application/x-bzip2'
     };
 
     const detectedMimeType = extensionMap[extension];
@@ -312,6 +526,7 @@ export class FileTypeDetector {
       'presentation': 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300',
       'text': 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
       'archive': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+      'vector': 'bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-300',
       'other': 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300'
     };
     return colorMap[category] || colorMap['other'];

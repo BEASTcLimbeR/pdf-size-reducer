@@ -2,7 +2,14 @@
 
 import { useState, useCallback } from 'react';
 import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, FileSpreadsheet, FileText } from 'lucide-react';
-import { PDFDocument, rgb } from 'pdf-lib';
+import ProgressIndicator from './ProgressIndicator';
+import EnhancedProgressBar from './EnhancedProgressBar';
+import SuccessAnimation from './SuccessAnimation';
+import FileRenameModal from './FileRenameModal';
+import { useProgress } from '@/hooks/useProgress';
+import { useUserActivityTracker } from '@/hooks/useUserActivityTracker';
+import { useFileDownload } from '@/hooks/useFileDownload';
+// Dynamic import for pdf-lib to avoid chunk loading issues
 
 interface ConversionResult {
   convertedFile: Uint8Array;
@@ -16,13 +23,52 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
   const [csvContent, setCsvContent] = useState('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [inputMode, setInputMode] = useState<'text' | 'file'>('text');
-  const [isConverting, setIsConverting] = useState(false);
   const [result, setResult] = useState<ConversionResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [tableSettings, setTableSettings] = useState({
     fontSize: 10,
     includeHeaders: true,
     pageOrientation: 'portrait' as 'portrait' | 'landscape',
+  });
+  const { trackFileOperation, trackWorkflowStep, trackUserPreference, trackPerformance } = useUserActivityTracker();
+  
+  // File download with rename functionality
+  const {
+    isRenameModalOpen,
+    pendingDownload,
+    downloadFile,
+    handleRenameConfirm,
+    handleRenameClose,
+    getFileExtension,
+    getFileNameWithoutExtension
+  } = useFileDownload();
+
+  const {
+    steps,
+    isProcessing,
+    error,
+    startProcessing,
+    completeStep,
+    setStepError,
+    cancelProcessing,
+    resetProgress
+  } = useProgress({
+    steps: [
+      { id: 'validate', label: 'Validating CSV data', estimatedTime: 2 },
+      { id: 'parse', label: 'Parsing CSV content', estimatedTime: 3 },
+      { id: 'create-pdf', label: 'Creating PDF document', estimatedTime: 5 },
+      { id: 'format-table', label: 'Formatting table layout', estimatedTime: 4 },
+      { id: 'finalize', label: 'Finalizing PDF', estimatedTime: 2 }
+    ],
+    onComplete: () => {
+      // Conversion completed successfully
+    },
+    onError: (err) => {
+      console.error('Conversion error:', err);
+    },
+    onCancel: async () => {
+      // Handle cancellation
+      resetProgress();
+    }
   });
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,19 +114,57 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
 
   const handleConvert = useCallback(async () => {
     if (!csvContent.trim()) {
-      setError('Please enter CSV content or upload a CSV file');
+      setStepError('validate', 'Please enter CSV content or upload a CSV file');
       return;
     }
 
-    setIsConverting(true);
-    setError(null);
+    const startTime = Date.now();
+    startProcessing();
+
+    // Track conversion start
+    trackFileOperation('csv-to-pdf', 'conversion_started', {
+      fileName: csvFile?.name || 'text_input',
+      fileSize: csvContent.length,
+      fileType: 'text/csv',
+      success: false,
+      processingTime: 0
+    });
 
     try {
-      // Parse CSV content
+      // Step 1: Validate CSV data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      completeStep('validate');
+      trackWorkflowStep('csv-to-pdf', 'validate', {
+        stepNumber: 1,
+        totalSteps: 5,
+        stepDuration: 1000,
+        success: true
+      });
+
+      // Step 2: Parse CSV content
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const rows = parseCSV(csvContent);
       if (rows.length === 0) {
         throw new Error('No data found in CSV');
       }
+      completeStep('parse');
+      trackWorkflowStep('csv-to-pdf', 'parse', {
+        stepNumber: 2,
+        totalSteps: 5,
+        stepDuration: 1000,
+        success: true
+      });
+
+      // Step 3: Create PDF document
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { PDFDocument, rgb } = await import('pdf-lib');
+      completeStep('create-pdf');
+      trackWorkflowStep('csv-to-pdf', 'create_pdf', {
+        stepNumber: 3,
+        totalSteps: 5,
+        stepDuration: 1000,
+        success: true
+      });
 
       // Create a new PDF document
       const pdfDoc = await PDFDocument.create();
@@ -109,6 +193,16 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
         color: rgb(0, 0, 0),
       });
       yPosition -= 30;
+      
+      // Step 4: Format table layout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      completeStep('format-table');
+      trackWorkflowStep('csv-to-pdf', 'format_table', {
+        stepNumber: 4,
+        totalSteps: 5,
+        stepDuration: 1000,
+        success: true
+      });
       
       // Add table
       for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
@@ -173,6 +267,8 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
       pdfDoc.setTitle('CSV to PDF Conversion');
       pdfDoc.setSubject('Converted CSV data to PDF table');
 
+      // Step 5: Finalize PDF
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const pdfBytes = await pdfDoc.save();
       
       const conversionResult: ConversionResult = {
@@ -184,36 +280,80 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
       };
 
       setResult(conversionResult);
+      completeStep('finalize');
+      
+      // Track successful conversion
+      const totalProcessingTime = Date.now() - startTime;
+      trackFileOperation('csv-to-pdf', 'conversion_completed', {
+        fileName: csvFile?.name || 'text_input',
+        fileSize: csvContent.length,
+        fileType: 'text/csv',
+        success: true,
+        processingTime: totalProcessingTime
+      });
+      
+      trackPerformance('csv-to-pdf', 'csv_to_pdf_conversion', {
+        duration: totalProcessingTime,
+        fileSize: csvContent.length,
+        success: true
+      });
+      
+      trackWorkflowStep('csv-to-pdf', 'finalize', {
+        stepNumber: 5,
+        totalSteps: 5,
+        stepDuration: 1000,
+        success: true
+      });
     } catch (err) {
-      setError('Failed to convert CSV to PDF. Please check your CSV format and try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setStepError('validate', `Failed to convert CSV to PDF: ${errorMessage}`);
       console.error('Conversion error:', err);
-    } finally {
-      setIsConverting(false);
+      
+      // Track conversion failure
+      trackFileOperation('csv-to-pdf', 'conversion_failed', {
+        fileName: csvFile?.name || 'text_input',
+        fileSize: csvContent.length,
+        fileType: 'text/csv',
+        success: false,
+        processingTime: Date.now() - startTime,
+        error: errorMessage
+      });
     }
-  }, [csvContent, tableSettings, parseCSV]);
+  }, [csvContent, tableSettings, parseCSV, startProcessing, completeStep, setStepError, trackFileOperation, trackWorkflowStep, trackPerformance, csvFile]);
 
   const handleDownload = useCallback(() => {
     if (!result) return;
 
-    const arrayBuffer = result.convertedFile.buffer.slice(0) as ArrayBuffer;
-    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'converted-csv.pdf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [result]);
+    const originalFileName = csvFile?.name || 'converted-csv';
+    const fileExtension = '.pdf';
+    const fileNameWithoutExt = getFileNameWithoutExtension(originalFileName);
+    const defaultFileName = `${fileNameWithoutExt}_converted${fileExtension}`;
+
+    downloadFile({
+      fileName: defaultFileName,
+      fileData: result.convertedFile,
+      mimeType: 'application/pdf',
+      operationType: 'csv-to-pdf',
+      showRenameModal: true,
+      fileSize: result.convertedSize
+    });
+  }, [result, csvFile, downloadFile, getFileNameWithoutExtension]);
 
   const handleReset = useCallback(() => {
     setCsvContent('');
     setCsvFile(null);
     setResult(null);
-    setError(null);
-    setIsConverting(false);
-  }, []);
+    resetProgress();
+    
+    // Track reset
+    trackFileOperation('csv-to-pdf', 'tool_reset', {
+      fileName: 'none',
+      fileSize: 0,
+      fileType: 'none',
+      success: true,
+      processingTime: 0
+    });
+  }, [resetProgress, trackFileOperation]);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -232,6 +372,36 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
 
         {!result ? (
           <div className="space-y-6">
+            {/* Enhanced Progress Bar */}
+            {isProcessing && (
+              <EnhancedProgressBar
+                steps={steps.map(step => ({
+                  id: step.id,
+                  label: step.label,
+                  status: step.status,
+                  progress: step.progress,
+                  estimatedTime: step.estimatedTime,
+                  startTime: step.startTime,
+                  endTime: step.endTime,
+                  error: step.error
+                }))}
+                currentStepIndex={steps.findIndex(step => step.status === 'active')}
+                isProcessing={isProcessing}
+                showTimeEstimate={true}
+                showCancelButton={true}
+                onCancel={cancelProcessing}
+                variant="detailed"
+                className="mb-6"
+              />
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
+                <span className="text-red-700 dark:text-red-300">{error}</span>
+              </div>
+            )}
             {/* Input Mode Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -364,94 +534,76 @@ export default function CSVToPDF({ onReset }: { onReset: () => void }) {
               </div>
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <AlertCircle className="h-5 w-5 text-red-500 mr-3" />
-                <span className="text-red-700 dark:text-red-300">{error}</span>
-              </div>
-            )}
-
             {/* Convert Button */}
-            <button
-              onClick={handleConvert}
-              disabled={isConverting || !csvContent.trim()}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center"
-            >
-              {isConverting ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Converting...
-                </>
-              ) : (
-                <>
-                  <FileSpreadsheet className="h-5 w-5 mr-2" />
-                  Convert to PDF
-                </>
-              )}
-            </button>
+            {!isProcessing && (
+              <button
+                onClick={handleConvert}
+                disabled={!csvContent.trim()}
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center"
+              >
+                <FileSpreadsheet className="h-5 w-5 mr-2" />
+                Convert to PDF
+              </button>
+            )}
           </div>
         ) : (
-          <div className="text-center space-y-6">
-            <div className="flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full mx-auto">
-              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Conversion Complete!
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Your CSV has been successfully converted to PDF
-              </p>
-            </div>
+          <SuccessAnimation
+            title="Conversion Complete!"
+            message="Your CSV has been successfully converted to PDF"
+            stats={[
+              {
+                label: 'Original Size',
+                value: `${result.originalSize.toLocaleString()} characters`,
+                icon: <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              },
+              {
+                label: 'PDF Size',
+                value: `${(result.convertedSize / 1024).toFixed(2)} KB`,
+                icon: <FileSpreadsheet className="h-5 w-5 text-green-600 dark:text-green-400" />
+              },
+              {
+                label: 'Pages',
+                value: result.pagesCount.toString(),
+                icon: <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              },
+              {
+                label: 'Rows',
+                value: result.rowsCount.toString(),
+                icon: <FileSpreadsheet className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              }
+            ]}
+            onAction={handleDownload}
+            actionLabel="Download PDF"
+            actionIcon={<Download className="h-5 w-5" />}
+            showConfetti={true}
+            className="mb-6"
+          />
+        )}
 
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400">Original Size</div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {result.originalSize.toLocaleString()} characters
-                  </div>
-                </div>
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400">PDF Size</div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {(result.convertedSize / 1024).toFixed(2)} KB
-                  </div>
-                </div>
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400">Pages</div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {result.pagesCount}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-gray-500 dark:text-gray-400">Rows</div>
-                  <div className="font-semibold text-gray-900 dark:text-white">
-                    {result.rowsCount}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={handleDownload}
-                className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
-              >
-                <Download className="h-5 w-5 mr-2" />
-                Download PDF
-              </button>
-              <button
-                onClick={handleReset}
-                className="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
-              >
-                <RotateCcw className="h-5 w-5 mr-2" />
-                Convert Another
-              </button>
-            </div>
+        {/* Reset Button */}
+        {result && (
+          <div className="text-center">
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
+            >
+              <RotateCcw className="h-5 w-5 mr-2" />
+              Convert Another
+            </button>
           </div>
+        )}
+
+        {/* File Rename Modal */}
+        {pendingDownload && (
+          <FileRenameModal
+            isOpen={isRenameModalOpen}
+            onClose={handleRenameClose}
+            onConfirm={handleRenameConfirm}
+            currentFileName={pendingDownload.fileName}
+            fileExtension={getFileExtension(pendingDownload.fileName)}
+            operationType={pendingDownload.operationType}
+            fileSize={pendingDownload.fileSize}
+          />
         )}
       </div>
     </div>

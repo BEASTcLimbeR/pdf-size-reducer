@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload, Palette } from 'lucide-react';
 
 // Lazy load heavy components for better performance
 const PDFUploader = lazy(() => import('@/components/PDFUploader'));
 const EnhancedFileUploader = lazy(() => import('@/components/EnhancedFileUploader'));
 const EnhancedPDFUploader = lazy(() => import('@/components/EnhancedPDFUploader'));
 const CompressionResults = lazy(() => import('@/components/CompressionResults'));
-const MergePDF = lazy(() => import('@/components/MergePDF'));
+import MergePDF from '@/components/MergePDF';
+import SupportedFormats from '@/components/SupportedFormats';
+import DebugFormats from '@/components/DebugFormats';
 const SplitPDF = lazy(() => import('@/components/SplitPDF'));
 const RemovePages = lazy(() => import('@/components/RemovePages'));
 const ExtractPages = lazy(() => import('@/components/ExtractPages'));
@@ -44,9 +46,14 @@ const PDFForms = lazy(() => import('@/components/PDFForms'));
 const WebhookSettings = lazy(() => import('@/components/WebhookSettings'));
 const AIDocumentChat = lazy(() => import('@/components/AIDocumentChat'));
 const AdobeStyleAIChat = lazy(() => import('@/components/AdobeStyleAIChat'));
-const SmartDocumentRelationships = lazy(() => import('@/components/SmartDocumentRelationships'));
-const PredictiveProcessing = lazy(() => import('@/components/PredictiveProcessing'));
+import SmartDocumentRelationships from '@/components/SmartDocumentRelationships';
+import PredictiveProcessing from '@/components/PredictiveProcessing';
 const AdvancedSecurity = lazy(() => import('@/components/AdvancedSecurity'));
+// Import CorelDRAW components
+import PDFToCorelDraw from '@/components/PDFToCorelDraw';
+import PNGToCorelDraw from '@/components/PNGToCorelDraw';
+import CorelDrawToPDF from '@/components/CorelDrawToPDF';
+import CorelDrawToPNG from '@/components/CorelDrawToPNG';
 
 // Keep these components as regular imports (lightweight and frequently used)
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -202,7 +209,11 @@ export default function Home() {
         { id: 'csv-to-pdf', name: 'CSV to PDF', icon: FileSpreadsheet, description: 'Convert CSV files to PDF tables' },
         { id: 'png-webp-to-pdf', name: 'PNG/WebP to PDF', icon: Image, description: 'Convert PNG/WebP images to PDF' },
         { id: 'txt-to-pdf', name: 'TXT to PDF', icon: Type, description: 'Convert text files to PDF' },
-        { id: 'rtf-to-pdf', name: 'RTF to PDF', icon: Type, description: 'Convert RTF files to PDF' }
+        { id: 'rtf-to-pdf', name: 'RTF to PDF', icon: Type, description: 'Convert RTF files to PDF' },
+        { id: 'pdf-to-corel', name: 'PDF to CorelDRAW', icon: Palette, description: 'Convert PDF to CorelDRAW (.cdr) files' },
+        { id: 'png-to-corel', name: 'PNG to CorelDRAW', icon: Palette, description: 'Convert PNG images to CorelDRAW (.cdr) files' },
+        { id: 'corel-to-pdf', name: 'CorelDRAW to PDF', icon: Palette, description: 'Convert CorelDRAW (.cdr) files to PDF' },
+        { id: 'corel-to-png', name: 'CorelDRAW to PNG', icon: Palette, description: 'Convert CorelDRAW (.cdr) files to PNG images' },
       ]
     },
     {
@@ -243,7 +254,8 @@ export default function Home() {
         { id: 'adobe-ai-chat', name: 'Adobe-Style AI Assistant', icon: Sparkles, description: 'Advanced AI assistant with Adobe-level intelligence and document understanding' },
         { id: 'smart-relationships', name: 'Smart Document Relationships', icon: Network, description: 'AI detects related documents and suggests connections' },
         { id: 'predictive-processing', name: 'Predictive Processing', icon: Sparkles, description: 'AI learns your patterns and suggests operations' },
-        { id: 'webhooks', name: 'Webhook Notifications', icon: Zap, description: 'Get real-time notifications when operations complete' }
+        { id: 'webhooks', name: 'Webhook Notifications', icon: Zap, description: 'Get real-time notifications when operations complete' },
+        { id: 'supported-formats', name: 'Supported Formats', icon: FileText, description: 'View all supported file formats and their capabilities' }
       ]
     }
   ];
@@ -410,7 +422,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="relative z-10 max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8 lg:py-8">
          {/* Hero Section - Show when no specific tool is selected */}
-         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
+         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
            <div className="text-center mb-4 sm:mb-8 lg:mb-12 px-1 sm:px-4">
              <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 leading-tight">
                Work with PDFs the way they were meant to be — fast, secure, and effortless.
@@ -436,7 +448,7 @@ export default function Home() {
          )}
 
         {/* Tool Header - Show when specific tool is selected */}
-        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && (
+        {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'supported-formats', 'advanced-security'].includes(activeTool) && (
           <div className="text-center mb-8">
             {/* Back Button */}
             <div className="flex justify-start mb-4">
@@ -477,7 +489,7 @@ export default function Home() {
         )}
 
         {/* Tool Categories - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'supported-formats', 'advanced-security'].includes(activeTool) && (
           <div className="space-y-8 sm:space-y-12">
             {/* Organize */}
             <div>
@@ -847,9 +859,7 @@ export default function Home() {
 
         {/* Merge PDF Tool */}
         {activeTool === 'merge' && (
-          <Suspense fallback={<PDFToolLoading />}>
-            <MergePDF onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <MergePDF onReset={() => setActiveTool('home')} />
         )}
 
         {/* Split PDF Tool */}
@@ -1062,6 +1072,30 @@ export default function Home() {
           </Suspense>
         )}
 
+        {activeTool === 'pdf-to-corel' && (
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PDFToCorelDraw onReset={() => setActiveTool('home')} />
+          </Suspense>
+        )}
+
+        {activeTool === 'png-to-corel' && (
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PNGToCorelDraw onReset={() => setActiveTool('home')} />
+          </Suspense>
+        )}
+
+        {activeTool === 'corel-to-pdf' && (
+          <Suspense fallback={<ConversionToolLoading />}>
+            <CorelDrawToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
+        )}
+
+        {activeTool === 'corel-to-png' && (
+          <Suspense fallback={<ConversionToolLoading />}>
+            <CorelDrawToPNG onReset={() => setActiveTool('home')} />
+          </Suspense>
+        )}
+
         {/* Batch Processing Tool */}
         {activeTool === 'batch-processing' && (
           <Suspense fallback={<PDFToolLoading />}>
@@ -1100,16 +1134,16 @@ export default function Home() {
 
         {/* Smart Document Relationships */}
         {activeTool === 'smart-relationships' && (
-          <Suspense fallback={<AIToolLoading />}>
-            <SmartDocumentRelationships onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <SmartDocumentRelationships onReset={() => setActiveTool('home')} />
         )}
 
         {/* Predictive Processing */}
         {activeTool === 'predictive-processing' && (
-          <Suspense fallback={<AIToolLoading />}>
-            <PredictiveProcessing onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <PredictiveProcessing onReset={() => setActiveTool('home')} />
+        )}
+
+        {activeTool === 'supported-formats' && (
+          <DebugFormats />
         )}
 
         {/* Advanced Security */}
@@ -1119,8 +1153,9 @@ export default function Home() {
           </Suspense>
         )}
 
+
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'supported-formats', 'advanced-security'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">

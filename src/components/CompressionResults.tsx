@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileText, Download, RotateCcw, Loader2, AlertCircle, Settings } from 'lucide-react';
-import { compressPDF, advancedCompressPDF, simpleCompressPDF, formatFileSize, validatePDFFile, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
+import { compressPDF, advancedCompressPDF, simpleCompressPDF, formatFileSize, validatePDFFile, validatePDFFileAsync, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
 import { webhookService } from '@/utils/webhookService';
 import CompressionMeter from './CompressionMeter';
+import FileRenameModal from './FileRenameModal';
+import { useFileDownload } from '@/hooks/useFileDownload';
 
 interface CompressionResultsProps {
   file: File;
@@ -46,6 +48,17 @@ export default function CompressionResults({
   });
   const [showSettings, setShowSettings] = useState(false);
 
+  // File download with rename functionality
+  const {
+    isRenameModalOpen,
+    pendingDownload,
+    downloadFile,
+    handleRenameConfirm,
+    handleRenameClose,
+    getFileExtension,
+    getFileNameWithoutExtension
+  } = useFileDownload();
+
   // Compress PDF function using the utility with fallback
   const handleCompressPDF = useCallback(async () => {
     const compressionStartTime = Date.now();
@@ -60,13 +73,21 @@ export default function CompressionResults({
         compressionOptions
       });
 
-      // Validate file first
-      const validation = validatePDFFile(file);
+      // Validate file first with enhanced validation
+      console.log('Validating PDF file...');
+      const validation = await validatePDFFileAsync(file);
       if (!validation.isValid) {
-        console.error('File validation failed:', validation.error);
+        console.error('File validation failed:', {
+          error: validation.error,
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          fileExtension: file.name.split('.').pop()
+        });
         onError(validation.error || 'Invalid file');
         return;
       }
+      console.log('PDF file validation successful');
 
       setCompressionProgress(20);
 
@@ -131,19 +152,23 @@ export default function CompressionResults({
     }
   }, [file, compressedFile, error, handleCompressPDF]);
 
-  // Download compressed file
+  // Download compressed file with rename functionality
   const downloadCompressedFile = () => {
     if (!compressedFile) return;
 
-    const blob = new Blob([compressedFile as BlobPart], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `compressed_${file.name}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const originalFileName = file.name;
+    const fileExtension = getFileExtension(originalFileName);
+    const fileNameWithoutExt = getFileNameWithoutExtension(originalFileName);
+    const defaultFileName = `${fileNameWithoutExt}_compressed${fileExtension}`;
+
+    downloadFile({
+      fileName: defaultFileName,
+      fileData: compressedFile,
+      mimeType: 'application/pdf',
+      operationType: 'compressed',
+      showRenameModal: true,
+      fileSize: compressedFile.length
+    });
   };
 
   return (
@@ -439,6 +464,19 @@ export default function CompressionResults({
             </button>
           </div>
         </div>
+      )}
+
+      {/* File Rename Modal */}
+      {pendingDownload && (
+        <FileRenameModal
+          isOpen={isRenameModalOpen}
+          onClose={handleRenameClose}
+          onConfirm={handleRenameConfirm}
+          currentFileName={pendingDownload.fileName}
+          fileExtension={getFileExtension(pendingDownload.fileName)}
+          operationType={pendingDownload.operationType}
+          fileSize={pendingDownload.fileSize}
+        />
       )}
     </div>
   );
