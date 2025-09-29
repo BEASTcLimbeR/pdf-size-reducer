@@ -5,6 +5,7 @@ import { MessageCircle, Send, Upload, FileText, Brain, Sparkles, Download, Searc
 import { AccurateAI, analyzeDocument as analyzeDocumentFile } from '@/utils/accurateAI';
 import { LanguageDetector } from '@/utils/languageDetector';
 import { chatGPT5AI } from '@/utils/chatgpt5AI';
+import { enhancedSummarizer, SummarizationOptions, DocumentSummary } from '@/utils/enhancedSummarizer';
 
 interface ChatMessage {
   id: string;
@@ -35,6 +36,8 @@ interface DocumentContext {
     sentiment: string;
     confidence: number;
   };
+  enhancedSummary?: DocumentSummary; // QuillBot-style enhanced summary
+  fileAnalysis?: any; // Detailed file analysis
 }
 
 interface AIDocumentChatProps {
@@ -50,6 +53,14 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('unavailable');
+  const [summarizationOptions, setSummarizationOptions] = useState<SummarizationOptions>({
+    summaryLength: 'medium',
+    focusMode: 'balanced',
+    includeBullets: true,
+    includeNumbers: true,
+    highlightImportant: true
+  });
+  const [showSummaryOptions, setShowSummaryOptions] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,43 +91,65 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
     scrollToBottom();
   }, [messages]);
 
-  // REAL AI document analysis using ML backend
+  // Enhanced document analysis with QuillBot-style summarization
   const analyzeDocument = async (file: File): Promise<DocumentContext> => {
     setIsAnalyzing(true);
     setAnalysisProgress(0);
 
     try {
-      // Step 1: Upload to AI backend
-      setAnalysisProgress(25);
+      // Step 1: Analyze file with enhanced summarizer
+      setAnalysisProgress(20);
+      console.log('🔍 Analyzing file with enhanced summarizer...');
+      const fileAnalysis = await enhancedSummarizer.analyzeFile(file);
       
-      // Step 2: REAL PDF content extraction
+      // Step 2: Generate QuillBot-style summary
       setAnalysisProgress(50);
-      let realContent = null;
+      console.log('📝 Generating enhanced summary...');
+      const enhancedSummary = await enhancedSummarizer.generateSummary(fileAnalysis, summarizationOptions);
+      
+      // Step 3: Get additional AI analysis
+      setAnalysisProgress(75);
+      let analysis;
       try {
-        const { SimplePDFReader } = await import('@/utils/simplePDFReader');
-        realContent = await SimplePDFReader.analyzePDF(file);
-        console.log('✅ Real PDF content extracted successfully');
-      } catch (extractionError) {
-        console.log('⚠️ Real extraction failed, using analysis fallback');
+        analysis = await analyzeDocumentFile(file);
+      } catch (error) {
+        console.log('⚠️ AI analysis failed, using fallback');
+        analysis = {
+          document_type: fileAnalysis.fileType.toUpperCase(),
+          key_topics: enhancedSummary.keyPoints.slice(0, 5),
+          entities: fileAnalysis.extractedData.entities || fileAnalysis.extractedData.topics || [],
+          summary: enhancedSummary.summary,
+          word_count: fileAnalysis.wordCount,
+          reading_time: enhancedSummary.readingTime.summary,
+          complexity: 'medium',
+          sentiment: 'neutral',
+          confidence: enhancedSummary.confidence
+        };
       }
       
-      const analysis = await analyzeDocumentFile(file);
-      
-      // Step 3: Process results
+      // Step 4: Process results
       setAnalysisProgress(100);
       await new Promise(resolve => setTimeout(resolve, 500));
 
       const documentContext: DocumentContext = {
         file,
-        content: realContent ? `Real content extracted from ${file.name}` : `Advanced AI analysis of ${file.name}`,
-        pages: realContent ? realContent.pages : (analysis.word_count > 0 ? Math.max(1, Math.ceil(analysis.word_count / 300)) : Math.max(1, Math.floor(file.size / 50000))),
+        content: fileAnalysis.content,
+        pages: fileAnalysis.pages,
         documentId: `doc_${Date.now()}`,
-        realContent: realContent, // Store real content for accurate responses
+        realContent: {
+          ...fileAnalysis.extractedData,
+          extractedText: fileAnalysis.content, // Add the main content as extractedText
+          text: fileAnalysis.content,
+          pages: fileAnalysis.pages,
+          wordCount: fileAnalysis.wordCount
+        },
+        fileAnalysis,
+        enhancedSummary,
         analysis: {
           document_type: analysis.document_type,
           key_topics: analysis.key_topics,
           entities: analysis.entities,
-          summary: analysis.summary,
+          summary: enhancedSummary.summary, // Use enhanced summary
           word_count: analysis.word_count,
           reading_time: analysis.reading_time,
           complexity: analysis.complexity,
@@ -125,9 +158,11 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
         }
       };
 
+      console.log('✅ Enhanced document analysis completed');
       setIsAnalyzing(false);
       return documentContext;
     } catch (error) {
+      console.error('❌ Enhanced document analysis failed:', error);
       setIsAnalyzing(false);
       throw error;
     }
@@ -187,8 +222,18 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || file.type !== 'application/pdf') {
-      alert('Please upload a PDF file');
+    if (!file) {
+      alert('Please select a file');
+      return;
+    }
+
+    // Check file type
+    const fileName = file.name.toLowerCase();
+    const supportedTypes = ['.pdf', '.docx', '.xlsx', '.txt'];
+    const isSupported = supportedTypes.some(type => fileName.endsWith(type));
+    
+    if (!isSupported) {
+      alert('Please upload a PDF, Word, Excel, or text file');
       return;
     }
 
@@ -196,28 +241,42 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
       const context = await analyzeDocument(file);
       setUploadedDoc(context);
       
-      // Add welcome message
+      // Add enhanced welcome message with QuillBot-style summary
       const welcomeMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
-        content: `📄 **Document Analysis Complete!**
+        content: `📄 **Enhanced Document Analysis Complete!**
 
-I've successfully analyzed "${file.name}" (${context.pages} pages, ${context.analysis.word_count} words).
+I've successfully analyzed "${file.name}" using QuillBot-style summarization technology.
 
-**Key Topics Identified:**
+**📊 Document Overview:**
+• **Pages:** ${context.pages}
+• **Word Count:** ${context.analysis.word_count.toLocaleString()} words
+• **Type:** ${context.analysis.document_type}
+• **Complexity:** ${context.analysis.complexity}
+• **Reading Time:** ~${context.analysis.reading_time} minutes
+
+**🎯 Key Topics Identified:**
 ${context.analysis.key_topics.map(topic => `• ${topic}`).join('\n')}
 
-**Document Type:** ${context.analysis.document_type}
-**Complexity:** ${context.analysis.complexity}
-**Reading Time:** ~${context.analysis.reading_time} minutes
+**📝 Enhanced Summary (QuillBot-style):**
+${context.enhancedSummary ? context.enhancedSummary.summary : context.analysis.summary}
 
-**Quick Summary:**
-${context.analysis.summary}
+${context.enhancedSummary ? `
+**📈 Summary Statistics:**
+• **Original:** ${context.enhancedSummary.wordCount.original.toLocaleString()} words
+• **Summary:** ${context.enhancedSummary.wordCount.summary.toLocaleString()} words  
+• **Reduction:** ${context.enhancedSummary.wordCount.reduction}% condensed
+• **Confidence:** ${Math.round(context.enhancedSummary.confidence * 100)}%
 
-**What would you like to know?** You can ask me anything about this document - from specific details to high-level summaries. I'm here to help you understand and work with your content!`,
+**🔑 Key Points:**
+${context.enhancedSummary.keyPoints.slice(0, 5).map(point => `• ${point}`).join('\n')}
+` : ''}
+
+**💬 What would you like to know?** Ask me anything about this document - I can provide detailed analysis, answer specific questions, or generate different types of summaries!`,
         timestamp: new Date(),
         metadata: {
-          confidence: 0.95,
+          confidence: context.enhancedSummary ? context.enhancedSummary.confidence : 0.95,
           suggestions: SUGGESTED_QUESTIONS.slice(0, 6)
         }
       };
@@ -330,7 +389,7 @@ ${context.analysis.summary}
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Upload PDF
+              Upload Document
             </button>
           </div>
         </div>
@@ -380,7 +439,7 @@ ${context.analysis.summary}
         type="file"
         ref={fileInputRef}
         onChange={handleFileUpload}
-        accept=".pdf"
+        accept=".pdf,.docx,.xlsx,.txt"
         className="hidden"
       />
 
@@ -548,18 +607,18 @@ ${context.analysis.summary}
         <div className="text-center py-16 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
           <Brain className="h-16 w-16 text-purple-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Ready to Chat with Your PDF?
+            Ready to Chat with Your Documents?
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-            Upload a PDF document and start having intelligent conversations about its content. 
-            Ask questions, get summaries, find specific information - all powered by AI.
+            Upload PDF, Word, Excel, or text documents and get QuillBot-style intelligent summaries. 
+            Ask questions, get detailed analysis, find specific information - all powered by advanced AI.
           </p>
           <button
             onClick={() => fileInputRef.current?.click()}
             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center mx-auto"
           >
             <Upload className="h-5 w-5 mr-2" />
-            Upload Your First PDF
+            Upload Your Document
           </button>
         </div>
       )}

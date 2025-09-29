@@ -82,7 +82,14 @@ export default function OCRPDF({ onReset }: { onReset: () => void }) {
               
               // Perform OCR on the canvas
               const imageData = ctx.getImageData(0, 0, 800, 600);
-              const { data: { text } } = await Tesseract.recognize(imageData, 'eng', {
+              const ocrCanvas = document.createElement('canvas');
+              ocrCanvas.width = 800;
+              ocrCanvas.height = 600;
+              const ocrCtx = ocrCanvas.getContext('2d');
+              if (ocrCtx) {
+                ocrCtx.putImageData(imageData, 0, 0);
+              }
+              const { data: { text } } = await Tesseract.recognize(ocrCanvas, 'eng', {
                 logger: (m) => {
                   if (m.status === 'recognizing text') {
                     const progress = 30 + (i / pages.length) * 50 + (m.progress * 0.1);
@@ -152,7 +159,7 @@ export default function OCRPDF({ onReset }: { onReset: () => void }) {
   const handleFileUpload = useCallback(async (file: File) => {
     const validation = validatePDFFile(file);
     if (!validation.isValid) {
-      setError(validation.error || 'Invalid file');
+      setError(validation.errors?.[0] || 'Invalid file');
       return;
     }
 

@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload } from 'lucide-react';
 import PDFUploader from '@/components/PDFUploader';
+import EnhancedFileUploader from '@/components/EnhancedFileUploader';
+import EnhancedPDFUploader from '@/components/EnhancedPDFUploader';
 import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
 import SplitPDF from '@/components/SplitPDF';
@@ -45,6 +47,7 @@ import PredictiveProcessing from '@/components/PredictiveProcessing';
 import AdvancedSecurity from '@/components/AdvancedSecurity';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToolCard from '@/components/ToolCard';
+import Squares from '@/components/Squares';
 
 export default function Home() {
   const [activeTool, setActiveTool] = useState('home');
@@ -252,9 +255,20 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible relative">
+        {/* Full Page Animated Background */}
+        <div className="fixed inset-0 z-0 opacity-10 dark:opacity-5">
+          <Squares 
+            direction="diagonal"
+            speed={0.5}
+            borderColor="#3b82f6"
+            squareSize={80}
+            hoverFillColor="#3b82f6"
+            className="w-full h-full"
+          />
+        </div>
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
+      <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-4 xl:px-8">
           <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-4">
             <button 
@@ -389,32 +403,32 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8 lg:py-8">
-        {/* Hero Section - Show when no specific tool is selected */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
-          <div className="text-center mb-4 sm:mb-8 lg:mb-12 px-1 sm:px-4">
-            <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 leading-tight">
-              Work with PDFs the way they were meant to be — fast, secure, and effortless.
-            </h1>
-            <p className="text-xs sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-3 sm:mb-6 lg:mb-8 leading-relaxed px-1">
-              From batch processing to advanced protection, DocNestly delivers enterprise-level solutions that keep your workflow moving smoothly. All in your browser. No uploads, no registrations. Just powerful tools, always in flow.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 lg:gap-6 text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400">
-              <div className="flex items-center">
-                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
-                100% Free
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
-                No Registration Required
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
-                Secure & Private
-              </div>
-            </div>
-          </div>
-        )}
+      <main className="relative z-10 max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8 lg:py-8">
+         {/* Hero Section - Show when no specific tool is selected */}
+         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
+           <div className="text-center mb-4 sm:mb-8 lg:mb-12 px-1 sm:px-4">
+             <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 leading-tight">
+               Work with PDFs the way they were meant to be — fast, secure, and effortless.
+             </h1>
+             <p className="text-xs sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-3 sm:mb-6 lg:mb-8 leading-relaxed px-1">
+               From batch processing to advanced protection, DocNestly delivers enterprise-level solutions that keep your workflow moving smoothly. All in your browser. No uploads, no registrations. Just powerful tools, always in flow.
+             </p>
+             <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 lg:gap-6 text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400">
+               <div className="flex items-center">
+                 <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
+                 100% Free
+               </div>
+               <div className="flex items-center">
+                 <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
+                 No Registration Required
+               </div>
+               <div className="flex items-center">
+                 <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 mr-1 sm:mr-2" />
+                 Secure & Private
+               </div>
+             </div>
+           </div>
+         )}
 
         {/* Tool Header - Show when specific tool is selected */}
         {['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'advanced-security'].includes(activeTool) && (
@@ -802,7 +816,14 @@ export default function Home() {
         {activeTool === 'compress' && (
           <>
             {!uploadedFile ? (
-              <PDFUploader onFileUpload={handleFileUpload} />
+              <EnhancedPDFUploader 
+                onFileUpload={handleFileUpload}
+                maxFiles={1}
+                maxSize={50}
+                showPreview={true}
+                showFileInfo={true}
+                className="max-w-4xl mx-auto"
+              />
             ) : (
               <CompressionResults
                 file={uploadedFile}
@@ -989,6 +1010,7 @@ export default function Home() {
           <WebhookSettings onReset={() => setActiveTool('home')} />
         )}
 
+
         {/* AI Document Chat */}
         {activeTool === 'ai-chat' && (
           <AIDocumentChat onReset={() => setActiveTool('home')} />
@@ -1053,7 +1075,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-16">
+      <footer className="relative z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-500 dark:text-gray-400">
             <p className="mb-2">

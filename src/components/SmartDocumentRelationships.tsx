@@ -1,30 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Network, Upload, FileText, Link, Merge, GitBranch, Brain, Sparkles, Download, Eye, Trash2, Plus, ArrowRight, CheckCircle, AlertCircle, Clock } from 'lucide-react';
-
-interface DocumentNode {
-  id: string;
-  name: string;
-  file: File;
-  size: number;
-  pages: number;
-  uploadDate: Date;
-  contentHash: string;
-  topics: string[];
-  entities: string[];
-  summary: string;
-  relationships: DocumentRelationship[];
-}
-
-interface DocumentRelationship {
-  targetId: string;
-  type: 'similar_content' | 'shared_entities' | 'complementary' | 'duplicate' | 'version';
-  strength: number; // 0-1
-  description: string;
-  suggestedAction: 'merge' | 'link' | 'compare' | 'archive';
-  commonElements: string[];
-}
+import { Network, Upload, FileText, Link, Merge, GitBranch, Brain, Sparkles, Download, Eye, Trash2, Plus, ArrowRight, CheckCircle, AlertCircle, Clock, Copy } from 'lucide-react';
+import { documentRelationshipAI, DocumentNode, DocumentRelationship } from '../utils/documentRelationshipAI';
 
 interface SmartDocumentRelationshipsProps {
   onReset: () => void;
@@ -37,151 +15,42 @@ export default function SmartDocumentRelationships({ onReset }: SmartDocumentRel
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'network'>('grid');
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [isAIBackendAvailable, setIsAIBackendAvailable] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Simulate AI document analysis
-  const analyzeDocument = async (file: File): Promise<DocumentNode> => {
-    // Simulate content analysis
-    const mockTopics = [
-      ['Financial Planning', 'Budget Analysis', 'Revenue Projections'],
-      ['Marketing Strategy', 'Brand Guidelines', 'Campaign Analysis'],
-      ['Technical Specification', 'System Architecture', 'API Documentation'],
-      ['Legal Contract', 'Terms of Service', 'Compliance Requirements'],
-      ['Project Management', 'Timeline Planning', 'Resource Allocation']
-    ];
-
-    const mockEntities = [
-      ['Company ABC', 'John Smith', 'Q4 2024'],
-      ['Marketing Dept', 'Sarah Johnson', 'Campaign Alpha'],
-      ['Tech Team', 'Mike Chen', 'Version 2.1'],
-      ['Legal Counsel', 'Anna Davis', 'Contract 2024'],
-      ['Project Manager', 'David Wilson', 'Phase 1']
-    ];
-
-    const randomIndex = Math.floor(Math.random() * mockTopics.length);
-
-    return {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      name: file.name,
-      file,
-      size: file.size,
-      pages: Math.floor(Math.random() * 50) + 1,
-      uploadDate: new Date(),
-      contentHash: `hash_${Date.now()}`,
-      topics: mockTopics[randomIndex],
-      entities: mockEntities[randomIndex],
-      summary: `This document focuses on ${mockTopics[randomIndex][0].toLowerCase()} and contains detailed information about ${mockTopics[randomIndex][1].toLowerCase()}. Key aspects include strategic planning, implementation guidelines, and performance metrics.`,
-      relationships: []
+  // Check AI backend availability on component mount
+  useEffect(() => {
+    const checkAIBackend = async () => {
+      const available = documentRelationshipAI.isAIBackendAvailable();
+      setIsAIBackendAvailable(available);
+      console.log('🤖 AI Backend available for document relationships:', available);
     };
-  };
+    checkAIBackend();
+  }, []);
 
-  // Find relationships between documents
-  const findRelationships = (newDoc: DocumentNode, existingDocs: DocumentNode[]): DocumentRelationship[] => {
-    const relationships: DocumentRelationship[] = [];
-
-    existingDocs.forEach(doc => {
-      // Check for similar content
-      const commonTopics = newDoc.topics.filter(topic => 
-        doc.topics.some(docTopic => docTopic.toLowerCase().includes(topic.toLowerCase()) || topic.toLowerCase().includes(docTopic.toLowerCase()))
-      );
-
-      const commonEntities = newDoc.entities.filter(entity => 
-        doc.entities.some(docEntity => docEntity.toLowerCase().includes(entity.toLowerCase()) || entity.toLowerCase().includes(docEntity.toLowerCase()))
-      );
-
-      // Similar content relationship
-      if (commonTopics.length >= 2) {
-        relationships.push({
-          targetId: doc.id,
-          type: 'similar_content',
-          strength: Math.min(commonTopics.length / Math.max(newDoc.topics.length, doc.topics.length), 1),
-          description: `Shares ${commonTopics.length} common topics: ${commonTopics.join(', ')}`,
-          suggestedAction: 'link',
-          commonElements: commonTopics
-        });
-      }
-
-      // Shared entities relationship
-      if (commonEntities.length >= 1) {
-        relationships.push({
-          targetId: doc.id,
-          type: 'shared_entities',
-          strength: Math.min(commonEntities.length / Math.max(newDoc.entities.length, doc.entities.length), 1),
-          description: `Shares ${commonEntities.length} common entities: ${commonEntities.join(', ')}`,
-          suggestedAction: 'compare',
-          commonElements: commonEntities
-        });
-      }
-
-      // Check for potential duplicates (similar names)
-      const nameSimilarity = calculateNameSimilarity(newDoc.name, doc.name);
-      if (nameSimilarity > 0.7) {
-        relationships.push({
-          targetId: doc.id,
-          type: 'duplicate',
-          strength: nameSimilarity,
-          description: `Potentially duplicate or version of "${doc.name}"`,
-          suggestedAction: 'compare',
-          commonElements: ['Similar filename']
-        });
-      }
-
-      // Complementary content (different topics but same entities)
-      if (commonTopics.length === 0 && commonEntities.length >= 2) {
-        relationships.push({
-          targetId: doc.id,
-          type: 'complementary',
-          strength: commonEntities.length / Math.max(newDoc.entities.length, doc.entities.length),
-          description: `Complementary content about ${commonEntities.join(', ')}`,
-          suggestedAction: 'link',
-          commonElements: commonEntities
-        });
-      }
-    });
-
-    return relationships.sort((a, b) => b.strength - a.strength);
-  };
-
-  const calculateNameSimilarity = (name1: string, name2: string): number => {
-    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const n1 = normalize(name1);
-    const n2 = normalize(name2);
-    
-    if (n1 === n2) return 1;
-    
-    const longer = n1.length > n2.length ? n1 : n2;
-    const shorter = n1.length > n2.length ? n2 : n1;
-    
-    if (longer.length === 0) return 1;
-    
-    const distance = levenshteinDistance(longer, shorter);
-    return (longer.length - distance) / longer.length;
-  };
-
-  const levenshteinDistance = (str1: string, str2: string): number => {
-    const matrix = [];
-    for (let i = 0; i <= str2.length; i++) {
-      matrix[i] = [i];
+  // Real AI document analysis using backend service
+  const analyzeDocument = async (file: File): Promise<DocumentNode> => {
+    try {
+      console.log('🔍 Analyzing document with real AI:', file.name);
+      return await documentRelationshipAI.analyzeDocument(file);
+    } catch (error) {
+      console.error('❌ AI document analysis failed:', error);
+      throw error;
     }
-    for (let j = 0; j <= str1.length; j++) {
-      matrix[0][j] = j;
-    }
-    for (let i = 1; i <= str2.length; i++) {
-      for (let j = 1; j <= str1.length; j++) {
-        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
-        } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
-          );
-        }
-      }
-    }
-    return matrix[str2.length][str1.length];
   };
+
+  // Find relationships between documents using AI
+  const findRelationships = async (newDoc: DocumentNode, existingDocs: DocumentNode[]): Promise<DocumentRelationship[]> => {
+    try {
+      console.log('🔗 Finding relationships using AI for:', newDoc.name);
+      return await documentRelationshipAI.findRelationships(newDoc, existingDocs);
+    } catch (error) {
+      console.error('❌ Relationship analysis failed:', error);
+      return [];
+    }
+  };
+
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -195,39 +64,52 @@ export default function SmartDocumentRelationships({ onReset }: SmartDocumentRel
     setIsAnalyzing(true);
     setAnalysisProgress(0);
 
-    for (let i = 0; i < pdfFiles.length; i++) {
-      const file = pdfFiles[i];
-      setAnalysisProgress((i / pdfFiles.length) * 100);
-      
-      try {
-        const newDoc = await analyzeDocument(file);
-        const relationships = findRelationships(newDoc, documents);
-        newDoc.relationships = relationships;
+    try {
+      for (let i = 0; i < pdfFiles.length; i++) {
+        const file = pdfFiles[i];
+        setAnalysisProgress((i / pdfFiles.length) * 100);
         
-        // Update existing documents with reverse relationships
-        const updatedDocs = documents.map(doc => {
-          const reverseRelationships = relationships
-            .filter(rel => rel.targetId === doc.id)
-            .map(rel => ({
-              ...rel,
-              targetId: newDoc.id,
-              description: `Related to "${newDoc.name}": ${rel.description}`
-            }));
+        try {
+          // Analyze document with real AI
+          const newDoc = await analyzeDocument(file);
           
-          return {
-            ...doc,
-            relationships: [...doc.relationships, ...reverseRelationships]
-          };
-        });
+          // Find relationships with existing documents using AI
+          const relationships = await findRelationships(newDoc, documents);
+          newDoc.relationships = relationships;
+          
+          // Update existing documents with reverse relationships
+          const updatedDocs = documents.map(doc => {
+            const reverseRelationships = relationships
+              .filter(rel => rel.targetId === doc.id)
+              .map(rel => ({
+                ...rel,
+                targetId: newDoc.id,
+                description: `Related to "${newDoc.name}": ${rel.description}`
+              }));
+            
+            return {
+              ...doc,
+              relationships: [...doc.relationships, ...reverseRelationships]
+            };
+          });
 
-        setDocuments([...updatedDocs, newDoc]);
-      } catch (error) {
-        console.error(`Failed to analyze ${file.name}:`, error);
+          setDocuments([...updatedDocs, newDoc]);
+          console.log(`✅ Successfully analyzed ${file.name} with AI`);
+          
+        } catch (error) {
+          console.error(`❌ Failed to analyze ${file.name}:`, error);
+          // Continue with other files even if one fails
+        }
       }
-    }
 
-    setAnalysisProgress(100);
-    setIsAnalyzing(false);
+      setAnalysisProgress(100);
+      console.log('🎉 Document relationship analysis completed');
+      
+    } catch (error) {
+      console.error('❌ File upload processing failed:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const executeAction = async (docId: string, targetId: string, action: string) => {
@@ -278,8 +160,17 @@ export default function SmartDocumentRelationships({ onReset }: SmartDocumentRel
               Smart Document Relationships
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              AI automatically detects relationships between your documents and suggests smart connections
+              {isAIBackendAvailable 
+                ? '🤖 Real AI automatically detects relationships between your documents and suggests smart connections'
+                : '📊 Smart analysis detects relationships between your documents using advanced pattern recognition'
+              }
             </p>
+            {isAIBackendAvailable && (
+              <div className="mt-2 flex items-center text-sm text-green-600 dark:text-green-400">
+                <CheckCircle className="h-4 w-4 mr-1" />
+                AI Backend Connected - Advanced Analysis Available
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-3">
             <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
@@ -378,7 +269,10 @@ export default function SmartDocumentRelationships({ onReset }: SmartDocumentRel
             ></div>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            AI is analyzing content, extracting entities, and finding relationships between your documents...
+            {isAIBackendAvailable 
+              ? '🤖 Real AI is analyzing content, extracting entities, and finding relationships between your documents...'
+              : '📊 Advanced pattern recognition is analyzing content and finding relationships between your documents...'
+            }
           </p>
         </div>
       )}
@@ -518,8 +412,10 @@ export default function SmartDocumentRelationships({ onReset }: SmartDocumentRel
             Discover Document Relationships
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-            Upload multiple PDF documents and let AI automatically discover relationships, 
-            suggest merges, and identify potential duplicates.
+            {isAIBackendAvailable 
+              ? 'Upload multiple PDF documents and let real AI automatically discover relationships, suggest merges, and identify potential duplicates using advanced natural language processing.'
+              : 'Upload multiple PDF documents and let our smart system discover relationships, suggest merges, and identify potential duplicates using advanced pattern recognition.'
+            }
           </p>
           <button
             onClick={() => fileInputRef.current?.click()}

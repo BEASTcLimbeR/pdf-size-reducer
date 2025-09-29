@@ -48,7 +48,7 @@ ${dates.map((date: string) => `• ${date}`).join('\n')}
         } else {
           response = `📅 **Date Analysis** (Real Content)
 
-**No Specific Dates Found:** After analyzing the complete ${realContent.estimatedWordCount.toLocaleString()}-word document, no explicit dates were identified in the text content.
+**No Specific Dates Found:** After analyzing the complete ${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()}-word document, no explicit dates were identified in the text content.
 
 **Alternative Temporal References:** The document may contain relative time references or general timeframes that don't follow standard date formats.`;
         }
@@ -71,11 +71,11 @@ ${contacts.map((contact: string) => `• ${contact}`).join('\n')}
 
 **Contact Analysis:** These contact details were extracted from the actual document text and represent real communication information mentioned in the content.
 
-**Document Context:** Found across ${realContent.pages} pages with ${realContent.estimatedWordCount.toLocaleString()} words of analyzed content.`;
+**Document Context:** Found across ${realContent?.pages || 'Unknown'} pages with ${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()} words of analyzed content.`;
         } else {
           response = `📞 **Contact Analysis** (Real Content)
 
-**No Contact Information Found:** After analyzing the complete document text (${realContent.estimatedWordCount.toLocaleString()} words), no email addresses, phone numbers, or explicit contact details were identified.
+**No Contact Information Found:** After analyzing the complete document text (${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()} words), no email addresses, phone numbers, or explicit contact details were identified.
 
 **Content Focus:** The document appears to focus on other aspects rather than contact information.`;
         }
@@ -94,11 +94,11 @@ ${amounts.map((amount: string) => `• ${amount}`).join('\n')}
 
 **Financial Analysis:** These amounts were extracted from the actual document content and represent real financial figures mentioned in the text.
 
-**Context:** Found in ${realContent.pages} pages of financial content with ${realContent.estimatedWordCount.toLocaleString()} words analyzed.`;
+**Context:** Found in ${realContent?.pages || 'Unknown'} pages of financial content with ${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()} words analyzed.`;
         } else {
           response = `💰 **Financial Analysis** (Real Content)
 
-**No Specific Amounts Found:** After analyzing ${realContent.estimatedWordCount.toLocaleString()} words of content, no explicit monetary amounts or financial figures were identified.
+**No Specific Amounts Found:** After analyzing ${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()} words of content, no explicit monetary amounts or financial figures were identified.
 
 **Document Nature:** This document may focus on non-financial aspects or use general financial terminology without specific amounts.`;
         }
@@ -107,7 +107,9 @@ ${amounts.map((amount: string) => `• ${amount}`).join('\n')}
 
       // Summary from real content
       else if (lowerQuestion.includes('summary') || lowerQuestion.includes('describe') || lowerQuestion.includes('about')) {
-        const contentPreview = realContent.extractedText.substring(0, 500);
+        // Handle different data structures from enhanced summarizer
+        const extractedText = realContent?.extractedText || realContent?.text || realContent?.rawText || '';
+        const contentPreview = extractedText ? extractedText.substring(0, 500) : 'No content available';
         
         response = `📄 **Real Content Summary**
 
@@ -115,9 +117,9 @@ ${amounts.map((amount: string) => `• ${amount}`).join('\n')}
 "${contentPreview}${contentPreview.length >= 500 ? '...' : ''}"
 
 **Document Statistics:**
-• Pages: ${realContent.pages}
-• Word Count: ${realContent.estimatedWordCount.toLocaleString()} words
-• Entities Found: ${Object.values(realContent.entities).flat().length} total
+• Pages: ${realContent?.pages || 'Unknown'}
+• Word Count: ${realContent?.estimatedWordCount?.toLocaleString() || realContent?.wordCount?.toLocaleString() || 'Unknown'} words
+• Entities Found: ${realContent?.entities ? Object.values(realContent.entities).flat().length : 0} total
 
 **Content Analysis:** This summary is generated from the actual extracted text content, not filename patterns or assumptions.`;
         confidence = 0.96;
@@ -125,14 +127,15 @@ ${amounts.map((amount: string) => `• ${amount}`).join('\n')}
 
       // Brief response from real content
       else if (lowerQuestion.includes('one line') || lowerQuestion.includes('brief')) {
-        const firstSentence = realContent.extractedText.match(/[^\.!?]+[\.!?]+/)?.[0]?.trim() || 
-                            realContent.extractedText.substring(0, 100);
+        const extractedText = realContent?.extractedText || realContent?.text || realContent?.rawText || '';
+        const firstSentence = extractedText.match(/[^\.!?]+[\.!?]+/)?.[0]?.trim() || 
+                            extractedText.substring(0, 100);
         
         response = `📝 **Brief Response** (Real Content)
 
 **One-Line Summary:** ${firstSentence}.
 
-**Quick Facts:** ${analysis.document_type} • ${realContent.estimatedWordCount.toLocaleString()} words • ${realContent.pages} pages
+**Quick Facts:** ${analysis.document_type} • ${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()} words • ${realContent?.pages || 'Unknown'} pages
 
 **Based on:** Actual extracted PDF content, not assumptions.`;
         confidence = 0.94;
@@ -144,7 +147,8 @@ ${amounts.map((amount: string) => `• ${amount}`).join('\n')}
           word.length > 3 && !['what', 'how', 'why', 'when', 'where', 'find', 'tell', 'show'].includes(word)
         );
 
-        const relevantSentences = this.findRelevantSentences(realContent.extractedText, searchKeywords);
+        const extractedText = realContent?.extractedText || realContent?.text || realContent?.rawText || '';
+        const relevantSentences = this.findRelevantSentences(extractedText, searchKeywords);
         
         response = `🔍 **Content Search Results** (Real PDF Analysis)
 
@@ -154,8 +158,8 @@ ${amounts.map((amount: string) => `• ${amount}`).join('\n')}
 ${relevantSentences.length > 0 ? relevantSentences.map(sentence => `• ${sentence}`).join('\n') : '• No specific matches found for your search terms'}
 
 **Search Statistics:**
-• Searched through: ${realContent.estimatedWordCount.toLocaleString()} words
-• Pages analyzed: ${realContent.pages}
+• Searched through: ${(realContent?.estimatedWordCount || realContent?.wordCount || 0).toLocaleString()} words
+• Pages analyzed: ${realContent?.pages || 'Unknown'}
 • Keywords: ${searchKeywords.join(', ')}
 
 **Real Content Analysis:** Results extracted from actual PDF text content using advanced pattern matching.`;
@@ -176,6 +180,10 @@ ${relevantSentences.length > 0 ? relevantSentences.map(sentence => `• ${senten
 
   // Find relevant sentences from real content
   private static findRelevantSentences(text: string, keywords: string[]): string[] {
+    if (!text || text.trim().length === 0) {
+      return ['No content available for search.'];
+    }
+    
     const sentences = text.match(/[^\.!?]+[\.!?]+/g) || [];
     const relevantSentences: string[] = [];
 
