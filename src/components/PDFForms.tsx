@@ -228,7 +228,7 @@ export default function PDFForms({ onReset }: PDFFormsProps) {
           case 'dropdown':
             const dropdown = form.createDropdown(field.name);
             if (field.options) {
-              field.options.forEach(option => dropdown.addOption(option, option));
+              field.options.forEach(option => dropdown.addOptions(option, option));
             }
             dropdown.addToPage(page, { x: field.x, y: field.y, width: field.width, height: field.height });
             break;

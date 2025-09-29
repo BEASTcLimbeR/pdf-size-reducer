@@ -1,53 +1,58 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload } from 'lucide-react';
-import PDFUploader from '@/components/PDFUploader';
-import EnhancedFileUploader from '@/components/EnhancedFileUploader';
-import EnhancedPDFUploader from '@/components/EnhancedPDFUploader';
-import CompressionResults from '@/components/CompressionResults';
-import MergePDF from '@/components/MergePDF';
-import SplitPDF from '@/components/SplitPDF';
-import RemovePages from '@/components/RemovePages';
-import ExtractPages from '@/components/ExtractPages';
-import RotatePDF from '@/components/RotatePDF';
-import OrganizePDF from '@/components/OrganizePDF';
-import ScanToPDF from '@/components/ScanToPDF';
-import RepairPDF from '@/components/RepairPDF';
-import OCRPDF from '@/components/OCRPDF';
-import PDFToWord from '@/components/PDFToWord';
-import PDFToPowerPoint from '@/components/PDFToPowerPoint';
-import PDFToExcel from '@/components/PDFToExcel';
-import PDFToJPG from '@/components/PDFToJPG';
-import WordToPDF from '@/components/WordToPDF';
-import PowerPointToPDF from '@/components/PowerPointToPDF';
-import ExcelToPDF from '@/components/ExcelToPDF';
-import JPGToPDF from '@/components/JPGToPDF';
-import EditPDF from '@/components/EditPDF';
-import AddPageNumbers from '@/components/AddPageNumbers';
-import AddWatermark from '@/components/AddWatermark';
-import CropPDF from '@/components/CropPDF';
-import UnlockPDF from '@/components/UnlockPDF';
-import ProtectPDF from '@/components/ProtectPDF';
-import SignPDF from '@/components/SignPDF';
-import RedactPDF from '@/components/RedactPDF';
-import ComparePDF from '@/components/ComparePDF';
-import HTMLToPDF from '@/components/HTMLToPDF';
-import CSVToPDF from '@/components/CSVToPDF';
-import PNGWebPToPDF from '@/components/PNGWebPToPDF';
-import TXTToPDF from '@/components/TXTToPDF';
-import RTFToPDF from '@/components/RTFToPDF';
-import BatchProcessing from '@/components/BatchProcessing';
-import PDFForms from '@/components/PDFForms';
-import WebhookSettings from '@/components/WebhookSettings';
-import AIDocumentChat from '@/components/AIDocumentChat';
-import AdobeStyleAIChat from '@/components/AdobeStyleAIChat';
-import SmartDocumentRelationships from '@/components/SmartDocumentRelationships';
-import PredictiveProcessing from '@/components/PredictiveProcessing';
-import AdvancedSecurity from '@/components/AdvancedSecurity';
+
+// Lazy load heavy components for better performance
+const PDFUploader = lazy(() => import('@/components/PDFUploader'));
+const EnhancedFileUploader = lazy(() => import('@/components/EnhancedFileUploader'));
+const EnhancedPDFUploader = lazy(() => import('@/components/EnhancedPDFUploader'));
+const CompressionResults = lazy(() => import('@/components/CompressionResults'));
+const MergePDF = lazy(() => import('@/components/MergePDF'));
+const SplitPDF = lazy(() => import('@/components/SplitPDF'));
+const RemovePages = lazy(() => import('@/components/RemovePages'));
+const ExtractPages = lazy(() => import('@/components/ExtractPages'));
+const RotatePDF = lazy(() => import('@/components/RotatePDF'));
+const OrganizePDF = lazy(() => import('@/components/OrganizePDF'));
+const ScanToPDF = lazy(() => import('@/components/ScanToPDF'));
+const RepairPDF = lazy(() => import('@/components/RepairPDF'));
+const OCRPDF = lazy(() => import('@/components/OCRPDF'));
+const PDFToWord = lazy(() => import('@/components/PDFToWord'));
+const PDFToPowerPoint = lazy(() => import('@/components/PDFToPowerPoint'));
+const PDFToExcel = lazy(() => import('@/components/PDFToExcel'));
+const PDFToJPG = lazy(() => import('@/components/PDFToJPG'));
+const WordToPDF = lazy(() => import('@/components/WordToPDF'));
+const PowerPointToPDF = lazy(() => import('@/components/PowerPointToPDF'));
+const ExcelToPDF = lazy(() => import('@/components/ExcelToPDF'));
+const JPGToPDF = lazy(() => import('@/components/JPGToPDF'));
+const EditPDF = lazy(() => import('@/components/EditPDF'));
+const AddPageNumbers = lazy(() => import('@/components/AddPageNumbers'));
+const AddWatermark = lazy(() => import('@/components/AddWatermark'));
+const CropPDF = lazy(() => import('@/components/CropPDF'));
+const UnlockPDF = lazy(() => import('@/components/UnlockPDF'));
+const ProtectPDF = lazy(() => import('@/components/ProtectPDF'));
+const SignPDF = lazy(() => import('@/components/SignPDF'));
+const RedactPDF = lazy(() => import('@/components/RedactPDF'));
+const ComparePDF = lazy(() => import('@/components/ComparePDF'));
+const HTMLToPDF = lazy(() => import('@/components/HTMLToPDF'));
+const CSVToPDF = lazy(() => import('@/components/CSVToPDF'));
+const PNGWebPToPDF = lazy(() => import('@/components/PNGWebPToPDF'));
+const TXTToPDF = lazy(() => import('@/components/TXTToPDF'));
+const RTFToPDF = lazy(() => import('@/components/RTFToPDF'));
+const BatchProcessing = lazy(() => import('@/components/BatchProcessing'));
+const PDFForms = lazy(() => import('@/components/PDFForms'));
+const WebhookSettings = lazy(() => import('@/components/WebhookSettings'));
+const AIDocumentChat = lazy(() => import('@/components/AIDocumentChat'));
+const AdobeStyleAIChat = lazy(() => import('@/components/AdobeStyleAIChat'));
+const SmartDocumentRelationships = lazy(() => import('@/components/SmartDocumentRelationships'));
+const PredictiveProcessing = lazy(() => import('@/components/PredictiveProcessing'));
+const AdvancedSecurity = lazy(() => import('@/components/AdvancedSecurity'));
+
+// Keep these components as regular imports (lightweight and frequently used)
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ToolCard from '@/components/ToolCard';
 import Squares from '@/components/Squares';
+import { PDFToolLoading, AIToolLoading, ConversionToolLoading, SecurityToolLoading } from '@/components/LoadingSpinner';
 
 export default function Home() {
   const [activeTool, setActiveTool] = useState('home');
@@ -814,7 +819,7 @@ export default function Home() {
 
         {/* Tool Content - Show when specific tool is selected */}
         {activeTool === 'compress' && (
-          <>
+          <Suspense fallback={<PDFToolLoading />}>
             {!uploadedFile ? (
               <EnhancedPDFUploader 
                 onFileUpload={handleFileUpload}
@@ -837,203 +842,281 @@ export default function Home() {
                 error={error}
               />
             )}
-          </>
+          </Suspense>
         )}
 
         {/* Merge PDF Tool */}
         {activeTool === 'merge' && (
-          <MergePDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <MergePDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Split PDF Tool */}
         {activeTool === 'split' && (
-          <SplitPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <SplitPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Remove Pages Tool */}
         {activeTool === 'remove-pages' && (
-          <RemovePages onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <RemovePages onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Extract Pages Tool */}
         {activeTool === 'extract-pages' && (
-          <ExtractPages onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <ExtractPages onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Rotate PDF Tool */}
         {activeTool === 'rotate-pdf' && (
-          <RotatePDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <RotatePDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Organize PDF Tool */}
         {activeTool === 'organize-pdf' && (
-          <OrganizePDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <OrganizePDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Scan to PDF Tool */}
         {activeTool === 'scan-to-pdf' && (
-          <ScanToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <ScanToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Repair PDF Tool */}
         {activeTool === 'repair-pdf' && (
-          <RepairPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <RepairPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* OCR PDF Tool */}
         {activeTool === 'ocr-pdf' && (
-          <OCRPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <OCRPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PDF to Word Tool */}
         {activeTool === 'pdf-to-word' && (
-          <PDFToWord onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PDFToWord onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PDF to PowerPoint Tool */}
         {activeTool === 'pdf-to-powerpoint' && (
-          <PDFToPowerPoint onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PDFToPowerPoint onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PDF to JPG Tool */}
         {activeTool === 'pdf-to-jpg' && (
-          <PDFToJPG onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PDFToJPG onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PDF to Excel Tool */}
         {activeTool === 'pdf-to-excel' && (
-          <PDFToExcel onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PDFToExcel onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Word to PDF Tool */}
         {activeTool === 'word-to-pdf' && (
-          <WordToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <WordToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PowerPoint to PDF Tool */}
         {activeTool === 'powerpoint-to-pdf' && (
-          <PowerPointToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PowerPointToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Excel to PDF Tool */}
         {activeTool === 'excel-to-pdf' && (
-          <ExcelToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <ExcelToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* JPG to PDF Tool */}
         {activeTool === 'jpg-to-pdf' && (
-          <JPGToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <JPGToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Edit PDF Tool */}
         {activeTool === 'edit-pdf' && (
-          <EditPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <EditPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Add Page Numbers Tool */}
         {activeTool === 'add-page-numbers' && (
-          <AddPageNumbers onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <AddPageNumbers onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Add Watermark Tool */}
         {activeTool === 'add-watermark' && (
-          <AddWatermark onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <AddWatermark onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Crop PDF Tool */}
         {activeTool === 'crop-pdf' && (
-          <CropPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <CropPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Unlock PDF Tool */}
         {activeTool === 'unlock' && (
-          <UnlockPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<SecurityToolLoading />}>
+            <UnlockPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Protect PDF Tool */}
         {activeTool === 'protect' && (
-          <ProtectPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<SecurityToolLoading />}>
+            <ProtectPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Sign PDF Tool */}
         {activeTool === 'sign' && (
-          <SignPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<SecurityToolLoading />}>
+            <SignPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Redact PDF Tool */}
         {activeTool === 'redact' && (
-          <RedactPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<SecurityToolLoading />}>
+            <RedactPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Compare PDF Tool */}
         {activeTool === 'compare' && (
-          <ComparePDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <ComparePDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* HTML to PDF Tool */}
         {activeTool === 'html-to-pdf' && (
-          <HTMLToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <HTMLToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* CSV to PDF Tool */}
         {activeTool === 'csv-to-pdf' && (
-          <CSVToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <CSVToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PNG/WebP to PDF Tool */}
         {activeTool === 'png-webp-to-pdf' && (
-          <PNGWebPToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <PNGWebPToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* TXT to PDF Tool */}
         {activeTool === 'txt-to-pdf' && (
-          <TXTToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <TXTToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* RTF to PDF Tool */}
         {activeTool === 'rtf-to-pdf' && (
-          <RTFToPDF onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<ConversionToolLoading />}>
+            <RTFToPDF onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Batch Processing Tool */}
         {activeTool === 'batch-processing' && (
-          <BatchProcessing onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <BatchProcessing onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* PDF Forms Tool */}
         {activeTool === 'pdf-forms' && (
-          <PDFForms onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <PDFForms onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Webhook Settings */}
         {activeTool === 'webhooks' && (
-          <WebhookSettings onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<PDFToolLoading />}>
+            <WebhookSettings onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
 
         {/* AI Document Chat */}
         {activeTool === 'ai-chat' && (
-          <AIDocumentChat onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<AIToolLoading />}>
+            <AIDocumentChat onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Adobe-Style AI Assistant */}
         {activeTool === 'adobe-ai-chat' && (
-          <AdobeStyleAIChat onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<AIToolLoading />}>
+            <AdobeStyleAIChat onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Smart Document Relationships */}
         {activeTool === 'smart-relationships' && (
-          <SmartDocumentRelationships onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<AIToolLoading />}>
+            <SmartDocumentRelationships onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Predictive Processing */}
         {activeTool === 'predictive-processing' && (
-          <PredictiveProcessing onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<AIToolLoading />}>
+            <PredictiveProcessing onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Advanced Security */}
         {activeTool === 'advanced-security' && (
-          <AdvancedSecurity onReset={() => setActiveTool('home')} />
+          <Suspense fallback={<SecurityToolLoading />}>
+            <AdvancedSecurity onReset={() => setActiveTool('home')} />
+          </Suspense>
         )}
 
         {/* Coming Soon Tool */}
