@@ -257,7 +257,7 @@ export default function Home() {
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible relative">
         {/* Full Page Animated Background */}
-        <div className="fixed inset-0 z-0 opacity-10 dark:opacity-5">
+        <div className="fixed inset-0 z-0 opacity-10 dark:opacity-8">
           <Squares 
             direction="diagonal"
             speed={0.5}
