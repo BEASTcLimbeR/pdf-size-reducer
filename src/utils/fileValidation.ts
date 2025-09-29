@@ -1,13 +1,21 @@
+import { EnhancedFileValidator, EnhancedValidationResult } from './enhancedFileValidation';
+import { securityMonitor } from './securityMonitoring';
+
 export interface ValidationOptions {
   maxSize: number; // in bytes
   allowedTypes: string[];
   required?: boolean;
+  enableSecurityScan?: boolean;
+  enableMalwareScan?: boolean;
 }
 
 export interface ValidationResult {
   isValid: boolean;
   errors: string[];
   warnings: string[];
+  securityScore?: number;
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
+  recommendations?: string[];
 }
 
 export class FileValidationError extends Error {
@@ -140,6 +148,80 @@ export const getFileExtension = (filename: string): string => {
 // Utility function to check if file type is supported
 export const isFileTypeSupported = (file: File, allowedTypes: string[]): boolean => {
   return allowedTypes.includes(file.type);
+};
+
+// Enhanced validation function with security features
+export const validateFileEnhanced = async (
+  file: File | null,
+  options: ValidationOptions,
+  customValidators?: Array<(file: File) => string | null>
+): Promise<ValidationResult> => {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check if file exists
+  if (!file) {
+    if (options.required) {
+      errors.push('No file selected');
+    }
+    return { isValid: errors.length === 0, errors, warnings };
+  }
+
+  // Basic validation
+  if (file.size === 0) {
+    errors.push('The selected file is empty');
+  } else if (file.size > options.maxSize) {
+    const maxSizeMB = Math.round(options.maxSize / (1024 * 1024));
+    errors.push(`File size must be less than ${maxSizeMB}MB`);
+  }
+
+  if (!options.allowedTypes.includes(file.type)) {
+    const allowedTypes = options.allowedTypes.join(', ');
+    errors.push(`Invalid file type. Allowed types: ${allowedTypes}`);
+  }
+
+  // Run custom validators
+  if (customValidators) {
+    for (const validator of customValidators) {
+      const error = validator(file);
+      if (error) {
+        errors.push(error);
+      }
+    }
+  }
+
+  // Enhanced security validation
+  if (options.enableSecurityScan !== false) {
+    try {
+      const enhancedValidator = new EnhancedFileValidator();
+      const enhancedResult = await enhancedValidator.validateFile(file);
+      
+      // Merge results
+      errors.push(...enhancedResult.errors);
+      warnings.push(...enhancedResult.warnings);
+      
+      // Log security event
+      securityMonitor.logFileUpload(
+        file.name,
+        file.size,
+        enhancedResult
+      );
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        securityScore: enhancedResult.securityScore,
+        riskLevel: enhancedResult.riskLevel,
+        recommendations: enhancedResult.recommendations
+      };
+    } catch (error) {
+      warnings.push('Security scan failed, using basic validation only');
+      console.warn('Enhanced validation failed:', error);
+    }
+  }
+
+  return { isValid: errors.length === 0, errors, warnings };
 };
 
 // Utility function to validate multiple files
