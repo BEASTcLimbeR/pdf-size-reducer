@@ -1,0 +1,135 @@
+{
+  "navigation": {
+    "home": "Startseite",
+    "tools": "Werkzeuge",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "pricing": "Preise"
+  },
+  "hero": {
+    "title": "Die Ultimative PDF-Lösung",
+    "subtitle": "Konvertieren, komprimieren, zusammenführen, teilen und bearbeiten Sie PDFs mit KI-gestützten Tools",
+    "description": "Verarbeiten Sie Ihre Dokumente mit unserer umfassenden PDF-Tool-Suite. Schnell, sicher und völlig kostenlos.",
+    "uploadButton": "Ihre Dateien Hochladen",
+    "learnMore": "Mehr Erfahren",
+    "trustedBy": "Vertraut von Millionen weltweit"
+  },
+  "features": {
+    "title": "Alles was Sie für das PDF-Management Brauchen",
+    "subtitle": "Professionelle Tools mit KI-gestützten Funktionen",
+    "convert": {
+      "title": "Jedes Format Konvertieren",
+      "description": "Konvertieren Sie zwischen PDF, Word, Excel, PowerPoint, Bildern und 40+ anderen Formaten"
+    },
+    "compress": {
+      "title": "Intelligente Komprimierung",
+      "description": "Reduzieren Sie die Dateigröße um bis zu 90% bei gleichbleibender Qualität mit KI-Optimierung"
+    },
+    "merge": {
+      "title": "Zusammenführen und Teilen",
+      "description": "Kombinieren Sie mehrere PDFs oder teilen Sie große Dokumente in kleinere Dateien auf"
+    },
+    "security": {
+      "title": "Erweiterte Sicherheit",
+      "description": "Schützen, entsperren, signieren und redigieren Sie sensible Informationen mit militärischer Verschlüsselung"
+    },
+    "ai": {
+      "title": "KI-Gestützte Funktionen",
+      "description": "Intelligente Dokumentenanalyse, prädiktive Verarbeitung und intelligente Empfehlungen"
+    }
+  },
+  "tools": {
+    "organize": "Organisieren",
+    "optimize": "Optimieren",
+    "convert": "Konvertieren",
+    "security": "Sicherheit",
+    "coreldraw": "CorelDRAW",
+    "ai": "KI-Tools",
+    "merge": "PDF Zusammenführen",
+    "split": "PDF Teilen",
+    "compress": "PDF Komprimieren",
+    "repair": "PDF Reparieren",
+    "ocr": "PDF OCR",
+    "unlock": "PDF Entsperren",
+    "protect": "PDF Schützen",
+    "sign": "PDF Signieren",
+    "redact": "PDF Redigieren",
+    "compare": "PDF Vergleichen",
+    "edit": "PDF Bearbeiten",
+    "rotate": "PDF Drehen",
+    "crop": "PDF Zuschneiden",
+    "watermark": "Wasserzeichen Hinzufügen",
+    "forms": "Formulare Erstellen und Bearbeiten",
+    "batch": "PDFs Stapelverarbeitung",
+    "scan": "Scannen zu PDF",
+    "aiChat": "KI-Dokumenten-Chat",
+    "smartRelations": "Intelligente Dokumentenbeziehungen",
+    "predictive": "Prädiktive Verarbeitung",
+    "supportedFormats": "Unterstützte Formate"
+  },
+  "fileFormats": {
+    "title": "Unterstützte Dateiformate",
+    "subtitle": "Verarbeiten Sie 40+ Dateiformate mit unseren umfassenden Tools",
+    "search": "Dateiformate suchen...",
+    "categories": {
+      "all": "Alle Formate",
+      "document": "Dokumente",
+      "image": "Bilder",
+      "spreadsheet": "Tabellenkalkulationen",
+      "presentation": "Präsentationen",
+      "text": "Textdateien",
+      "archive": "Archive",
+      "vector": "Vektorgrafiken"
+    },
+    "supported": "Unterstützt",
+    "maxSize": "Max. Größe",
+    "suggestedTools": "Empfohlene Tools"
+  },
+  "upload": {
+    "dragDrop": "Ziehen Sie Ihre Dateien hierher oder klicken Sie zum Durchsuchen",
+    "selectFiles": "Dateien Auswählen",
+    "supportedFormats": "Unterstützte Formate",
+    "maxSize": "Max. Dateigröße",
+    "processing": "Verarbeitung...",
+    "uploadComplete": "Upload Abgeschlossen",
+    "error": "Upload-Fehler"
+  },
+  "progress": {
+    "processing": "Verarbeitung...",
+    "estimatedTime": "Geschätzte verbleibende Zeit",
+    "cancel": "Abbrechen",
+    "completed": "Abgeschlossen",
+    "error": "Fehler aufgetreten"
+  },
+  "download": {
+    "download": "Herunterladen",
+    "rename": "Datei Umbenennen",
+    "fileName": "Dateiname",
+    "fileSize": "Dateigröße",
+    "confirm": "Bestätigen",
+    "cancel": "Abbrechen"
+  },
+  "footer": {
+    "description": "Die umfassendste PDF-Lösung für alle Ihre Dokumentenbedürfnisse",
+    "quickLinks": "Schnelllinks",
+    "tools": "Tools",
+    "support": "Support",
+    "legal": "Rechtliches",
+    "privacy": "Datenschutzrichtlinie",
+    "terms": "Nutzungsbedingungen",
+    "cookies": "Cookie-Richtlinie",
+    "rights": "Alle Rechte vorbehalten"
+  },
+  "errors": {
+    "fileTooLarge": "Dateigröße überschreitet das maximale Limit",
+    "invalidFormat": "Ungültiges Dateiformat",
+    "uploadFailed": "Upload fehlgeschlagen. Bitte versuchen Sie es erneut",
+    "processingFailed": "Verarbeitung fehlgeschlagen. Bitte versuchen Sie es erneut",
+    "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung"
+  },
+  "success": {
+    "uploadComplete": "Datei erfolgreich hochgeladen",
+    "processingComplete": "Verarbeitung erfolgreich abgeschlossen",
+    "downloadReady": "Ihre Datei ist zum Download bereit"
+  }
+}

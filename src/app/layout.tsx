@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "../styles/rtl.css";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +29,30 @@ export default function RootLayout({
         <html lang="en" className="dark">
           <head>
             <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  try {
+                    const theme = localStorage.getItem('theme');
+                    if (theme === 'light') {
+                      document.documentElement.classList.remove('dark');
+                    } else {
+                      document.documentElement.classList.add('dark');
+                    }
+                  } catch (e) {
+                    // Default to dark mode
+                    document.documentElement.classList.add('dark');
+                  }
+                `,
+              }}
+            />
           </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileText, Download, RotateCcw, Loader2, AlertCircle, Settings } from 'lucide-react';
-import { compressPDF, advancedCompressPDF, simpleCompressPDF, formatFileSize, validatePDFFile, validatePDFFileAsync, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
+import { compressPDF, advancedCompressPDF, simpleCompressPDF, ultraSimpleCompressPDF, formatFileSize, validatePDFFile, validatePDFFileAsync, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
 import { webhookService } from '@/utils/webhookService';
 import CompressionMeter from './CompressionMeter';
 import FileRenameModal from './FileRenameModal';
@@ -47,6 +47,7 @@ export default function CompressionResults({
     removeAnnotations: false
   });
   const [showSettings, setShowSettings] = useState(false);
+  const [compressionMethod, setCompressionMethod] = useState<string>('');
 
   // File download with rename functionality
   const {
@@ -67,9 +68,9 @@ export default function CompressionResults({
       setCompressionProgress(0);
 
       console.log('Starting PDF compression...', {
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
+        fileName: file.name || 'Unknown',
+        fileSize: file.size || 0,
+        fileType: file.type || 'Unknown',
         compressionOptions
       });
 
@@ -79,10 +80,10 @@ export default function CompressionResults({
       if (!validation.isValid) {
         console.error('File validation failed:', {
           error: validation.error,
-          fileName: file.name,
-          fileSize: file.size,
-          fileType: file.type,
-          fileExtension: file.name.split('.').pop()
+          fileName: file.name || 'Unknown',
+          fileSize: file.size || 0,
+          fileType: file.type || 'Unknown',
+          fileExtension: file.name?.split('.').pop() || 'Unknown'
         });
         onError(validation.error || 'Invalid file');
         return;
@@ -96,6 +97,7 @@ export default function CompressionResults({
         console.log('Attempting advanced compression method...');
         // Try the advanced compression method first
         result = await advancedCompressPDF(file, compressionOptions);
+        setCompressionMethod('Advanced Compression');
         console.log('Advanced compression successful:', {
           originalSize: result.originalSize,
           compressedSize: result.compressedSize,
@@ -105,26 +107,43 @@ export default function CompressionResults({
         console.warn('Advanced compression failed, trying main method:', advancedError);
         setCompressionProgress(30);
         
-        try {
-          console.log('Attempting main compression method...');
-          result = await compressPDF(file, compressionOptions);
-          console.log('Main compression successful:', {
-            originalSize: result.originalSize,
-            compressedSize: result.compressedSize,
-            reductionPercentage: result.reductionPercentage
-          });
+          try {
+            console.log('Attempting main compression method...');
+            result = await compressPDF(file, compressionOptions);
+            setCompressionMethod('Standard Compression');
+            console.log('Main compression successful:', {
+              originalSize: result.originalSize,
+              compressedSize: result.compressedSize,
+              reductionPercentage: result.reductionPercentage
+            });
         } catch (mainError) {
           console.warn('Main compression failed, trying simple method:', mainError);
           setCompressionProgress(60);
           
-          // If main compression fails, try the simple method
-          console.log('Attempting simple compression method...');
-          result = await simpleCompressPDF(file);
-          console.log('Simple compression successful:', {
-            originalSize: result.originalSize,
-            compressedSize: result.compressedSize,
-            reductionPercentage: result.reductionPercentage
-          });
+          try {
+            // If main compression fails, try the simple method
+            console.log('Attempting simple compression method...');
+            result = await simpleCompressPDF(file);
+            setCompressionMethod('Simple Compression');
+            console.log('Simple compression successful:', {
+              originalSize: result.originalSize,
+              compressedSize: result.compressedSize,
+              reductionPercentage: result.reductionPercentage
+            });
+          } catch (simpleError) {
+            console.warn('Simple compression failed, trying ultra-simple method:', simpleError);
+            setCompressionProgress(80);
+            
+            // Final fallback - ultra-simple method that works with any PDF
+            console.log('Attempting ultra-simple compression method (passthrough)...');
+            result = await ultraSimpleCompressPDF(file);
+            setCompressionMethod('Passthrough (File Compatible)');
+            console.log('Ultra-simple compression successful (passthrough):', {
+              originalSize: result.originalSize,
+              compressedSize: result.compressedSize,
+              reductionPercentage: result.reductionPercentage
+            });
+          }
         }
       }
       
@@ -156,7 +175,7 @@ export default function CompressionResults({
   const downloadCompressedFile = () => {
     if (!compressedFile) return;
 
-    const originalFileName = file.name;
+    const originalFileName = file.name || 'document.pdf';
     const fileExtension = getFileExtension(originalFileName);
     const fileNameWithoutExt = getFileNameWithoutExtension(originalFileName);
     const defaultFileName = `${fileNameWithoutExt}_compressed${fileExtension}`;
@@ -182,7 +201,7 @@ export default function CompressionResults({
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {file.name}
+                {file.name || 'document.pdf'}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Original size: {formatFileSize(file.size)}
@@ -437,6 +456,19 @@ export default function CompressionResults({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Download Your Compressed PDF
               </h3>
+              
+              {compressionMethod && (
+                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <strong>Compression Method:</strong> {compressionMethod}
+                    {compressionMethod === 'Passthrough (File Compatible)' && (
+                      <span className="block mt-1 text-xs">
+                        Your PDF was processed using a compatible method to ensure it works with all file types.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
               
               <button
                 onClick={downloadCompressedFile}

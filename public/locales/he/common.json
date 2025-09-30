@@ -1,0 +1,135 @@
+{
+  "navigation": {
+    "home": "בית",
+    "tools": "כלים",
+    "about": "אודות",
+    "contact": "צור קשר",
+    "pricing": "מחירים"
+  },
+  "hero": {
+    "title": "פתרון ה-PDF האולטימטיבי",
+    "subtitle": "המר, דחוס, מיזג, חלק וערוך קבצי PDF עם כלים מונעי בינה מלאכותית",
+    "description": "עבד עם המסמכים שלך עם סוויטת הכלים המקיפה שלנו ל-PDF. מהיר, בטוח וחינמי לחלוטין.",
+    "uploadButton": "העלה את הקבצים שלך",
+    "learnMore": "למד עוד",
+    "trustedBy": "מהימן על ידי מיליונים ברחבי העולם"
+  },
+  "features": {
+    "title": "כל מה שאתה צריך לניהול PDF",
+    "subtitle": "כלים ברמה מקצועית עם תכונות מונעות בינה מלאכותית",
+    "convert": {
+      "title": "המר כל פורמט",
+      "description": "המר בין PDF, Word, Excel, PowerPoint, תמונות ו-40+ פורמטים אחרים"
+    },
+    "compress": {
+      "title": "דחיסה חכמה",
+      "description": "הקטן את גודל הקובץ עד 90% תוך שמירה על איכות עם אופטימיזציית בינה מלאכותית"
+    },
+    "merge": {
+      "title": "מיזוג וחלוקה",
+      "description": "שלב מספר קבצי PDF או חלק מסמכים גדולים לקבצים קטנים יותר"
+    },
+    "security": {
+      "title": "אבטחה מתקדמת",
+      "description": "הגן, בטל נעילה, חתום והסר מידע רגיש עם הצפנה ברמה צבאית"
+    },
+    "ai": {
+      "title": "תכונות מונעות בינה מלאכותית",
+      "description": "ניתוח מסמכים חכם, עיבוד חיזוי והמלצות חכמות"
+    }
+  },
+  "tools": {
+    "organize": "ארגן",
+    "optimize": "אופטימיזציה",
+    "convert": "המר",
+    "security": "אבטחה",
+    "coreldraw": "CorelDRAW",
+    "ai": "כלי בינה מלאכותית",
+    "merge": "מיזוג PDF",
+    "split": "חלוקת PDF",
+    "compress": "דחיסת PDF",
+    "repair": "תיקון PDF",
+    "ocr": "OCR PDF",
+    "unlock": "ביטול נעילת PDF",
+    "protect": "הגנת PDF",
+    "sign": "חתימת PDF",
+    "redact": "הסרת PDF",
+    "compare": "השוואת PDF",
+    "edit": "עריכת PDF",
+    "rotate": "סיבוב PDF",
+    "crop": "חיתוך PDF",
+    "watermark": "הוספת סימן מים",
+    "forms": "יצירה ועריכת טפסים",
+    "batch": "עיבוד PDF בקבוצות",
+    "scan": "סריקה ל-PDF",
+    "aiChat": "צ'אט בינה מלאכותית עם מסמכים",
+    "smartRelations": "קשרי מסמכים חכמים",
+    "predictive": "עיבוד חיזוי",
+    "supportedFormats": "פורמטים נתמכים"
+  },
+  "fileFormats": {
+    "title": "פורמטי קבצים נתמכים",
+    "subtitle": "עבד עם 40+ פורמטי קבצים עם הכלים המקיפים שלנו",
+    "search": "חיפוש פורמטי קבצים...",
+    "categories": {
+      "all": "כל הפורמטים",
+      "document": "מסמכים",
+      "image": "תמונות",
+      "spreadsheet": "גיליונות אלקטרוניים",
+      "presentation": "מצגות",
+      "text": "קבצי טקסט",
+      "archive": "ארכיונים",
+      "vector": "גרפיקה וקטורית"
+    },
+    "supported": "נתמך",
+    "maxSize": "גודל מקסימלי",
+    "suggestedTools": "כלים מוצעים"
+  },
+  "upload": {
+    "dragDrop": "גרור ושחרר את הקבצים שלך כאן, או לחץ לדפדוף",
+    "selectFiles": "בחר קבצים",
+    "supportedFormats": "פורמטים נתמכים",
+    "maxSize": "גודל קובץ מקסימלי",
+    "processing": "מעבד...",
+    "uploadComplete": "העלאה הושלמה",
+    "error": "שגיאת העלאה"
+  },
+  "progress": {
+    "processing": "מעבד...",
+    "estimatedTime": "זמן משוער נותר",
+    "cancel": "בטל",
+    "completed": "הושלם",
+    "error": "אירעה שגיאה"
+  },
+  "download": {
+    "download": "הורד",
+    "rename": "שנה שם קובץ",
+    "fileName": "שם הקובץ",
+    "fileSize": "גודל הקובץ",
+    "confirm": "אשר",
+    "cancel": "בטל"
+  },
+  "footer": {
+    "description": "פתרון ה-PDF המקיף ביותר לכל צרכי המסמכים שלך",
+    "quickLinks": "קישורים מהירים",
+    "tools": "כלים",
+    "support": "תמיכה",
+    "legal": "משפטי",
+    "privacy": "מדיניות פרטיות",
+    "terms": "תנאי שירות",
+    "cookies": "מדיניות עוגיות",
+    "rights": "כל הזכויות שמורות"
+  },
+  "errors": {
+    "fileTooLarge": "גודל הקובץ עולה על הגבול המקסימלי",
+    "invalidFormat": "פורמט קובץ לא תקין",
+    "uploadFailed": "ההעלאה נכשלה. אנא נסה שוב",
+    "processingFailed": "העיבוד נכשל. אנא נסה שוב",
+    "networkError": "שגיאת רשת. אנא בדוק את החיבור שלך"
+  },
+  "success": {
+    "uploadComplete": "הקובץ הועלה בהצלחה",
+    "processingComplete": "העיבוד הושלם בהצלחה",
+    "downloadReady": "הקובץ שלך מוכן להורדה"
+  }
+}

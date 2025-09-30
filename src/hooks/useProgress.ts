@@ -16,6 +16,8 @@ export interface UseProgressReturn {
   isProcessing: boolean;
   isCancelled: boolean;
   error: string | null;
+  totalTime: number;
+  estimatedTime: number;
   startProcessing: () => void;
   completeStep: (stepId: string) => void;
   setStepError: (stepId: string, error: string) => void;
@@ -37,7 +39,11 @@ export function useProgress({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCancelled, setIsCancelled] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [totalTime, setTotalTime] = useState(0);
+  const [estimatedTime, setEstimatedTime] = useState(0);
   const cancelRef = useRef<AbortController | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startProcessing = useCallback(() => {
     setSteps(prev => prev.map((step, index) => ({
@@ -48,8 +54,16 @@ export function useProgress({
     setIsProcessing(true);
     setIsCancelled(false);
     setError(null);
+    setTotalTime(0);
+    setEstimatedTime(initialSteps.length * 2000); // Estimate 2 seconds per step
+    startTimeRef.current = Date.now();
     cancelRef.current = new AbortController();
-  }, []);
+    
+    // Start timer
+    intervalRef.current = setInterval(() => {
+      setTotalTime(Date.now() - startTimeRef.current);
+    }, 100);
+  }, [initialSteps.length]);
 
   const completeStep = useCallback((stepId: string) => {
     setSteps(prev => prev.map(step => 
@@ -70,6 +84,9 @@ export function useProgress({
     } else {
       // All steps completed
       setIsProcessing(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       onComplete?.();
     }
   }, [steps, onComplete]);
@@ -82,6 +99,9 @@ export function useProgress({
     ));
     setError(errorMessage);
     setIsProcessing(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     onError?.(new Error(errorMessage));
   }, [onError]);
 
@@ -91,6 +111,9 @@ export function useProgress({
     }
     setIsCancelled(true);
     setIsProcessing(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     setSteps(prev => prev.map(step => ({
       ...step,
       status: step.status === 'active' ? 'pending' as const : step.status
@@ -104,6 +127,11 @@ export function useProgress({
     setIsProcessing(false);
     setIsCancelled(false);
     setError(null);
+    setTotalTime(0);
+    setEstimatedTime(0);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
     cancelRef.current = null;
   }, [initialSteps]);
 
@@ -121,6 +149,8 @@ export function useProgress({
     isProcessing,
     isCancelled,
     error,
+    totalTime,
+    estimatedTime,
     startProcessing,
     completeStep,
     setStepError,

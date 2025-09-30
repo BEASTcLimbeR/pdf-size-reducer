@@ -1,0 +1,135 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "tools": "Outils",
+    "about": "À propos",
+    "contact": "Contact",
+    "pricing": "Tarifs"
+  },
+  "hero": {
+    "title": "La Solution PDF Ultime",
+    "subtitle": "Convertissez, compressez, fusionnez, divisez et éditez les PDFs avec des outils alimentés par l'IA",
+    "description": "Traitez vos documents avec notre suite complète d'outils PDF. Rapide, sécurisé et entièrement gratuit.",
+    "uploadButton": "Télécharger Vos Fichiers",
+    "learnMore": "En Savoir Plus",
+    "trustedBy": "Fait confiance par des millions dans le monde"
+  },
+  "features": {
+    "title": "Tout ce dont Vous Avez Besoin pour la Gestion PDF",
+    "subtitle": "Outils de niveau professionnel avec des fonctionnalités alimentées par l'IA",
+    "convert": {
+      "title": "Convertir N'importe Quel Format",
+      "description": "Convertissez entre PDF, Word, Excel, PowerPoint, images et 40+ autres formats"
+    },
+    "compress": {
+      "title": "Compression Intelligente",
+      "description": "Réduisez la taille du fichier jusqu'à 90% tout en maintenant la qualité avec l'optimisation IA"
+    },
+    "merge": {
+      "title": "Fusionner et Diviser",
+      "description": "Combinez plusieurs PDFs ou divisez de gros documents en fichiers plus petits"
+    },
+    "security": {
+      "title": "Sécurité Avancée",
+      "description": "Protégez, déverrouillez, signez et supprimez les informations sensibles avec un chiffrement de niveau militaire"
+    },
+    "ai": {
+      "title": "Fonctionnalités Alimentées par l'IA",
+      "description": "Analyse intelligente de documents, traitement prédictif et recommandations intelligentes"
+    }
+  },
+  "tools": {
+    "organize": "Organiser",
+    "optimize": "Optimiser",
+    "convert": "Convertir",
+    "security": "Sécurité",
+    "coreldraw": "CorelDRAW",
+    "ai": "Outils IA",
+    "merge": "Fusionner PDF",
+    "split": "Diviser PDF",
+    "compress": "Compresser PDF",
+    "repair": "Réparer PDF",
+    "ocr": "OCR PDF",
+    "unlock": "Déverrouiller PDF",
+    "protect": "Protéger PDF",
+    "sign": "Signer PDF",
+    "redact": "Supprimer PDF",
+    "compare": "Comparer PDF",
+    "edit": "Éditer PDF",
+    "rotate": "Tourner PDF",
+    "crop": "Recadrer PDF",
+    "watermark": "Ajouter Filigrane",
+    "forms": "Créer et Éditer Formulaires",
+    "batch": "Traiter PDFs par Lot",
+    "scan": "Scanner vers PDF",
+    "aiChat": "Chat IA avec Documents",
+    "smartRelations": "Relations Intelligentes de Documents",
+    "predictive": "Traitement Prédictif",
+    "supportedFormats": "Formats Supportés"
+  },
+  "fileFormats": {
+    "title": "Formats de Fichier Supportés",
+    "subtitle": "Traitez 40+ formats de fichier avec nos outils complets",
+    "search": "Rechercher formats de fichier...",
+    "categories": {
+      "all": "Tous les Formats",
+      "document": "Documents",
+      "image": "Images",
+      "spreadsheet": "Feuilles de Calcul",
+      "presentation": "Présentations",
+      "text": "Fichiers Texte",
+      "archive": "Archives",
+      "vector": "Graphiques Vectoriels"
+    },
+    "supported": "Supporté",
+    "maxSize": "Taille Max",
+    "suggestedTools": "Outils Suggérés"
+  },
+  "upload": {
+    "dragDrop": "Glissez-déposez vos fichiers ici, ou cliquez pour parcourir",
+    "selectFiles": "Sélectionner Fichiers",
+    "supportedFormats": "Formats supportés",
+    "maxSize": "Taille max du fichier",
+    "processing": "Traitement...",
+    "uploadComplete": "Téléchargement Terminé",
+    "error": "Erreur de Téléchargement"
+  },
+  "progress": {
+    "processing": "Traitement...",
+    "estimatedTime": "Temps estimé restant",
+    "cancel": "Annuler",
+    "completed": "Terminé",
+    "error": "Erreur survenue"
+  },
+  "download": {
+    "download": "Télécharger",
+    "rename": "Renommer Fichier",
+    "fileName": "Nom du Fichier",
+    "fileSize": "Taille du Fichier",
+    "confirm": "Confirmer",
+    "cancel": "Annuler"
+  },
+  "footer": {
+    "description": "La solution PDF la plus complète pour tous vos besoins documentaires",
+    "quickLinks": "Liens Rapides",
+    "tools": "Outils",
+    "support": "Support",
+    "legal": "Légal",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions de Service",
+    "cookies": "Politique des Cookies",
+    "rights": "Tous droits réservés"
+  },
+  "errors": {
+    "fileTooLarge": "La taille du fichier dépasse la limite maximale",
+    "invalidFormat": "Format de fichier invalide",
+    "uploadFailed": "Le téléchargement a échoué. Veuillez réessayer",
+    "processingFailed": "Le traitement a échoué. Veuillez réessayer",
+    "networkError": "Erreur réseau. Veuillez vérifier votre connexion"
+  },
+  "success": {
+    "uploadComplete": "Fichier téléchargé avec succès",
+    "processingComplete": "Traitement terminé avec succès",
+    "downloadReady": "Votre fichier est prêt à être téléchargé"
+  }
+}

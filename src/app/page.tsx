@@ -1,19 +1,26 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload, Palette } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload, Palette, PenTool, EyeOff } from 'lucide-react';
 
 // Lazy load heavy components for better performance
 const PDFUploader = lazy(() => import('@/components/PDFUploader'));
 const EnhancedFileUploader = lazy(() => import('@/components/EnhancedFileUploader'));
 const EnhancedPDFUploader = lazy(() => import('@/components/EnhancedPDFUploader'));
-const CompressionResults = lazy(() => import('@/components/CompressionResults'));
+// Convert CompressionResults to static import to avoid chunk loading issues
+import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
 import SupportedFormats from '@/components/SupportedFormats';
 import DebugFormats from '@/components/DebugFormats';
-const SplitPDF = lazy(() => import('@/components/SplitPDF'));
-const RemovePages = lazy(() => import('@/components/RemovePages'));
-const ExtractPages = lazy(() => import('@/components/ExtractPages'));
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslation } from '@/hooks/useTranslation';
+import RTLProvider from '@/components/RTLProvider';
+import GradientText from '@/components/GradientText';
+import ThemeToggle from '@/components/ThemeToggle';
+// Convert commonly used components to static imports to avoid chunk loading issues
+import SplitPDF from '@/components/SplitPDF';
+import RemovePages from '@/components/RemovePages';
+import ExtractPages from '@/components/ExtractPages';
 const RotatePDF = lazy(() => import('@/components/RotatePDF'));
 const OrganizePDF = lazy(() => import('@/components/OrganizePDF'));
 const ScanToPDF = lazy(() => import('@/components/ScanToPDF'));
@@ -76,7 +83,97 @@ export default function Home() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownAnimating, setDropdownAnimating] = useState(false);
   const [mobileMenuAnimating, setMobileMenuAnimating] = useState(false);
+  const { t, locale, changeLanguage } = useTranslation();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Get translated tools
+  const getTranslatedTools = () => [
+    {
+      id: 'organize',
+      name: t('tools.organize'),
+      icon: FileText,
+      color: 'blue',
+      tools: [
+        { id: 'merge', name: t('tools.merge'), icon: Merge, description: t('toolDescriptions.merge') },
+        { id: 'split', name: t('tools.split'), icon: Split, description: t('toolDescriptions.split') },
+        { id: 'remove-pages', name: t('tools.removePages'), icon: Trash2, description: t('toolDescriptions.removePages') },
+        { id: 'extract-pages', name: t('tools.extractPages'), icon: Download, description: t('toolDescriptions.extractPages') },
+        { id: 'organize', name: t('tools.organize'), icon: FileText, description: t('toolDescriptions.organize') },
+        { id: 'scan', name: t('tools.scan'), icon: Scan, description: t('toolDescriptions.scan') },
+        { id: 'batch-processing', name: t('tools.batch'), icon: Archive, description: t('toolDescriptions.batchProcessing') }
+      ]
+    },
+    {
+      id: 'optimize',
+      name: t('tools.optimize'),
+      icon: Zap,
+      color: 'green',
+      tools: [
+        { id: 'compress', name: t('tools.compress'), icon: FileText, description: t('toolDescriptions.compress') },
+        { id: 'repair', name: t('tools.repair'), icon: Shield, description: t('toolDescriptions.repair') },
+        { id: 'ocr', name: t('tools.ocr'), icon: Eye, description: t('toolDescriptions.ocr') }
+      ]
+    },
+    {
+      id: 'convert',
+      name: t('tools.convert'),
+      icon: RotateCcw,
+      color: 'purple',
+      tools: [
+        { id: 'pdf-to-word', name: t('tools.pdfToWord'), icon: FileText, description: t('toolDescriptions.pdfToWord') },
+        { id: 'pdf-to-powerpoint', name: t('tools.pdfToPowerpoint'), icon: Presentation, description: t('toolDescriptions.pdfToPowerpoint') },
+        { id: 'pdf-to-excel', name: t('tools.pdfToExcel'), icon: FileSpreadsheet, description: t('toolDescriptions.pdfToExcel') },
+        { id: 'pdf-to-jpg', name: t('tools.pdfToJpg'), icon: Image, description: t('toolDescriptions.pdfToJpg') },
+        { id: 'word-to-pdf', name: t('tools.wordToPdf'), icon: FileText, description: t('toolDescriptions.wordToPdf') },
+        { id: 'powerpoint-to-pdf', name: t('tools.powerpointToPdf'), icon: Presentation, description: t('toolDescriptions.powerpointToPdf') },
+        { id: 'excel-to-pdf', name: t('tools.excelToPdf'), icon: FileSpreadsheet, description: t('toolDescriptions.excelToPdf') },
+        { id: 'jpg-to-pdf', name: t('tools.jpgToPdf'), icon: Image, description: t('toolDescriptions.jpgToPdf') },
+        { id: 'html-to-pdf', name: t('tools.htmlToPdf'), icon: Globe, description: t('toolDescriptions.htmlToPdf') },
+        { id: 'csv-to-pdf', name: t('tools.csvToPdf'), icon: FileSpreadsheet, description: t('toolDescriptions.csvToPdf') },
+        { id: 'png-webp-to-pdf', name: t('tools.pngWebpToPdf'), icon: Image, description: t('toolDescriptions.pngWebpToPdf') },
+        { id: 'txt-to-pdf', name: t('tools.txtToPdf'), icon: Type, description: t('toolDescriptions.txtToPdf') },
+        { id: 'rtf-to-pdf', name: t('tools.rtfToPdf'), icon: Type, description: t('toolDescriptions.rtfToPdf') },
+        { id: 'pdf-to-corel', name: t('tools.pdfToCorel'), icon: Palette, description: t('toolDescriptions.pdfToCorel') },
+        { id: 'png-to-corel', name: t('tools.pngToCorel'), icon: Palette, description: t('toolDescriptions.pngToCorel') },
+        { id: 'corel-to-pdf', name: t('tools.corelToPdf'), icon: Palette, description: t('toolDescriptions.corelToPdf') },
+        { id: 'corel-to-png', name: t('tools.corelToPng'), icon: Palette, description: t('toolDescriptions.corelToPng') },
+      ]
+    },
+    {
+      id: 'security',
+      name: t('tools.security'),
+      icon: Shield,
+      color: 'red',
+      tools: [
+        { id: 'unlock', name: t('tools.unlock'), icon: Unlock, description: t('toolDescriptions.unlock') },
+        { id: 'protect', name: t('tools.protect'), icon: Lock, description: t('toolDescriptions.protect') },
+        { id: 'sign', name: t('tools.sign'), icon: PenTool, description: t('toolDescriptions.sign') },
+        { id: 'redact', name: t('tools.redact'), icon: EyeOff, description: t('toolDescriptions.redact') },
+        { id: 'compare', name: t('tools.compare'), icon: GitCompare, description: t('toolDescriptions.compare') },
+        { id: 'edit-pdf', name: t('tools.edit'), icon: Edit, description: t('toolDescriptions.editPdf') },
+        { id: 'add-page-numbers', name: t('tools.addPageNumbers'), icon: Hash, description: t('toolDescriptions.addPageNumbers') },
+        { id: 'add-watermark', name: t('tools.watermark'), icon: Droplets, description: t('toolDescriptions.addWatermark') },
+        { id: 'crop-pdf', name: t('tools.crop'), icon: Crop, description: t('toolDescriptions.cropPdf') },
+        { id: 'pdf-forms', name: t('tools.forms'), icon: FileText, description: t('toolDescriptions.pdfForms') }
+      ]
+    },
+    {
+      id: 'ai-features',
+      name: t('tools.ai'),
+      icon: Brain,
+      color: 'purple',
+      tools: [
+        { id: 'ai-chat', name: t('tools.aiChat'), icon: Brain, description: t('toolDescriptions.aiDocumentChat') },
+        { id: 'adobe-ai-chat', name: t('tools.adobeStyleAiChat'), icon: Sparkles, description: t('toolDescriptions.adobeStyleAiChat') },
+        { id: 'smart-relationships', name: t('tools.smartRelations'), icon: Network, description: t('toolDescriptions.smartDocumentRelationships') },
+        { id: 'predictive-processing', name: t('tools.predictive'), icon: Sparkles, description: t('toolDescriptions.predictiveProcessing') },
+        { id: 'webhooks', name: t('tools.webhookSettings'), icon: Zap, description: t('toolDescriptions.webhookSettings') },
+        { id: 'supported-formats', name: t('tools.supportedFormats'), icon: FileText, description: 'View all supported file formats and their capabilities' }
+      ]
+    }
+  ];
+
+  const tools = getTranslatedTools();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -164,101 +261,6 @@ export default function Home() {
     setError(null);
   };
 
-  const tools = [
-    {
-      id: 'organize',
-      name: 'Organize',
-      icon: FileText,
-      color: 'blue',
-      tools: [
-        { id: 'merge', name: 'Merge PDF', icon: Merge, description: 'Combine PDFs in the order you want' },
-        { id: 'split', name: 'Split PDF', icon: Split, description: 'Separate pages into independent PDFs' },
-        { id: 'remove-pages', name: 'Remove Pages', icon: Trash2, description: 'Delete unwanted pages from PDF' },
-        { id: 'extract-pages', name: 'Extract Pages', icon: Download, description: 'Extract specific pages from PDF' },
-        { id: 'organize', name: 'Organize PDF', icon: FileText, description: 'Sort and arrange PDF pages' },
-        { id: 'scan', name: 'Scan to PDF', icon: Scan, description: 'Convert scans to PDF documents' },
-        { id: 'batch-processing', name: 'Batch Process PDFs', icon: Archive, description: 'Process multiple PDFs at once' }
-      ]
-    },
-    {
-      id: 'optimize',
-      name: 'Optimize',
-      icon: Zap,
-      color: 'green',
-      tools: [
-        { id: 'compress', name: 'Compress PDF', icon: FileText, description: 'Reduce file size while optimizing quality' },
-        { id: 'repair', name: 'Repair PDF', icon: Shield, description: 'Fix damaged or corrupt PDF files' },
-        { id: 'ocr', name: 'OCR PDF', icon: Eye, description: 'Convert scanned PDFs to searchable text' }
-      ]
-    },
-    {
-      id: 'convert',
-      name: 'Convert',
-      icon: RotateCcw,
-      color: 'purple',
-      tools: [
-        { id: 'pdf-to-word', name: 'PDF to Word', icon: FileText, description: 'Convert PDF to editable Word documents' },
-        { id: 'pdf-to-powerpoint', name: 'PDF to PowerPoint', icon: Presentation, description: 'Convert PDF to PowerPoint presentations' },
-        { id: 'pdf-to-excel', name: 'PDF to Excel', icon: FileSpreadsheet, description: 'Convert PDF to Excel spreadsheets' },
-        { id: 'pdf-to-jpg', name: 'PDF to JPG', icon: Image, description: 'Convert PDF pages to JPG images' },
-        { id: 'word-to-pdf', name: 'Word to PDF', icon: FileText, description: 'Convert Word documents to PDF' },
-        { id: 'powerpoint-to-pdf', name: 'PowerPoint to PDF', icon: Presentation, description: 'Convert PowerPoint to PDF' },
-        { id: 'excel-to-pdf', name: 'Excel to PDF', icon: FileSpreadsheet, description: 'Convert Excel to PDF' },
-        { id: 'jpg-to-pdf', name: 'JPG to PDF', icon: Image, description: 'Convert JPG images to PDF' },
-        { id: 'html-to-pdf', name: 'HTML to PDF', icon: Globe, description: 'Convert web pages to PDF' },
-        { id: 'csv-to-pdf', name: 'CSV to PDF', icon: FileSpreadsheet, description: 'Convert CSV files to PDF tables' },
-        { id: 'png-webp-to-pdf', name: 'PNG/WebP to PDF', icon: Image, description: 'Convert PNG/WebP images to PDF' },
-        { id: 'txt-to-pdf', name: 'TXT to PDF', icon: Type, description: 'Convert text files to PDF' },
-        { id: 'rtf-to-pdf', name: 'RTF to PDF', icon: Type, description: 'Convert RTF files to PDF' },
-        { id: 'pdf-to-corel', name: 'PDF to CorelDRAW', icon: Palette, description: 'Convert PDF to CorelDRAW (.cdr) files' },
-        { id: 'png-to-corel', name: 'PNG to CorelDRAW', icon: Palette, description: 'Convert PNG images to CorelDRAW (.cdr) files' },
-        { id: 'corel-to-pdf', name: 'CorelDRAW to PDF', icon: Palette, description: 'Convert CorelDRAW (.cdr) files to PDF' },
-        { id: 'corel-to-png', name: 'CorelDRAW to PNG', icon: Palette, description: 'Convert CorelDRAW (.cdr) files to PNG images' },
-      ]
-    },
-    {
-      id: 'edit',
-      name: 'Edit',
-      icon: Edit,
-      color: 'orange',
-      tools: [
-        { id: 'rotate', name: 'Rotate PDF', icon: RotateCcw, description: 'Rotate PDF pages as needed' },
-        { id: 'watermark', name: 'Add Watermark', icon: Droplets, description: 'Add text or image watermarks' },
-        { id: 'crop', name: 'Crop PDF', icon: Crop, description: 'Crop margins or specific areas' },
-        { id: 'page-numbers', name: 'Add Page Numbers', icon: Hash, description: 'Add page numbers to PDF' },
-        { id: 'edit-pdf', name: 'Edit PDF', icon: Edit, description: 'Add text, images, and annotations' },
-        { id: 'pdf-forms', name: 'Create & Edit Forms', icon: FileText, description: 'Create fillable forms and edit existing ones' }
-      ]
-    },
-    {
-      id: 'security',
-      name: 'Security',
-      icon: Shield,
-      color: 'red',
-      tools: [
-        { id: 'protect', name: 'Protect PDF', icon: Lock, description: 'Add password protection to PDF' },
-        { id: 'unlock', name: 'Unlock PDF', icon: Unlock, description: 'Remove password protection' },
-        { id: 'sign', name: 'Sign PDF', icon: FileText, description: 'Add digital signatures' },
-        { id: 'redact', name: 'Redact PDF', icon: Trash2, description: 'Permanently remove sensitive information' },
-        { id: 'compare', name: 'Compare PDF', icon: GitCompare, description: 'Compare different PDF versions' },
-        { id: 'advanced-security', name: 'Advanced Security', icon: Shield, description: 'Blockchain verification, military encryption, and audit trails' }
-      ]
-    },
-    {
-      id: 'ai_tools',
-      name: 'AI Tools',
-      icon: Brain,
-      color: 'purple',
-      tools: [
-        { id: 'ai-chat', name: 'AI Document Chat', icon: Brain, description: 'Chat with your PDFs - ask questions about content, get summaries' },
-        { id: 'adobe-ai-chat', name: 'Adobe-Style AI Assistant', icon: Sparkles, description: 'Advanced AI assistant with Adobe-level intelligence and document understanding' },
-        { id: 'smart-relationships', name: 'Smart Document Relationships', icon: Network, description: 'AI detects related documents and suggests connections' },
-        { id: 'predictive-processing', name: 'Predictive Processing', icon: Sparkles, description: 'AI learns your patterns and suggests operations' },
-        { id: 'webhooks', name: 'Webhook Notifications', icon: Zap, description: 'Get real-time notifications when operations complete' },
-        { id: 'supported-formats', name: 'Supported Formats', icon: FileText, description: 'View all supported file formats and their capabilities' }
-      ]
-    }
-  ];
 
   const getToolById = (toolId: string) => {
     for (const category of tools) {
@@ -272,7 +274,8 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible relative">
+      <RTLProvider locale={locale}>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible relative">
         {/* Full Page Animated Background */}
         <div className="fixed inset-0 z-0 opacity-10 dark:opacity-8">
           <Squares 
@@ -362,25 +365,34 @@ export default function Home() {
               ))}
             </nav>
 
-            {/* Tablet Menu Button */}
-            <button
-              onClick={handleMobileMenuToggle}
-              className="navbar-button hidden md:flex lg:hidden items-center p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0 transition-all duration-200"
-            >
-              <div className={`transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : 'rotate-0'}`}>
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </div>
-            </button>
+            {/* Mobile/Tablet Menu Buttons with Language Switcher and Theme Toggle */}
+        <div className="lg:hidden flex items-center space-x-1">
+          {/* Language Switcher */}
+          <LanguageSwitcher currentLocale={locale} className="scale-75" onLanguageChange={changeLanguage} />
+          
+          {/* Theme Toggle */}
+          <ThemeToggle />
+              
+              {/* Tablet Menu Button */}
+              <button
+                onClick={handleMobileMenuToggle}
+                className="navbar-button hidden md:flex lg:hidden items-center p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0 transition-all duration-200"
+              >
+                <div className={`transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : 'rotate-0'}`}>
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </div>
+              </button>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={handleMobileMenuToggle}
-              className="navbar-button md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0 transition-all duration-200"
-            >
-              <div className={`transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : 'rotate-0'}`}>
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </div>
-            </button>
+              {/* Mobile Menu Button */}
+              <button
+                onClick={handleMobileMenuToggle}
+                className="navbar-button md:hidden p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white touch-manipulation min-h-[44px] min-w-[44px] flex-shrink-0 transition-all duration-200"
+              >
+                <div className={`transition-transform duration-200 ${mobileMenuOpen ? 'rotate-180' : 'rotate-0'}`}>
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Mobile & Tablet Navigation */}
@@ -417,18 +429,30 @@ export default function Home() {
             </div>
           )}
         </div>
+        
+        {/* Desktop Language Switcher and Theme Toggle - Top Right */}
+        <div className="hidden lg:flex absolute top-1/2 right-4 z-50 -translate-y-1/2 items-center space-x-2">
+          <LanguageSwitcher currentLocale={locale} onLanguageChange={changeLanguage} />
+          <ThemeToggle />
+        </div>
       </header>
 
       {/* Main Content */}
       <main className="relative z-10 max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-6 md:py-8 lg:py-8">
          {/* Hero Section - Show when no specific tool is selected */}
-         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf'].includes(activeTool) && (
+         {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'batch-processing', 'pdf-forms', 'unlock', 'protect', 'sign', 'redact', 'compare', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'ai-chat', 'adobe-ai-chat', 'smart-relationships', 'predictive-processing', 'webhooks', 'supported-formats', 'advanced-security'].includes(activeTool) && (
            <div className="text-center mb-4 sm:mb-8 lg:mb-12 px-1 sm:px-4">
-             <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 leading-tight">
-               Work with PDFs the way they were meant to be — fast, secure, and effortless.
+             <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-4 leading-tight">
+               <GradientText 
+                 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold"
+                 colors={['#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4']}
+                 animationSpeed={8}
+               >
+                 {t('hero.title')}
+               </GradientText>
              </h1>
              <p className="text-xs sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-3 sm:mb-6 lg:mb-8 leading-relaxed px-1">
-               From batch processing to advanced protection, DocNestly delivers enterprise-level solutions that keep your workflow moving smoothly. All in your browser. No uploads, no registrations. Just powerful tools, always in flow.
+               {t('hero.description')}
              </p>
              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 lg:gap-6 text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-400">
                <div className="flex items-center">
@@ -444,6 +468,8 @@ export default function Home() {
                  Secure & Private
                </div>
              </div>
+             
+             
            </div>
          )}
 
@@ -864,23 +890,17 @@ export default function Home() {
 
         {/* Split PDF Tool */}
         {activeTool === 'split' && (
-          <Suspense fallback={<PDFToolLoading />}>
-            <SplitPDF onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <SplitPDF onReset={() => setActiveTool('home')} />
         )}
 
         {/* Remove Pages Tool */}
         {activeTool === 'remove-pages' && (
-          <Suspense fallback={<PDFToolLoading />}>
-            <RemovePages onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <RemovePages onReset={() => setActiveTool('home')} />
         )}
 
         {/* Extract Pages Tool */}
         {activeTool === 'extract-pages' && (
-          <Suspense fallback={<PDFToolLoading />}>
-            <ExtractPages onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <ExtractPages onReset={() => setActiveTool('home')} />
         )}
 
         {/* Rotate PDF Tool */}
@@ -1142,6 +1162,7 @@ export default function Home() {
           <PredictiveProcessing onReset={() => setActiveTool('home')} />
         )}
 
+
         {activeTool === 'supported-formats' && (
           <DebugFormats />
         )}
@@ -1155,7 +1176,7 @@ export default function Home() {
 
 
         {/* Coming Soon Tool */}
-        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'smart-relationships', 'predictive-processing', 'supported-formats', 'advanced-security'].includes(activeTool) && activeTool !== 'home' && (
+        {!['compress', 'merge', 'split', 'remove-pages', 'extract-pages', 'rotate-pdf', 'organize-pdf', 'scan-to-pdf', 'repair-pdf', 'ocr-pdf', 'pdf-to-word', 'pdf-to-powerpoint', 'pdf-to-excel', 'pdf-to-jpg', 'word-to-pdf', 'powerpoint-to-pdf', 'excel-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'csv-to-pdf', 'png-webp-to-pdf', 'txt-to-pdf', 'rtf-to-pdf', 'pdf-to-corel', 'png-to-corel', 'corel-to-pdf', 'corel-to-png', 'edit-pdf', 'add-page-numbers', 'add-watermark', 'crop-pdf', 'unlock', 'protect', 'sign', 'redact', 'compare', 'batch-processing', 'pdf-forms', 'webhooks', 'ai-chat', 'adobe-ai-chat', 'smart-relationships', 'predictive-processing', 'supported-formats', 'advanced-security'].includes(activeTool) && activeTool !== 'home' && (
           <div className="text-center py-12">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
               <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1206,6 +1227,7 @@ export default function Home() {
         </div>
       </footer>
       </div>
+      </RTLProvider>
     </ErrorBoundary>
   );
 }
