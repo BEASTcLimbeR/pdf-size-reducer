@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Download, FileText, Sparkles, Trophy } from 'lucide-react';
 import Lottie from 'lottie-react';
+// Import the animation data directly
 import successAnimationData from '../../public/success-animation.json';
 
 export interface SuccessAnimationProps {
@@ -44,21 +45,23 @@ export default function SuccessAnimation({
   }>>([]);
 
   useEffect(() => {
-    console.log('SuccessAnimation mounted, animation data:', successAnimationData);
+    console.log('SuccessAnimation mounted');
+    console.log('Animation data type:', typeof successAnimationData);
+    console.log('Animation data keys:', successAnimationData ? Object.keys(successAnimationData) : 'null');
+    console.log('Animation data:', successAnimationData);
+    
     setShowAnimation(true);
     setAnimationData(successAnimationData);
     setAnimationStarted(true);
     
-    // Ensure animation plays for at least 2 seconds
+    // Ensure animation plays for at least 3 seconds
     const minAnimationTime = setTimeout(() => {
-      if (!animationComplete) {
-        console.log('Minimum animation time reached, showing results');
-        setShowResults(true);
-        if (showConfetti) {
-          generateConfetti();
-        }
+      console.log('Minimum animation time reached, showing results');
+      setShowResults(true);
+      if (showConfetti) {
+        generateConfetti();
       }
-    }, 2000);
+    }, 3000);
     
     return () => clearTimeout(minAnimationTime);
   }, []);
@@ -118,22 +121,32 @@ export default function SuccessAnimation({
           <div className={`w-96 h-96 mx-auto transition-all duration-1000 ease-out ${
             showAnimation ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
           }`}>
-            {animationData ? (
-              <Lottie
-                animationData={animationData}
-                loop={false}
-                autoplay={true}
-                onComplete={handleAnimationComplete}
-                onLoad={() => console.log('Lottie animation loaded successfully')}
-                onError={(error) => console.error('Lottie animation error:', error)}
-                style={{ width: '100%', height: '100%' }}
-                rendererSettings={{
-                  preserveAspectRatio: 'xMidYMid slice'
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-green-600 dark:border-green-400 border-t-transparent rounded-full animate-spin"></div>
+            {/* Always show a visible checkmark for testing */}
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-32 h-32 border-4 border-green-500 rounded-full flex items-center justify-center animate-pulse">
+                <div className="w-16 h-16 text-green-500">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            {/* Lottie Animation (if data is available) */}
+            {animationData && (
+              <div className="absolute inset-0">
+                <Lottie
+                  animationData={animationData}
+                  loop={false}
+                  autoplay={true}
+                  onComplete={handleAnimationComplete}
+                  onLoad={() => console.log('Lottie animation loaded successfully')}
+                  onError={(error) => console.error('Lottie animation error:', error)}
+                  style={{ width: '100%', height: '100%' }}
+                  rendererSettings={{
+                    preserveAspectRatio: 'xMidYMid slice'
+                  }}
+                />
               </div>
             )}
           </div>
