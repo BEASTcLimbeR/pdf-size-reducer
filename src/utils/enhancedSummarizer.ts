@@ -516,28 +516,12 @@ class EnhancedSummarizer {
    */
   private async extractFromXlsx(file: File): Promise<{ text: string; sheets: number; [key: string]: any }> {
     try {
-      const XLSX = await import('xlsx');
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      
-      let allText = '';
-      const sheetNames = workbook.SheetNames;
-      
-      sheetNames.forEach(sheetName => {
-        const worksheet = workbook.Sheets[sheetName];
-        const sheetText = XLSX.utils.sheet_to_txt(worksheet);
-        allText += `\n--- Sheet: ${sheetName} ---\n${sheetText}\n`;
-      });
-      
+      // XLSX library removed due to security vulnerability
+      // Return basic file info instead
       return {
-        text: allText.trim(),
-        sheets: sheetNames.length,
-        extractedData: { 
-          type: 'xlsx', 
-          size: file.size,
-          sheetNames,
-          totalSheets: sheetNames.length
-        }
+        text: `Excel file: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`,
+        sheets: 1,
+        message: 'Excel processing temporarily unavailable due to security update'
       };
     } catch (error) {
       console.error('XLSX extraction failed:', error);

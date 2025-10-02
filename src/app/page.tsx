@@ -17,6 +17,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 import RTLProvider from '@/components/RTLProvider';
 import GradientText from '@/components/GradientText';
 import ThemeToggle from '@/components/ThemeToggle';
+import Preloader from '@/components/Preloader';
+import { useLoading } from '@/contexts/LoadingContext';
 // Convert commonly used components to static imports to avoid chunk loading issues
 import SplitPDF from '@/components/SplitPDF';
 import RemovePages from '@/components/RemovePages';
@@ -84,6 +86,7 @@ export default function Home() {
   const [dropdownAnimating, setDropdownAnimating] = useState(false);
   const [mobileMenuAnimating, setMobileMenuAnimating] = useState(false);
   const { t, locale, changeLanguage } = useTranslation();
+  const { isLoading } = useLoading();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get translated tools
@@ -168,7 +171,7 @@ export default function Home() {
         { id: 'smart-relationships', name: t('tools.smartRelations'), icon: Network, description: t('toolDescriptions.smartDocumentRelationships') },
         { id: 'predictive-processing', name: t('tools.predictive'), icon: Sparkles, description: t('toolDescriptions.predictiveProcessing') },
         { id: 'webhooks', name: t('tools.webhookSettings'), icon: Zap, description: t('toolDescriptions.webhookSettings') },
-        { id: 'supported-formats', name: t('tools.supportedFormats'), icon: FileText, description: 'View all supported file formats and their capabilities' }
+        { id: 'supported-formats', name: t('tools.supportedFormats'), icon: FileText, description: 'View all supported file formats and their capabilities' },
       ]
     }
   ];
@@ -275,6 +278,10 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <RTLProvider locale={locale}>
+        {/* Preloader */}
+        {isLoading && <Preloader />}
+        
+        
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 overflow-x-hidden lg:overflow-x-visible relative">
         {/* Full Page Animated Background */}
         <div className="fixed inset-0 z-0 opacity-10 dark:opacity-8">

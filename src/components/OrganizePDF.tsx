@@ -4,12 +4,164 @@ import React, { useState, useCallback } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import { Upload, Download, RotateCcw, ArrowUp, ArrowDown, Trash2, CheckCircle, AlertCircle, FileText, GripVertical } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface PageInfo {
   id: number;
   pageNumber: number;
   thumbnail: string;
 }
+
+interface DraggablePageItemProps {
+  page: PageInfo;
+  index: number;
+  movePage: (fromIndex: number, toIndex: number) => void;
+  movePageUp: (index: number) => void;
+  movePageDown: (index: number) => void;
+  removePage: (index: number) => void;
+  totalPages: number;
+}
+
+const DraggablePageItem: React.FC<DraggablePageItemProps> = ({
+  page,
+  index,
+  movePage,
+  movePageUp,
+  movePageDown,
+  removePage,
+  totalPages
+}) => {
+  const [{ isDragging, canDrag }, drag, preview] = useDrag({
+    type: 'page',
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+      canDrag: monitor.canDrag(),
+    }),
+    end: (item, monitor) => {
+      // Reset any visual states when drag ends
+    },
+  });
+
+  const [{ isOver, canDrop }, drop] = useDrop({
+    accept: 'page',
+    hover: (draggedItem: { index: number }) => {
+      if (draggedItem.index !== index) {
+        movePage(draggedItem.index, index);
+        draggedItem.index = index;
+      }
+    },
+    drop: (item: { index: number }) => {
+      // Handle drop completion
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  });
+
+  return (
+    <>
+      <div
+        ref={(node) => drag(drop(node))}
+        className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 ease-in-out transform ${
+          isDragging 
+            ? 'opacity-30 scale-95 rotate-2 shadow-2xl bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' 
+            : isOver && canDrop
+            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600 shadow-lg scale-[1.02]'
+            : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:shadow-lg hover:scale-[1.01] hover:bg-gray-100 dark:hover:bg-gray-600'
+        }`}
+        style={{
+          transform: isDragging ? 'rotate(2deg) scale(0.95)' : 'rotate(0deg) scale(1)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          willChange: 'transform, opacity',
+        }}
+      >
+      <div className="flex items-center">
+        <div className={`mr-3 transition-all duration-200 ${
+          isDragging ? 'scale-110 text-blue-500' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+        }`}>
+          <GripVertical className="h-5 w-5 cursor-move" />
+        </div>
+        <div className={`w-16 h-20 rounded border flex items-center justify-center text-sm font-medium transition-all duration-200 ${
+          isDragging 
+            ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300' 
+            : 'bg-white dark:bg-gray-600 border-gray-300 dark:border-gray-500 text-gray-600 dark:text-gray-300'
+        }`}>
+          {page.pageNumber}
+        </div>
+        <div className="ml-4">
+          <p className={`font-medium transition-colors duration-200 ${
+            isDragging ? 'text-blue-900 dark:text-blue-100' : 'text-gray-900 dark:text-white'
+          }`}>
+            Page {page.pageNumber}
+          </p>
+          <p className={`text-sm transition-colors duration-200 ${
+            isDragging ? 'text-blue-600 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'
+          }`}>
+            Original page {page.id + 1}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-1">
+        <button
+          onClick={() => movePageUp(index)}
+          disabled={index === 0}
+          className="p-2 rounded-md transition-all duration-200 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-600 active:scale-95"
+          title="Move up"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => movePageDown(index)}
+          disabled={index === totalPages - 1}
+          className="p-2 rounded-md transition-all duration-200 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-600 active:scale-95"
+          title="Move down"
+        >
+          <ArrowDown className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => removePage(index)}
+          className="p-2 rounded-md transition-all duration-200 text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-95"
+          title="Remove page"
+        >
+          <Trash2 className="h-4 w-4" />
+        </button>
+      </div>
+      </div>
+      
+      {/* Custom Drag Preview */}
+      {isDragging && (
+        <div
+          ref={preview}
+          className="fixed pointer-events-none z-50 opacity-80"
+          style={{
+            transform: 'rotate(2deg) scale(0.95)',
+          }}
+        >
+          <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-600 rounded-lg shadow-2xl">
+            <div className="flex items-center">
+              <GripVertical className="h-5 w-5 text-blue-500 mr-3" />
+              <div className="w-16 h-20 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-600 rounded flex items-center justify-center text-sm font-medium text-blue-700 dark:text-blue-300">
+                {page.pageNumber}
+              </div>
+              <div className="ml-4">
+                <p className="font-medium text-blue-900 dark:text-blue-100">
+                  Page {page.pageNumber}
+                </p>
+                <p className="text-sm text-blue-600 dark:text-blue-300">
+                  Original page {page.id + 1}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 interface OrganizePDFProps {
   onReset?: () => void;
@@ -70,21 +222,21 @@ export default function OrganizePDF({ onReset }: OrganizePDFProps) {
     }
   };
 
-  const movePage = (fromIndex: number, toIndex: number) => {
+  const movePage = useCallback((fromIndex: number, toIndex: number) => {
     if (fromIndex === toIndex) return;
 
-    const newPages = [...pages];
-    const [movedPage] = newPages.splice(fromIndex, 1);
-    newPages.splice(toIndex, 0, movedPage);
+    setPages(prevPages => {
+      const newPages = [...prevPages];
+      const [movedPage] = newPages.splice(fromIndex, 1);
+      newPages.splice(toIndex, 0, movedPage);
 
-    // Update page numbers
-    const updatedPages = newPages.map((page, index) => ({
-      ...page,
-      pageNumber: index + 1
-    }));
-
-    setPages(updatedPages);
-  };
+      // Update page numbers
+      return newPages.map((page, index) => ({
+        ...page,
+        pageNumber: index + 1
+      }));
+    });
+  }, []);
 
   const movePageUp = (index: number) => {
     if (index > 0) {
@@ -193,7 +345,8 @@ export default function OrganizePDF({ onReset }: OrganizePDFProps) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <DndProvider backend={HTML5Backend}>
+      <div className="max-w-6xl mx-auto p-6">
 
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -276,52 +429,24 @@ export default function OrganizePDF({ onReset }: OrganizePDFProps) {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3 relative">
                 {pages.map((page, index) => (
                   <div
                     key={page.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+                    className="transition-all duration-300 ease-in-out"
+                    style={{
+                      transform: 'translateZ(0)', // Enable hardware acceleration
+                    }}
                   >
-                    <div className="flex items-center">
-                      <GripVertical className="h-5 w-5 text-gray-400 mr-3 cursor-move" />
-                      <div className="w-16 h-20 bg-white dark:bg-gray-600 rounded border flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
-                        {page.pageNumber}
-                      </div>
-                      <div className="ml-4">
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          Page {page.pageNumber}
-                        </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">
-                          Original page {page.id + 1}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => movePageUp(index)}
-                        disabled={index === 0}
-                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Move up"
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => movePageDown(index)}
-                        disabled={index === pages.length - 1}
-                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Move down"
-                      >
-                        <ArrowDown className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => removePage(index)}
-                        className="p-2 text-red-400 hover:text-red-600 dark:hover:text-red-300"
-                        title="Remove page"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <DraggablePageItem
+                      page={page}
+                      index={index}
+                      movePage={movePage}
+                      movePageUp={movePageUp}
+                      movePageDown={movePageDown}
+                      removePage={removePage}
+                      totalPages={pages.length}
+                    />
                   </div>
                 ))}
               </div>
@@ -357,6 +482,7 @@ export default function OrganizePDF({ onReset }: OrganizePDFProps) {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </DndProvider>
   );
 }

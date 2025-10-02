@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, Download, RotateCcw, Loader2, CheckCircle, AlertCircle, Scissors } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
+import SuccessAnimation from './SuccessAnimation';
 
 interface SplitPDFProps {
   onReset?: () => void;
@@ -436,31 +437,29 @@ export default function SplitPDF({ onReset }: SplitPDFProps) {
         </div>
       )}
 
-      {/* Success State */}
+      {/* Success State with Animation */}
       {splitFiles.length > 0 && (
         <div className="space-y-6">
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
-            <div className="flex items-center mb-4">
-              <CheckCircle className="h-6 w-6 text-green-500 mr-3" />
-              <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
-                PDF Split Successfully!
-              </h3>
-            </div>
-            
-            <p className="text-green-700 dark:text-green-400 mb-4">
-              Your PDF has been split into {splitFiles.length} file(s).
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={downloadAllFiles}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
-              >
-                <Download className="h-5 w-5 mr-2" />
-                Download All Files
-              </button>
-            </div>
-          </div>
+          <SuccessAnimation
+            title="PDF Split Successfully!"
+            message={`Your PDF has been split into ${splitFiles.length} file(s).`}
+            stats={[
+              {
+                label: 'Files Created',
+                value: splitFiles.length.toString(),
+                icon: <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              },
+              {
+                label: 'Total Pages',
+                value: totalPages.toString(),
+                icon: <Scissors className="h-5 w-5 text-green-600 dark:text-green-400" />
+              }
+            ]}
+            onAction={downloadAllFiles}
+            actionLabel="Download All Files"
+            actionIcon={<Download className="h-5 w-5" />}
+            showConfetti={true}
+          />
 
           {/* Individual Files */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">

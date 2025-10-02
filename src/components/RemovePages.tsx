@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, Download, RotateCcw, Loader2, AlertCircle, Trash2, Plus, Minus } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
+import SuccessAnimation from './SuccessAnimation';
 
 interface RemovePagesProps {
   onReset?: () => void;
@@ -343,35 +344,34 @@ export default function RemovePages({ onReset }: RemovePagesProps) {
         </div>
       )}
 
-      {/* Success State */}
+      {/* Success State with Animation */}
       {processedFile && (
         <div className="space-y-6">
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
-            <div className="flex items-center mb-4">
-              <div className="w-6 h-6 text-green-500 mr-3">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-green-800 dark:text-green-400">
-                Pages Removed Successfully!
-              </h3>
-            </div>
-            
-            <div className="text-center">
-              <p className="text-green-700 dark:text-green-400 mb-4">
-                {pagesToRemove.length} page(s) have been removed from your PDF.
-              </p>
-              
-              <button
-                onClick={downloadProcessedFile}
-                className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
-              >
-                <Download className="h-5 w-5 mr-2" />
-                Download Modified PDF
-              </button>
-            </div>
-          </div>
+          <SuccessAnimation
+            title="Pages Removed Successfully!"
+            message={`${pagesToRemove.length} page(s) have been removed from your PDF.`}
+            stats={[
+              {
+                label: 'Pages Removed',
+                value: pagesToRemove.length.toString(),
+                icon: <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
+              },
+              {
+                label: 'Pages Remaining',
+                value: (totalPages - pagesToRemove.length).toString(),
+                icon: <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              },
+              {
+                label: 'File Size',
+                value: formatFileSize(processedFile.length),
+                icon: <Download className="h-5 w-5 text-green-600 dark:text-green-400" />
+              }
+            ]}
+            onAction={downloadProcessedFile}
+            actionLabel="Download Modified PDF"
+            actionIcon={<Download className="h-5 w-5" />}
+            showConfetti={true}
+          />
 
           <div className="flex justify-center">
             <button

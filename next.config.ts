@@ -182,7 +182,13 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   
   // Generate ETags
-  generateEtags: true
+  generateEtags: true,
+  
+  // Performance optimizations
+  experimental: {
+    // Optimize memory usage
+    memoryBasedWorkersCount: true,
+  }
 };
 
 export default nextConfig;
