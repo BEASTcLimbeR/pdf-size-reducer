@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Download, FileText, Sparkles, Trophy } from 'lucide-react';
-import Lottie from 'lottie-react';
 
 export interface SuccessAnimationProps {
   title: string;
@@ -30,10 +29,8 @@ export default function SuccessAnimation({
   className = ''
 }: SuccessAnimationProps) {
   const [showAnimation, setShowAnimation] = useState(false);
-  const [animationData, setAnimationData] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
-  const [animationStarted, setAnimationStarted] = useState(false);
   const [confettiParticles, setConfettiParticles] = useState<Array<{
     id: number;
     x: number;
@@ -43,35 +40,20 @@ export default function SuccessAnimation({
   }>>([]);
 
   useEffect(() => {
-    console.log('SuccessAnimation mounted');
+    console.log('SuccessAnimation mounted - starting animation');
     setShowAnimation(true);
-    setAnimationStarted(true);
     
-    // Load animation data dynamically
-    const loadAnimation = async () => {
-      try {
-        const response = await fetch('/success-animation.json');
-        const data = await response.json();
-        console.log('Animation loaded successfully:', data);
-        setAnimationData(data);
-      } catch (error) {
-        console.error('Failed to load animation:', error);
-        setAnimationData(null);
-      }
-    };
-    
-    loadAnimation();
-    
-    // Ensure animation plays for at least 2.5 seconds
-    const minAnimationTime = setTimeout(() => {
-      console.log('Minimum animation time reached, showing results');
+    // Play animation for 3 seconds then show results
+    const animationTimer = setTimeout(() => {
+      console.log('Animation completed - showing results');
+      setAnimationComplete(true);
       setShowResults(true);
       if (showConfetti) {
         generateConfetti();
       }
-    }, 2500);
+    }, 3000);
     
-    return () => clearTimeout(minAnimationTime);
+    return () => clearTimeout(animationTimer);
   }, []);
 
   const generateConfetti = () => {
@@ -86,19 +68,6 @@ export default function SuccessAnimation({
     setConfettiParticles(particles);
   };
 
-  const handleAnimationComplete = () => {
-    console.log('Lottie animation completed!');
-    setAnimationComplete(true);
-    
-    // Show results after a short delay
-    setTimeout(() => {
-      console.log('Showing results after Lottie animation completion');
-      setShowResults(true);
-      if (showConfetti) {
-        generateConfetti();
-      }
-    }, 500);
-  };
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -121,45 +90,49 @@ export default function SuccessAnimation({
         </div>
       )}
 
-      {/* Animation Section */}
+      {/* Success Animation */}
       {!showResults && (
         <div className="flex items-center justify-center min-h-[500px] bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
           <div className={`w-96 h-96 mx-auto transition-all duration-1000 ease-out ${
             showAnimation ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
           }`}>
-            {/* Lottie Animation */}
-            {animationData ? (
-              <Lottie
-                animationData={animationData}
-                loop={false}
-                autoplay={true}
-                onComplete={handleAnimationComplete}
-                onLoad={() => console.log('Lottie animation loaded successfully')}
-                onError={(error) => console.error('Lottie animation error:', error)}
-                style={{ width: '100%', height: '100%' }}
-                rendererSettings={{
-                  preserveAspectRatio: 'xMidYMid slice'
-                }}
-              />
-            ) : (
-              /* Fallback Animation */
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="relative">
-                  {/* Animated Circle */}
-                  <div className="w-32 h-32 border-4 border-green-200 rounded-full flex items-center justify-center">
-                    <div className="w-28 h-28 border-4 border-green-500 rounded-full animate-spin border-t-transparent"></div>
-                  </div>
-                  {/* Checkmark */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 text-green-500 animate-pulse">
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                      </svg>
-                    </div>
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="relative">
+                {/* Outer Circle - Draws itself */}
+                <div className="w-40 h-40 border-4 border-green-200 rounded-full flex items-center justify-center">
+                  <div 
+                    className="w-36 h-36 border-4 border-green-500 rounded-full border-t-transparent animate-spin"
+                    style={{
+                      animation: 'spin 2s linear infinite, drawCircle 2s ease-in-out forwards'
+                    }}
+                  ></div>
+                </div>
+                
+                {/* Checkmark - Appears after circle */}
+                <div 
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{
+                    animation: 'fadeInCheckmark 0.5s ease-in-out 1.5s forwards',
+                    opacity: 0
+                  }}
+                >
+                  <div className="w-20 h-20 text-green-500">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
                   </div>
                 </div>
+                
+                {/* Success Pulse Effect */}
+                <div 
+                  className="absolute inset-0 rounded-full bg-green-100 animate-ping"
+                  style={{
+                    animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) 2s forwards',
+                    opacity: 0
+                  }}
+                ></div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

@@ -632,3 +632,39 @@ nav.overflow-x-auto::-webkit-scrollbar {
     @apply bg-background text-foreground;
   }
 }
+
+/* Success Animation Keyframes */
+@keyframes drawCircle {
+  0% {
+    stroke-dasharray: 0 1000;
+  }
+  100% {
+    stroke-dasharray: 1000 1000;
+  }
+}
+
+@keyframes fadeInCheckmark {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
