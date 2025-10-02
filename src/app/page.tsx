@@ -6,7 +6,7 @@ import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw,
 // Lazy load heavy components for better performance
 const PDFUploader = lazy(() => import('@/components/PDFUploader'));
 const EnhancedFileUploader = lazy(() => import('@/components/EnhancedFileUploader'));
-const EnhancedPDFUploader = lazy(() => import('@/components/EnhancedPDFUploader'));
+import EnhancedPDFUploader from '@/components/EnhancedPDFUploader';
 // Convert CompressionResults to static import to avoid chunk loading issues
 import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
@@ -50,7 +50,7 @@ const CSVToPDF = lazy(() => import('@/components/CSVToPDF'));
 const PNGWebPToPDF = lazy(() => import('@/components/PNGWebPToPDF'));
 const TXTToPDF = lazy(() => import('@/components/TXTToPDF'));
 const RTFToPDF = lazy(() => import('@/components/RTFToPDF'));
-const BatchProcessing = lazy(() => import('@/components/BatchProcessing'));
+import BatchProcessing from '@/components/BatchProcessing';
 const PDFForms = lazy(() => import('@/components/PDFForms'));
 const WebhookSettings = lazy(() => import('@/components/WebhookSettings'));
 const AIDocumentChat = lazy(() => import('@/components/AIDocumentChat'));
@@ -864,7 +864,7 @@ export default function Home() {
 
         {/* Tool Content - Show when specific tool is selected */}
         {activeTool === 'compress' && (
-          <Suspense fallback={<PDFToolLoading />}>
+          <>
             {!uploadedFile ? (
               <EnhancedPDFUploader 
                 onFileUpload={handleFileUpload}
@@ -887,7 +887,7 @@ export default function Home() {
                 error={error}
               />
             )}
-          </Suspense>
+          </>
         )}
 
         {/* Merge PDF Tool */}
@@ -1125,9 +1125,7 @@ export default function Home() {
 
         {/* Batch Processing Tool */}
         {activeTool === 'batch-processing' && (
-          <Suspense fallback={<PDFToolLoading />}>
-            <BatchProcessing onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <BatchProcessing onReset={() => setActiveTool('home')} />
         )}
 
         {/* PDF Forms Tool */}

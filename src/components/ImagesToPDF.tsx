@@ -7,7 +7,6 @@ import { PDFDocument } from 'pdf-lib';
 import { useProgress } from '@/hooks/useProgress';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import SuccessAnimation from './SuccessAnimation';
 
 interface ImagesToPDFProps {
   onReset?: () => void;
@@ -437,41 +436,52 @@ export default function ImagesToPDF({ onReset }: ImagesToPDFProps) {
 
   if (pdfFile) {
     return (
-      <div className="space-y-6">
-        <SuccessAnimation
-          title="PDF Created Successfully!"
-          message={`Your ${imageFiles.length} image${imageFiles.length !== 1 ? 's have' : ' has'} been converted to PDF.`}
-          stats={[
-            {
-              label: 'Images Converted',
-              value: imageFiles.length.toString(),
-              icon: <Image className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            },
-            {
-              label: 'File Size',
-              value: formatFileSize(pdfFile.length),
-              icon: <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
-            },
-            {
-              label: 'Pages Created',
-              value: imageFiles.length.toString(),
-              icon: <Download className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-            }
-          ]}
-          onAction={downloadPDF}
-          actionLabel="Download PDF"
-          actionIcon={<Download className="h-5 w-5" />}
-          showConfetti={true}
-        />
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <CheckCircle className="w-8 h-8 text-green-500" />
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  PDF Created Successfully!
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Your images have been converted to PDF
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={resetUpload}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4 mr-2 inline" />
+              Create Another
+            </button>
+          </div>
 
-        <div className="flex justify-center">
-          <button
-            onClick={resetUpload}
-            className="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-lg font-medium transition-colors flex items-center"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Create Another PDF
-          </button>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+            <div className="flex items-center space-x-4">
+              <FileText className="w-8 h-8 text-blue-500" />
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900 dark:text-white">
+                  images-to-pdf.pdf
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {formatFileSize(pdfFile.length)} • {imageFiles.length} pages
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <button
+              onClick={downloadPDF}
+              className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center space-x-2"
+            >
+              <Download className="w-5 h-5" />
+              <span>Download PDF</span>
+            </button>
+          </div>
         </div>
       </div>
     );

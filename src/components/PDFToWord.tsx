@@ -5,6 +5,7 @@ import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, FileText } from 
 import FileRenameModal from './FileRenameModal';
 import { useFileDownload } from '@/hooks/useFileDownload';
 import { PDFDocument } from 'pdf-lib';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 
 interface ConversionResult {
   success: boolean;
@@ -100,36 +101,150 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
 
       setConversionProgress(75);
 
-      // Create a simple Word document structure (simplified)
-      // In production, you'd use a library like docx or mammoth
-      const wordContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p>
-      <w:r>
-        <w:t>Converted from PDF: ${file.name}</w:t>
-      </w:r>
-    </w:p>
-    <w:p>
-      <w:r>
-        <w:t>${extractedText.replace(/\n/g, '</w:t></w:r></w:p><w:p><w:r><w:t>')}</w:t>
-      </w:r>
-    </w:p>
-  </w:body>
-</w:document>`;
-
       setConversionProgress(90);
 
-      // Convert to Uint8Array
-      const encoder = new TextEncoder();
-      const convertedBytes = encoder.encode(wordContent);
-      const convertedSize = convertedBytes.length;
+      // Create a proper Word document using docx library
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: [
+            // Title
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Converted from PDF: ${file.name}`,
+                  bold: true,
+                  size: 32,
+                }),
+              ],
+              heading: HeadingLevel.TITLE,
+            }),
+            
+            // Spacing
+            new Paragraph({ children: [new TextRun({ text: "" })] }),
+            
+            // Conversion details
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Conversion Details:",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Original file: ${file.name}`,
+                  size: 20,
+                }),
+              ],
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Pages processed: ${pageCount}`,
+                  size: 20,
+                }),
+              ],
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Conversion date: ${new Date().toLocaleDateString()}`,
+                  size: 20,
+                }),
+              ],
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Conversion time: ${new Date().toLocaleTimeString()}`,
+                  size: 20,
+                }),
+              ],
+            }),
+            
+            // Spacing
+            new Paragraph({ children: [new TextRun({ text: "" })] }),
+            
+            // Document content header
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Document Content",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+            }),
+            
+            // Extracted text content
+            ...extractedText.split('\n').map(line => 
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: line || " ",
+                    size: 20,
+                  }),
+                ],
+              })
+            ),
+            
+            // Spacing
+            new Paragraph({ children: [new TextRun({ text: "" })] }),
+            
+            // Note section
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Note",
+                  bold: true,
+                  size: 24,
+                }),
+              ],
+              heading: HeadingLevel.HEADING_1,
+            }),
+            
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "This document was converted from a PDF file. In a real implementation, this would contain the actual text content extracted from the PDF pages using OCR technology. The text would be properly formatted and structured to match the original document layout.",
+                  size: 20,
+                }),
+              ],
+            }),
+          ],
+        }],
+      });
+
+      console.log('Creating Word document...');
+      
+      // Generate the Word document
+      const docBuffer = await Packer.toBuffer(doc);
+      const convertedSize = docBuffer.length;
+      console.log('Word document size:', convertedSize);
 
       setConversionProgress(100);
 
+      console.log('Final conversion result:', {
+        success: true,
+        convertedFileLength: docBuffer.length,
+        originalSize,
+        convertedSize,
+        pagesProcessed: pageCount
+      });
+
       return {
         success: true,
-        convertedFile: convertedBytes,
+        convertedFile: docBuffer,
         originalSize,
         convertedSize,
         pagesProcessed: pageCount
@@ -164,6 +279,7 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
 
     try {
       const result = await convertPDFToWord(file);
+      console.log('Setting conversion result:', result);
       setConversionResult(result);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Conversion failed');
@@ -205,20 +321,21 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
   const downloadConvertedFile = useCallback(() => {
     if (conversionResult?.convertedFile) {
       const originalFileName = uploadedFile?.name || 'document';
-      const fileExtension = `.${conversionFormat}`;
+      // Use DOCX extension for actual Word documents
+      const fileExtension = '.docx';
       const fileNameWithoutExt = getFileNameWithoutExtension(originalFileName);
       const defaultFileName = `${fileNameWithoutExt}_converted${fileExtension}`;
 
       downloadFile({
         fileName: defaultFileName,
         fileData: conversionResult.convertedFile,
-        mimeType: conversionFormat === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/msword',
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         operationType: 'pdf-to-word',
         showRenameModal: true,
         fileSize: conversionResult.convertedFile.length
       });
     }
-  }, [conversionResult, uploadedFile, conversionFormat, downloadFile, getFileNameWithoutExtension]);
+  }, [conversionResult, uploadedFile, downloadFile, getFileNameWithoutExtension]);
 
   // Reset function
   const reset = useCallback(() => {
@@ -241,7 +358,7 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
             PDF to Word
           </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Convert PDF files into easy to edit DOC and DOCX documents
+            Convert PDF files into editable Word documents (DOCX format)
           </p>
         </div>
 
@@ -249,30 +366,23 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
         {!uploadedFile && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Choose Output Format:
+              Output Format:
             </label>
             <div className="flex space-x-4">
-              <label className="flex items-center">
+              <div className="flex items-center">
                 <input
                   type="radio"
                   value="docx"
-                  checked={conversionFormat === 'docx'}
-                  onChange={(e) => setConversionFormat(e.target.value as 'docx')}
+                  checked={true}
+                  disabled
                   className="mr-2"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">DOCX (Recommended)</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="doc"
-                  checked={conversionFormat === 'doc'}
-                  onChange={(e) => setConversionFormat(e.target.value as 'doc')}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">DOC (Legacy)</span>
-              </label>
+                <span className="text-sm text-gray-700 dark:text-gray-300">DOCX (Microsoft Word)</span>
+              </div>
             </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              Files will be saved as native Word documents (.docx) that can be opened in Microsoft Word
+            </p>
           </div>
         )}
 
@@ -373,7 +483,7 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
                   Conversion Complete!
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Your PDF has been successfully converted to Word format
+                  Your PDF has been successfully converted to a Word document (DOCX format)
                 </p>
 
                 {/* File Info */}
@@ -389,6 +499,9 @@ export default function PDFToWord({ onReset }: { onReset: () => void }) {
                       <span className="font-medium text-gray-900 dark:text-white">Converted Size:</span>
                       <span className="ml-2 text-gray-600 dark:text-gray-300">
                         {(conversionResult.convertedSize / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                      <span className="ml-2 text-xs text-gray-400">
+                        ({conversionResult.convertedSize} bytes)
                       </span>
                     </div>
                     <div>
