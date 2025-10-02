@@ -34,6 +34,7 @@ export default function SuccessAnimation({
   const [animationData, setAnimationData] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [animationStarted, setAnimationStarted] = useState(false);
   const [confettiParticles, setConfettiParticles] = useState<Array<{
     id: number;
     x: number;
@@ -43,8 +44,23 @@ export default function SuccessAnimation({
   }>>([]);
 
   useEffect(() => {
+    console.log('SuccessAnimation mounted, animation data:', successAnimationData);
     setShowAnimation(true);
     setAnimationData(successAnimationData);
+    setAnimationStarted(true);
+    
+    // Ensure animation plays for at least 2 seconds
+    const minAnimationTime = setTimeout(() => {
+      if (!animationComplete) {
+        console.log('Minimum animation time reached, showing results');
+        setShowResults(true);
+        if (showConfetti) {
+          generateConfetti();
+        }
+      }
+    }, 2000);
+    
+    return () => clearTimeout(minAnimationTime);
   }, []);
 
   const generateConfetti = () => {
@@ -60,14 +76,19 @@ export default function SuccessAnimation({
   };
 
   const handleAnimationComplete = () => {
+    console.log('Animation completed!');
     setAnimationComplete(true);
-    // Show results with a smooth delay after animation completes
-    setTimeout(() => {
-      setShowResults(true);
-      if (showConfetti) {
-        generateConfetti();
-      }
-    }, 500); // Longer delay for smoother transition
+    
+    // If minimum time has passed, show results immediately
+    if (animationStarted) {
+      setTimeout(() => {
+        console.log('Showing results after animation completion');
+        setShowResults(true);
+        if (showConfetti) {
+          generateConfetti();
+        }
+      }, 500); // Short delay after animation completes
+    }
   };
 
   return (
@@ -94,7 +115,7 @@ export default function SuccessAnimation({
       {/* Google Pay Style: Animation First */}
       {!showResults && (
         <div className="flex items-center justify-center min-h-[500px] bg-gradient-to-br from-green-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-          <div className={`w-80 h-80 mx-auto transition-all duration-1000 ease-out ${
+          <div className={`w-96 h-96 mx-auto transition-all duration-1000 ease-out ${
             showAnimation ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
           }`}>
             {animationData ? (
@@ -103,6 +124,8 @@ export default function SuccessAnimation({
                 loop={false}
                 autoplay={true}
                 onComplete={handleAnimationComplete}
+                onLoad={() => console.log('Lottie animation loaded successfully')}
+                onError={(error) => console.error('Lottie animation error:', error)}
                 style={{ width: '100%', height: '100%' }}
                 rendererSettings={{
                   preserveAspectRatio: 'xMidYMid slice'
