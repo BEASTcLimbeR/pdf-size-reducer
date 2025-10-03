@@ -64,6 +64,25 @@ export default function CompressionResults({
   const handleCompressPDF = useCallback(async () => {
     const compressionStartTime = Date.now();
     try {
+      // Check if file is valid
+      if (!file) {
+        console.error('No file provided for compression');
+        onError('No file provided for compression');
+        return;
+      }
+
+      // Check if file is actually a File object
+      if (typeof file.arrayBuffer !== 'function') {
+        console.error('Invalid file object:', {
+          file: file,
+          type: typeof file,
+          hasArrayBuffer: typeof file?.arrayBuffer === 'function',
+          constructor: file?.constructor?.name
+        });
+        onError('Invalid file object - please try uploading the file again');
+        return;
+      }
+
       setIsCompressing(true);
       setCompressionProgress(0);
 

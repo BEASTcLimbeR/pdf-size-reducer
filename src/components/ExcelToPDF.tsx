@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, FileSpreadsheet } from 'lucide-react';
 import { PDFDocument, rgb } from 'pdf-lib';
+import * as ExcelJS from 'exceljs';
 
 interface ConversionResult {
   success: boolean;
@@ -62,13 +63,27 @@ export default function ExcelToPDF({ onReset }: { onReset: () => void }) {
       const arrayBuffer = await file.arrayBuffer();
       setConversionProgress(20);
 
-      // In a real implementation, you would:
-      // 1. Parse the Excel file using xlsx or similar
-      // 2. Extract data from each worksheet
-      // 3. Create PDF pages with tables and charts
-      // 4. Handle formatting, formulas, and cell styles
-
+      // Parse the Excel file using ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(arrayBuffer);
+      
       setConversionProgress(30);
+      
+      // Extract data from worksheets
+      const worksheetData: string[] = [];
+      workbook.eachSheet((worksheet, sheetId) => {
+        worksheetData.push(`\n--- Worksheet: ${worksheet.name} ---\n`);
+        
+        worksheet.eachRow((row, rowNumber) => {
+          const rowData: string[] = [];
+          row.eachCell((cell, colNumber) => {
+            rowData.push(cell.text || '');
+          });
+          worksheetData.push(rowData.join('\t'));
+        });
+      });
+
+      setConversionProgress(50);
 
       // Create a new PDF document
       const pdfDoc = await PDFDocument.create();
@@ -83,24 +98,28 @@ export default function ExcelToPDF({ onReset }: { onReset: () => void }) {
       const pageWidth = orientation === 'landscape' ? dimensions[pageSize].height : dimensions[pageSize].width;
       const pageHeight = orientation === 'landscape' ? dimensions[pageSize].width : dimensions[pageSize].height;
 
-      // Simulate processing multiple worksheets
-      const worksheetCount = 2; // Simulated worksheet count
+      // Process worksheets and create PDF pages
+      const worksheetCount = workbook.worksheets.length;
       
       for (let i = 0; i < worksheetCount; i++) {
-        setConversionProgress(40 + (i / worksheetCount) * 40);
+        setConversionProgress(50 + (i / worksheetCount) * 40);
         
         // Add a page for each worksheet
         const page = pdfDoc.addPage([pageWidth, pageHeight]);
+        const worksheet = workbook.worksheets[i];
         
-        // Simulate worksheet content
-        const worksheetTitle = `Worksheet ${i + 1}`;
-        const tableData = [
-          ['Column A', 'Column B', 'Column C', 'Column D'],
-          ['Data 1', 'Value 1', 'Result 1', 'Total 1'],
-          ['Data 2', 'Value 2', 'Result 2', 'Total 2'],
-          ['Data 3', 'Value 3', 'Result 3', 'Total 3'],
-          ['Data 4', 'Value 4', 'Result 4', 'Total 4'],
-        ];
+        // Use actual worksheet data
+        const worksheetTitle = worksheet.name;
+        const tableData: string[][] = [];
+        
+        // Extract data from the worksheet
+        worksheet.eachRow((row, rowNumber) => {
+          const rowData: string[] = [];
+          row.eachCell((cell, colNumber) => {
+            rowData.push(cell.text || '');
+          });
+          tableData.push(rowData);
+        });
 
         // Add worksheet title
         page.drawText(worksheetTitle, {

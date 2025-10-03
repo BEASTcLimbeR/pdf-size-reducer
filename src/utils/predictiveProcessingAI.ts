@@ -54,11 +54,12 @@ class PredictiveProcessingAI {
       const response = await fetch(`${this.baseUrl}/status`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(3000) // 3 second timeout
       });
       this.isOnline = response.ok;
     } catch (error) {
       this.isOnline = false;
-      console.warn('Predictive Processing AI backend is offline. Using fallback mode.');
+      // Silently handle backend unavailability
     }
   }
 
@@ -76,6 +77,7 @@ class PredictiveProcessingAI {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(action),
+        signal: AbortSignal.timeout(5000) // 5 second timeout
       });
 
       if (!response.ok) {
@@ -114,7 +116,9 @@ class PredictiveProcessingAI {
         return this.getLocalPatterns();
       }
 
-      const response = await fetch(`${this.baseUrl}/patterns`);
+      const response = await fetch(`${this.baseUrl}/patterns`, {
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -134,7 +138,9 @@ class PredictiveProcessingAI {
         return this.getLocalSuggestions();
       }
 
-      const response = await fetch(`${this.baseUrl}/suggestions`);
+      const response = await fetch(`${this.baseUrl}/suggestions`, {
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -154,7 +160,9 @@ class PredictiveProcessingAI {
         return this.getLocalInsights();
       }
 
-      const response = await fetch(`${this.baseUrl}/insights`);
+      const response = await fetch(`${this.baseUrl}/insights`, {
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

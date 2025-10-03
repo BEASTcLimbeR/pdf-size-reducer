@@ -47,16 +47,20 @@ class AIBackendService {
     try {
       const response = await fetch(`${AI_BACKEND_URL}/`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(3000) // 3 second timeout
       });
       
       if (response.ok) {
         const data = await response.json();
         this.backendAvailable = data.status === 'running';
         console.log('🤖 AI Backend is available:', data);
+      } else {
+        console.warn(`🤖 AI Backend responded with ${response.status}`);
+        this.backendAvailable = false;
       }
     } catch (error) {
-      console.log('🔄 AI Backend not available, using fallback system');
+      // Silently handle backend unavailability - don't log as error
       this.backendAvailable = false;
     }
   }
@@ -77,6 +81,7 @@ class AIBackendService {
       const response = await fetch(`${AI_BACKEND_URL}/analyze-document`, {
         method: 'POST',
         body: formData,
+        signal: AbortSignal.timeout(30000) // 30 second timeout for file upload
       });
 
       if (!response.ok) {

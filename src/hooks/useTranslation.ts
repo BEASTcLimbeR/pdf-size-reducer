@@ -41,22 +41,29 @@ export const useTranslation = (): UseTranslationReturn => {
     const loadTranslations = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/locales/${locale}/common.json`);
+        const response = await fetch(`/locales/${locale}/common.json`, {
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
         if (response.ok) {
           const data = await response.json();
           setTranslations(data);
         } else {
           // Fallback to English if translation not found
-          const fallbackResponse = await fetch('/locales/en/common.json');
-          const fallbackData = await fallbackResponse.json();
-          setTranslations(fallbackData);
+          try {
+            const fallbackResponse = await fetch('/locales/en/common.json', {
+              signal: AbortSignal.timeout(5000)
+            });
+            const fallbackData = await fallbackResponse.json();
+            setTranslations(fallbackData);
+          } catch (fallbackError) {
+            console.warn('Translation files not found, using default translations');
+            setTranslations({});
+          }
         }
       } catch (error) {
-        console.error('Error loading translations:', error);
-        // Fallback to English
-        const fallbackResponse = await fetch('/locales/en/common.json');
-        const fallbackData = await fallbackResponse.json();
-        setTranslations(fallbackData);
+        console.warn('Error loading translations, using default:', error);
+        // Use empty translations as fallback
+        setTranslations({});
       } finally {
         setIsLoading(false);
       }

@@ -173,7 +173,8 @@ export class AccuratePDFAnalyzer {
       // Check if Python backend is available
       const healthCheck = await fetch('http://localhost:8001/health', {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(3000) // 3 second timeout
       });
       
       if (!healthCheck.ok) {
@@ -187,6 +188,7 @@ export class AccuratePDFAnalyzer {
       const response = await fetch('http://localhost:8001/analyze-pdf-accurate', {
         method: 'POST',
         body: formData,
+        signal: AbortSignal.timeout(10000) // 10 second timeout for analysis
       });
       
       if (response.ok) {

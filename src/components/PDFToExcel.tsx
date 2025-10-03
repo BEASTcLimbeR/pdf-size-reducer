@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { Upload, Download, AlertCircle, CheckCircle, RotateCcw, FileSpreadsheet, FileText } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
+import * as ExcelJS from 'exceljs';
 
 interface ConversionResult {
   success: boolean;
@@ -86,20 +87,36 @@ export default function PDFToExcel({ onReset }: { onReset: () => void }) {
 
       setConversionProgress(75);
 
-      // Create a simple Excel structure (simplified)
-      // In production, you'd use xlsx library to create proper Excel files
-      const excelContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <sheets>
-    <sheet name="PDF Data" sheetId="1" r:id="rId1"/>
-  </sheets>
-</workbook>`;
+      // Create a proper Excel workbook using ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('PDF Data');
+      
+      // Add headers
+      worksheet.addRow(['Page', 'Content', 'Type', 'Notes']);
+      
+      // Add data for each page
+      for (let i = 0; i < pages.length; i++) {
+        worksheet.addRow([
+          `Page ${i + 1}`,
+          `Data extracted from page ${i + 1} of the PDF`,
+          'Text Content',
+          'In real implementation, this would be actual structured data from PDF tables'
+        ]);
+      }
+      
+      // Style the header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
 
       setConversionProgress(90);
 
-      // Convert to Uint8Array
-      const encoder = new TextEncoder();
-      const convertedBytes = encoder.encode(excelContent);
+      // Generate Excel file buffer
+      const buffer = await workbook.xlsx.writeBuffer();
+      const convertedBytes = new Uint8Array(buffer);
       const convertedSize = convertedBytes.length;
 
       setConversionProgress(100);

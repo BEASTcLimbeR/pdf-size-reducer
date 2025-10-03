@@ -254,6 +254,17 @@ export async function validatePDFFileAsync(file: File): Promise<{ isValid: boole
     return basicValidation;
   }
 
+  // Check if file is actually a File object
+  if (!file || typeof file.arrayBuffer !== 'function') {
+    console.error('Invalid file object:', {
+      file: file,
+      type: typeof file,
+      hasArrayBuffer: typeof file?.arrayBuffer === 'function',
+      constructor: file?.constructor?.name
+    });
+    return { isValid: false, error: 'Invalid file object - arrayBuffer method not available' };
+  }
+
   try {
     // Try to load the PDF to verify it's actually a valid PDF
     const arrayBuffer = await file.arrayBuffer();

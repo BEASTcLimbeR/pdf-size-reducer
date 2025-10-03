@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload, Palette, PenTool, EyeOff } from 'lucide-react';
+import { FileText, Download, CheckCircle, Menu, X, Zap, Shield, Edit, RotateCcw, Lock, Unlock, Merge, Split, Image, FileSpreadsheet, Presentation, Crop, Droplets, Hash, Scan, Eye, GitCompare, Trash2, Globe, Type, Archive, FileStack, Brain, Network, Sparkles, Upload, Palette, PenTool, EyeOff, AlertCircle } from 'lucide-react';
 
 // Lazy load heavy components for better performance
 const PDFUploader = lazy(() => import('@/components/PDFUploader'));
@@ -12,7 +12,10 @@ import CompressionResults from '@/components/CompressionResults';
 import MergePDF from '@/components/MergePDF';
 import SupportedFormats from '@/components/SupportedFormats';
 import DebugFormats from '@/components/DebugFormats';
+// import DebugFetch from '@/components/DebugFetch'; // Removed - causing fetch errors
+import FetchErrorBoundary from '@/components/FetchErrorBoundary';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { globalErrorHandler } from '@/utils/globalErrorHandler';
 import { useTranslation } from '@/hooks/useTranslation';
 import RTLProvider from '@/components/RTLProvider';
 import GradientText from '@/components/GradientText';
@@ -27,7 +30,7 @@ const RotatePDF = lazy(() => import('@/components/RotatePDF'));
 const OrganizePDF = lazy(() => import('@/components/OrganizePDF'));
 const ScanToPDF = lazy(() => import('@/components/ScanToPDF'));
 const RepairPDF = lazy(() => import('@/components/RepairPDF'));
-const OCRPDF = lazy(() => import('@/components/OCRPDF'));
+import OCRPDF from '@/components/OCRPDF';
 const PDFToWord = lazy(() => import('@/components/PDFToWord'));
 const PDFToPowerPoint = lazy(() => import('@/components/PDFToPowerPoint'));
 const PDFToExcel = lazy(() => import('@/components/PDFToExcel'));
@@ -88,6 +91,11 @@ export default function Home() {
   const { t, locale, changeLanguage } = useTranslation();
   const { isLoading } = useLoading();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Initialize error monitoring
+  useEffect(() => {
+    console.log('Error summary:', globalErrorHandler.getErrorSummary());
+  }, []);
 
   // Get translated tools
   const getTranslatedTools = () => [
@@ -277,7 +285,8 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <RTLProvider locale={locale}>
+      <FetchErrorBoundary>
+        <RTLProvider locale={locale}>
         {/* Preloader */}
         {isLoading && <Preloader />}
         
@@ -874,7 +883,7 @@ export default function Home() {
                 showFileInfo={true}
                 className="max-w-4xl mx-auto"
               />
-            ) : (
+            ) : uploadedFile ? (
               <CompressionResults
                 file={uploadedFile}
                 onCompression={handleCompression}
@@ -886,6 +895,17 @@ export default function Home() {
                 compressionStats={compressionStats}
                 error={error}
               />
+            ) : (
+              <div className="text-center py-8">
+                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                <p className="text-red-600">No file uploaded. Please try again.</p>
+                <button
+                  onClick={resetUpload}
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Upload File
+                </button>
+              </div>
             )}
           </>
         )}
@@ -940,9 +960,7 @@ export default function Home() {
 
         {/* OCR PDF Tool */}
         {activeTool === 'ocr-pdf' && (
-          <Suspense fallback={<PDFToolLoading />}>
-            <OCRPDF onReset={() => setActiveTool('home')} />
-          </Suspense>
+          <OCRPDF onReset={() => setActiveTool('home')} />
         )}
 
         {/* PDF to Word Tool */}
@@ -1216,6 +1234,8 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Debug Fetch Component - Removed to prevent fetch errors */}
       </main>
 
       {/* Footer */}
@@ -1233,6 +1253,7 @@ export default function Home() {
       </footer>
       </div>
       </RTLProvider>
+      </FetchErrorBoundary>
     </ErrorBoundary>
   );
 }
