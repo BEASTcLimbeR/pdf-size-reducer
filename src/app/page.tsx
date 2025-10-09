@@ -88,6 +88,7 @@ export default function Home() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownAnimating, setDropdownAnimating] = useState(false);
   const [mobileMenuAnimating, setMobileMenuAnimating] = useState(false);
+  const [aiBackendAvailable, setAiBackendAvailable] = useState(false);
   const { t, locale, changeLanguage } = useTranslation();
   const { isLoading } = useLoading();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -95,6 +96,31 @@ export default function Home() {
   // Initialize error monitoring
   useEffect(() => {
     console.log('Error summary:', globalErrorHandler.getErrorSummary());
+  }, []);
+
+  // Check AI backend availability
+  useEffect(() => {
+    const checkAIBackend = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(3000) // 3 second timeout
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setAiBackendAvailable(data.status === 'running');
+        } else {
+          setAiBackendAvailable(false);
+        }
+      } catch (error) {
+        // Backend not available - use fallback mode
+        setAiBackendAvailable(false);
+      }
+    };
+
+    checkAIBackend();
   }, []);
 
   // Get translated tools
@@ -837,6 +863,37 @@ export default function Home() {
                   NEW
                 </span>
               </h2>
+              <div className={`mb-4 p-3 border rounded-lg ${
+                aiBackendAvailable 
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                  : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+              }`}>
+                <div className={`flex items-center text-sm ${
+                  aiBackendAvailable 
+                    ? 'text-green-700 dark:text-green-300' 
+                    : 'text-yellow-700 dark:text-yellow-300'
+                }`}>
+                  <Brain className="h-4 w-4 mr-2" />
+                  <span className="font-medium">AI Backend Status:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    aiBackendAvailable 
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
+                      : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
+                  }`}>
+                    {aiBackendAvailable ? 'Connected' : 'Fallback Mode'}
+                  </span>
+                </div>
+                <p className={`text-xs mt-1 ${
+                  aiBackendAvailable 
+                    ? 'text-green-600 dark:text-green-400' 
+                    : 'text-yellow-600 dark:text-yellow-400'
+                }`}>
+                  {aiBackendAvailable 
+                    ? 'AI backend is running. Full AI features are available.' 
+                    : 'AI tools are working in fallback mode. Advanced features available when backend is running.'
+                  }
+                </p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={Brain}
