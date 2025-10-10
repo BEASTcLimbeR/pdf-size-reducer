@@ -1,4 +1,4 @@
-// Enhanced Document Summarizer - QuillBot-style summarization for multiple file formats
+// Enhanced Document Summarizer - Advanced summarization for multiple file formats
 import { PDFTextExtractor } from './pdfTextExtractor';
 
 export interface SummarizationOptions {
@@ -148,7 +148,7 @@ class EnhancedSummarizer {
   }
 
   /**
-   * Generate QuillBot-style summary with multiple options
+   * Generate advanced summary with multiple options
    */
   async generateSummary(
     fileAnalysis: FileAnalysis, 

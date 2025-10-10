@@ -188,6 +188,16 @@ const nextConfig: NextConfig = {
   experimental: {
     // Optimize memory usage
     memoryBasedWorkersCount: true,
+  },
+  
+  // Custom script injection for early error suppression
+  async rewrites() {
+    return [
+      {
+        source: '/fetch-override.js',
+        destination: '/api/fetch-override'
+      }
+    ];
   }
 };
 

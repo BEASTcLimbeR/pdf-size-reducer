@@ -42,8 +42,8 @@ export const useTranslation = (): UseTranslationReturn => {
       setIsLoading(true);
       try {
         const response = await fetch(`/locales/${locale}/common.json`, {
-          signal: AbortSignal.timeout(5000) // 5 second timeout
-        });
+          silent: true // Use silent mode to prevent error logging
+        } as any);
         if (response.ok) {
           const data = await response.json();
           setTranslations(data);
@@ -51,8 +51,8 @@ export const useTranslation = (): UseTranslationReturn => {
           // Fallback to English if translation not found
           try {
             const fallbackResponse = await fetch('/locales/en/common.json', {
-              signal: AbortSignal.timeout(5000)
-            });
+              silent: true // Use silent mode to prevent error logging
+            } as any);
             const fallbackData = await fallbackResponse.json();
             setTranslations(fallbackData);
           } catch (fallbackError) {

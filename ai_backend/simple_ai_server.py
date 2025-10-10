@@ -1,5 +1,5 @@
 """
-Simple AI Server - Real ChatGPT-like responses using Hugging Face models
+Simple AI Server - Real advanced AI responses using Hugging Face models
 """
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -72,7 +72,7 @@ def load_ai_models():
         classifier = pipeline('sentiment-analysis', model='cardiffnlp/twitter-roberta-base-sentiment-latest')
         
         print("✅ All real AI models loaded successfully!")
-        print("🚀 DocNestly now has genuine ChatGPT-like intelligence!")
+        print("🚀 DocNestly now has genuine advanced AI intelligence!")
         return True
         
     except Exception as e:
@@ -243,7 +243,7 @@ I've analyzed your question "{request.question}" using advanced transformer mode
 if __name__ == "__main__":
     import uvicorn
     print("🚀 Starting DocNestly AI Backend...")
-    print("📖 This will provide real ChatGPT-like intelligence using FREE models!")
+    print("📖 This will provide real advanced AI intelligence using FREE models!")
     print("🌐 Server will be available at: http://localhost:8000")
     print("📚 API docs will be at: http://localhost:8000/docs")
     print("🤖 Loading AI models... This may take 2-3 minutes on first startup.")

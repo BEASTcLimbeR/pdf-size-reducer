@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileText, Download, RotateCcw, Loader2, AlertCircle, Settings } from 'lucide-react';
-import { compressPDF, advancedCompressPDF, simpleCompressPDF, ultraSimpleCompressPDF, formatFileSize, validatePDFFile, validatePDFFileAsync, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
+import { compressPDF, ultraSimpleCompressPDF, formatFileSize, validatePDFFile, validatePDFFileAsync, getQualityDescription, CompressionOptions } from '@/utils/pdfCompression';
 import { webhookService } from '@/utils/webhookService';
 import CompressionMeter from './CompressionMeter';
 import FileRenameModal from './FileRenameModal';
@@ -72,10 +72,12 @@ export default function CompressionResults({
       }
 
       // Check if file is actually a File object
-      if (typeof file.arrayBuffer !== 'function') {
+      if (typeof file !== 'object' || !file.name || typeof file.size !== 'number' || typeof file.arrayBuffer !== 'function') {
         console.error('Invalid file object:', {
           file: file,
           type: typeof file,
+          hasName: !!file?.name,
+          hasSize: typeof file?.size === 'number',
           hasArrayBuffer: typeof file?.arrayBuffer === 'function',
           constructor: file?.constructor?.name
         });
@@ -113,11 +115,11 @@ export default function CompressionResults({
 
       let result;
       try {
-        console.log('Attempting advanced compression method...');
+        console.log('Attempting main compression method...');
         // Try the advanced compression method first
-        result = await advancedCompressPDF(file, compressionOptions);
-        setCompressionMethod('Advanced Compression');
-        console.log('Advanced compression successful:', {
+        result = await compressPDF(file, compressionOptions);
+        setCompressionMethod('Main Compression');
+        console.log('Main compression successful:', {
           originalSize: result.originalSize,
           compressedSize: result.compressedSize,
           reductionPercentage: result.reductionPercentage
@@ -141,10 +143,10 @@ export default function CompressionResults({
           
           try {
             // If main compression fails, try the simple method
-            console.log('Attempting simple compression method...');
-            result = await simpleCompressPDF(file);
-            setCompressionMethod('Simple Compression');
-            console.log('Simple compression successful:', {
+            console.log('Attempting ultra-simple compression method...');
+            result = await ultraSimpleCompressPDF(file);
+            setCompressionMethod('Ultra-Simple Compression');
+            console.log('Ultra-simple compression successful:', {
               originalSize: result.originalSize,
               compressedSize: result.compressedSize,
               reductionPercentage: result.reductionPercentage

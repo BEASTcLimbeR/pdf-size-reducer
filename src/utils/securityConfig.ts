@@ -153,6 +153,8 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
     ],
     connectSrc: [
       "'self'",
+      "http://localhost:8000",
+      "http://localhost:8001",
       "https://api.openai.com",
       "https://api.anthropic.com",
       "https://api.cohere.ai",

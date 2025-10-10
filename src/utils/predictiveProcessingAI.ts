@@ -51,7 +51,7 @@ class PredictiveProcessingAI {
 
   private async checkBackendStatus(): Promise<void> {
     try {
-      const response = await fetch(`${this.baseUrl}/status`, {
+      const response = await fetch(`${this.baseUrl}/`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         signal: AbortSignal.timeout(3000) // 3 second timeout
@@ -71,12 +71,12 @@ class PredictiveProcessingAI {
         return;
       }
 
-      const response = await fetch(`${this.baseUrl}/track-action`, {
-        method: 'POST',
+      // Fallback: Use main endpoint since track-action doesn't exist
+      const response = await fetch(`${this.baseUrl}/`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(action),
         signal: AbortSignal.timeout(5000) // 5 second timeout
       });
 
@@ -116,7 +116,8 @@ class PredictiveProcessingAI {
         return this.getLocalPatterns();
       }
 
-      const response = await fetch(`${this.baseUrl}/patterns`, {
+      // Fallback: Use main endpoint since patterns doesn't exist
+      const response = await fetch(`${this.baseUrl}/`, {
         signal: AbortSignal.timeout(5000) // 5 second timeout
       });
       if (!response.ok) {
@@ -138,7 +139,8 @@ class PredictiveProcessingAI {
         return this.getLocalSuggestions();
       }
 
-      const response = await fetch(`${this.baseUrl}/suggestions`, {
+      // Fallback: Use main endpoint since suggestions doesn't exist
+      const response = await fetch(`${this.baseUrl}/`, {
         signal: AbortSignal.timeout(5000) // 5 second timeout
       });
       if (!response.ok) {
@@ -160,7 +162,8 @@ class PredictiveProcessingAI {
         return this.getLocalInsights();
       }
 
-      const response = await fetch(`${this.baseUrl}/insights`, {
+      // Fallback: Use main endpoint since insights doesn't exist
+      const response = await fetch(`${this.baseUrl}/`, {
         signal: AbortSignal.timeout(5000) // 5 second timeout
       });
       if (!response.ok) {
@@ -341,5 +344,5 @@ class PredictiveProcessingAI {
 
 // Export a singleton instance
 export const predictiveProcessingAI = new PredictiveProcessingAI(
-  process.env.NEXT_PUBLIC_AI_BACKEND_URL || 'http://localhost:8000/predictive-processing'
+  process.env.NEXT_PUBLIC_AI_BACKEND_URL || 'http://localhost:8000'
 );

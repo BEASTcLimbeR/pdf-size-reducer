@@ -16,6 +16,7 @@ import DebugFormats from '@/components/DebugFormats';
 import FetchErrorBoundary from '@/components/FetchErrorBoundary';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { globalErrorHandler } from '@/utils/globalErrorHandler';
+import { fetchWrapper } from '@/utils/fetchWrapper';
 import { useTranslation } from '@/hooks/useTranslation';
 import RTLProvider from '@/components/RTLProvider';
 import GradientText from '@/components/GradientText';
@@ -95,22 +96,28 @@ export default function Home() {
 
   // Initialize error monitoring
   useEffect(() => {
+    // Temporarily disable error logging to prevent empty object errors
+    globalErrorHandler.disableErrorLogging();
     console.log('Error summary:', globalErrorHandler.getErrorSummary());
   }, []);
 
   // Check AI backend availability
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     const checkAIBackend = async () => {
       try {
         const response = await fetch('http://localhost:8000/', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          signal: AbortSignal.timeout(3000) // 3 second timeout
-        });
+          silent: true // Use silent mode to prevent error logging
+        } as any);
         
         if (response.ok) {
           const data = await response.json();
-          setAiBackendAvailable(data.status === 'running');
+          const isAvailable = data.status === 'running' && data.models_loaded === true;
+          setAiBackendAvailable(isAvailable);
         } else {
           setAiBackendAvailable(false);
         }
@@ -119,7 +126,7 @@ export default function Home() {
         setAiBackendAvailable(false);
       }
     };
-
+    
     checkAIBackend();
   }, []);
 
@@ -563,55 +570,55 @@ export default function Home() {
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <FileText className="h-6 w-6 mr-2 text-blue-600" />
-                Organize
+                {t('sections.organize')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={Merge}
-                  title="Merge PDF"
-                  description="Combine PDFs in the order you want with the easiest PDF merger available."
+                  title={t('tools.merge')}
+                  description={t('toolDescriptions.merge')}
                   status="available"
                   onClick={() => setActiveTool('merge')}
                 />
                 <ToolCard
                   icon={Split}
-                  title="Split PDF"
-                  description="Separate one page or a whole set for easy conversion into independent PDF files."
+                  title={t('tools.split')}
+                  description={t('toolDescriptions.split')}
                   status="available"
                   onClick={() => setActiveTool('split')}
                 />
                 <ToolCard
                   icon={Trash2}
-                  title="Remove Pages"
-                  description="Delete unwanted pages from your PDF documents quickly and easily."
+                  title={t('tools.removePages')}
+                  description={t('toolDescriptions.removePages')}
                   status="available"
                   onClick={() => setActiveTool('remove-pages')}
                 />
                 <ToolCard
                   icon={Download}
-                  title="Extract Pages"
-                  description="Extract specific pages from your PDF and save them as separate files."
+                  title={t('tools.extractPages')}
+                  description={t('toolDescriptions.extractPages')}
                   status="available"
                   onClick={() => setActiveTool('extract-pages')}
                 />
                 <ToolCard
                   icon={FileText}
-                  title="Organize PDF"
-                  description="Sort and rearrange pages in your PDF documents however you like."
+                  title={t('tools.organize')}
+                  description={t('toolDescriptions.organize')}
                   status="available"
                   onClick={() => setActiveTool('organize-pdf')}
                 />
                 <ToolCard
                   icon={Scan}
-                  title="Scan to PDF"
-                  description="Convert scanned documents and images into searchable PDF files."
+                  title={t('tools.scan')}
+                  description={t('toolDescriptions.scan')}
                   status="available"
                   onClick={() => setActiveTool('scan-to-pdf')}
                 />
                 <ToolCard
                   icon={Archive}
-                  title="Batch Process PDFs"
-                  description="Process multiple PDFs at once with compression, conversion, watermarking, and more."
+                  title={t('tools.batch')}
+                  description={t('toolDescriptions.batchProcessing')}
                   status="available"
                   onClick={() => setActiveTool('batch-processing')}
                 />
@@ -622,27 +629,27 @@ export default function Home() {
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Zap className="h-6 w-6 mr-2 text-green-600" />
-                Optimize
+                {t('sections.optimize')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={Zap}
-                  title="Compress PDF"
-                  description="Reduce file size while optimizing for maximal PDF quality."
+                  title={t('tools.compress')}
+                  description={t('toolDescriptions.compress')}
                   status="available"
                   onClick={() => setActiveTool('compress')}
                 />
                 <ToolCard
                   icon={Shield}
-                  title="Repair PDF"
-                  description="Fix damaged PDF files and recover data from corrupt documents."
+                  title={t('tools.repair')}
+                  description={t('toolDescriptions.repair')}
                   status="available"
                   onClick={() => setActiveTool('repair-pdf')}
                 />
                 <ToolCard
                   icon={Eye}
-                  title="OCR PDF"
-                  description="Convert scanned PDFs into searchable and selectable documents."
+                  title={t('tools.ocr')}
+                  description={t('toolDescriptions.ocr')}
                   status="available"
                   onClick={() => setActiveTool('ocr-pdf')}
                 />
@@ -653,97 +660,97 @@ export default function Home() {
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <RotateCcw className="h-6 w-6 mr-2 text-purple-600" />
-                Convert
+                {t('sections.convert')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={FileText}
-                  title="PDF to Word"
-                  description="Convert PDF files into easy to edit DOC and DOCX documents."
+                  title={t('tools.pdfToWord')}
+                  description={t('toolDescriptions.pdfToWord')}
                   status="available"
                   onClick={() => setActiveTool('pdf-to-word')}
                 />
                 <ToolCard
                   icon={Presentation}
-                  title="PDF to PowerPoint"
-                  description="Turn PDF files into easy to edit PPT and PPTX slideshows."
+                  title={t('tools.pdfToPowerpoint')}
+                  description={t('toolDescriptions.pdfToPowerpoint')}
                   status="available"
                   onClick={() => setActiveTool('pdf-to-powerpoint')}
                 />
                 <ToolCard
                   icon={FileSpreadsheet}
-                  title="PDF to Excel"
-                  description="Extract data from PDFs into Excel spreadsheets in seconds."
+                  title={t('tools.pdfToExcel')}
+                  description={t('toolDescriptions.pdfToExcel')}
                   status="available"
                   onClick={() => setActiveTool('pdf-to-excel')}
                 />
                 <ToolCard
                   icon={Image}
-                  title="PDF to JPG"
-                  description="Convert each PDF page into JPG images or extract all images."
+                  title={t('tools.pdfToJpg')}
+                  description={t('toolDescriptions.pdfToJpg')}
                   status="available"
                   onClick={() => setActiveTool('pdf-to-jpg')}
                 />
                 <ToolCard
                   icon={FileText}
-                  title="Word to PDF"
-                  description="Convert DOC and DOCX files to PDF for easy viewing."
+                  title={t('tools.wordToPdf')}
+                  description={t('toolDescriptions.wordToPdf')}
                   status="available"
                   onClick={() => setActiveTool('word-to-pdf')}
                 />
                 <ToolCard
                   icon={Presentation}
-                  title="PowerPoint to PDF"
-                  description="Convert PPT and PPTX slideshows to PDF format."
+                  title={t('tools.powerpointToPdf')}
+                  description={t('toolDescriptions.powerpointToPdf')}
                   status="available"
                   onClick={() => setActiveTool('powerpoint-to-pdf')}
                 />
                 <ToolCard
                   icon={FileSpreadsheet}
-                  title="Excel to PDF"
-                  description="Convert Excel spreadsheets to PDF for easy sharing."
+                  title={t('tools.excelToPdf')}
+                  description={t('toolDescriptions.excelToPdf')}
                   status="available"
                   onClick={() => setActiveTool('excel-to-pdf')}
                 />
                 <ToolCard
                   icon={Image}
-                  title="JPG to PDF"
-                  description="Convert JPG images to PDF in seconds with custom orientation."
+                  title={t('tools.jpgToPdf')}
+                  description={t('toolDescriptions.jpgToPdf')}
                   status="available"
                   onClick={() => setActiveTool('jpg-to-pdf')}
                 />
                 <ToolCard
                   icon={Globe}
-                  title="HTML to PDF"
-                  description="Convert HTML content or web pages to PDF documents."
+                  title={t('tools.htmlToPdf')}
+                  description={t('toolDescriptions.htmlToPdf')}
                   status="available"
                   onClick={() => setActiveTool('html-to-pdf')}
                 />
                 <ToolCard
                   icon={FileSpreadsheet}
-                  title="CSV to PDF"
-                  description="Convert CSV files to PDF tables with customizable formatting."
+                  title={t('tools.csvToPdf')}
+                  description={t('toolDescriptions.csvToPdf')}
                   status="available"
                   onClick={() => setActiveTool('csv-to-pdf')}
                 />
                 <ToolCard
                   icon={Image}
-                  title="PNG/WebP to PDF"
-                  description="Convert PNG, WebP, and JPEG images to PDF documents."
+                  title={t('tools.pngWebpToPdf')}
+                  description={t('toolDescriptions.pngWebpToPdf')}
                   status="available"
                   onClick={() => setActiveTool('png-webp-to-pdf')}
                 />
                 <ToolCard
                   icon={Type}
-                  title="TXT to PDF"
-                  description="Convert plain text files to PDF documents with custom formatting."
+                  title={t('tools.txtToPdf')}
+                  description={t('toolDescriptions.txtToPdf')}
                   status="available"
                   onClick={() => setActiveTool('txt-to-pdf')}
                 />
                 <ToolCard
                   icon={Type}
-                  title="RTF to PDF"
-                  description="Convert Rich Text Format files to PDF documents."
+                  title={t('tools.rtfToPdf')}
+                  description={t('toolDescriptions.rtfToPdf')}
                   status="available"
                   onClick={() => setActiveTool('rtf-to-pdf')}
                 />
@@ -754,48 +761,48 @@ export default function Home() {
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Edit className="h-6 w-6 mr-2 text-orange-600" />
-                Edit
+                {t('sections.edit')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={Edit}
-                  title="Edit PDF"
-                  description="Add text, images, shapes or annotations to PDF documents."
+                  title={t('tools.edit')}
+                  description={t('toolDescriptions.editPdf')}
                   status="available"
                   onClick={() => setActiveTool('edit-pdf')}
                 />
                 <ToolCard
                   icon={RotateCcw}
-                  title="Rotate PDF"
-                  description="Rotate PDFs the way you need them, even multiple PDFs at once."
+                  title={t('tools.rotate')}
+                  description={t('toolDescriptions.rotate')}
                   status="available"
                   onClick={() => setActiveTool('rotate-pdf')}
                 />
                 <ToolCard
                   icon={Hash}
-                  title="Add Page Numbers"
-                  description="Add page numbers to PDFs with custom positions and styling."
+                  title={t('tools.addPageNumbers')}
+                  description={t('toolDescriptions.addPageNumbers')}
                   status="available"
                   onClick={() => setActiveTool('add-page-numbers')}
                 />
                 <ToolCard
                   icon={Droplets}
-                  title="Add Watermark"
-                  description="Stamp images or text over your PDF with custom transparency."
+                  title={t('tools.addWatermark')}
+                  description={t('toolDescriptions.addWatermark')}
                   status="available"
                   onClick={() => setActiveTool('add-watermark')}
                 />
                 <ToolCard
                   icon={Crop}
-                  title="Crop PDF"
-                  description="Crop margins or select specific areas in your PDF documents."
+                  title={t('tools.crop')}
+                  description={t('toolDescriptions.cropPdf')}
                   status="available"
                   onClick={() => setActiveTool('crop-pdf')}
                 />
                 <ToolCard
                   icon={FileText}
-                  title="Create & Edit Forms"
-                  description="Create fillable PDF forms with text fields, checkboxes, dropdowns, and more."
+                  title={t('tools.forms')}
+                  description={t('toolDescriptions.pdfForms')}
                   status="available"
                   onClick={() => setActiveTool('pdf-forms')}
                 />
@@ -806,48 +813,48 @@ export default function Home() {
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Shield className="h-6 w-6 mr-2 text-red-600" />
-                Security
+                {t('sections.security')}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={Unlock}
-                  title="Unlock PDF"
-                  description="Remove PDF password security and use your PDFs freely."
+                  title={t('tools.unlock')}
+                  description={t('toolDescriptions.unlock')}
                   status="available"
                   onClick={() => setActiveTool('unlock')}
                 />
                 <ToolCard
                   icon={Lock}
-                  title="Protect PDF"
-                  description="Protect PDF files with passwords and encrypt documents."
+                  title={t('tools.protect')}
+                  description={t('toolDescriptions.protect')}
                   status="available"
                   onClick={() => setActiveTool('protect')}
                 />
                 <ToolCard
                   icon={FileText}
-                  title="Sign PDF"
-                  description="Sign yourself or request electronic signatures from others."
+                  title={t('tools.sign')}
+                  description={t('toolDescriptions.sign')}
                   status="available"
                   onClick={() => setActiveTool('sign')}
                 />
                 <ToolCard
                   icon={Trash2}
-                  title="Redact PDF"
-                  description="Permanently remove sensitive information from PDF documents."
+                  title={t('tools.redact')}
+                  description={t('toolDescriptions.redact')}
                   status="available"
                   onClick={() => setActiveTool('redact')}
                 />
                 <ToolCard
                   icon={GitCompare}
-                  title="Compare PDF"
-                  description="Show side-by-side comparison and spot changes between versions."
+                  title={t('tools.compare')}
+                  description={t('toolDescriptions.compare')}
                   status="available"
                   onClick={() => setActiveTool('compare')}
                 />
                 <ToolCard
                   icon={Shield}
-                  title="Advanced Security"
-                  description="Blockchain verification, military-grade encryption, and comprehensive audit trails."
+                  title={t('tools.advancedSecurity')}
+                  description={t('toolDescriptions.advancedSecurity')}
                   status="available"
                   onClick={() => setActiveTool('advanced-security')}
                 />
@@ -858,68 +865,51 @@ export default function Home() {
             <div>
               <h2 className="text-sm sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-4 md:mb-5 lg:mb-6 flex items-center">
                 <Brain className="h-6 w-6 mr-2 text-purple-600" />
-                AI Tools
+                {t('sections.ai')}
                 <span className="ml-3 px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full animate-pulse">
                   NEW
                 </span>
               </h2>
-              <div className={`mb-4 p-3 border rounded-lg ${
-                aiBackendAvailable 
-                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
-                  : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
-              }`}>
-                <div className={`flex items-center text-sm ${
-                  aiBackendAvailable 
-                    ? 'text-green-700 dark:text-green-300' 
-                    : 'text-yellow-700 dark:text-yellow-300'
-                }`}>
-                  <Brain className="h-4 w-4 mr-2" />
-                  <span className="font-medium">AI Backend Status:</span>
-                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                    aiBackendAvailable 
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200' 
-                      : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
-                  }`}>
-                    {aiBackendAvailable ? 'Connected' : 'Fallback Mode'}
-                  </span>
+              {!aiBackendAvailable && (
+                <div className="mb-4 p-3 border rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+                  <div className="flex items-center text-sm text-yellow-700 dark:text-yellow-300">
+                    <Brain className="h-4 w-4 mr-2" />
+                    <span className="font-medium">{t('aiBackend.status')}</span>
+                    <span className="ml-2 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
+                      {t('aiBackend.fallbackMode')}
+                    </span>
+                  </div>
+                  <p className="text-xs mt-1 text-yellow-600 dark:text-yellow-400">
+                    {t('aiBackend.fallbackDescription')}
+                  </p>
                 </div>
-                <p className={`text-xs mt-1 ${
-                  aiBackendAvailable 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-yellow-600 dark:text-yellow-400'
-                }`}>
-                  {aiBackendAvailable 
-                    ? 'AI backend is running. Full AI features are available.' 
-                    : 'AI tools are working in fallback mode. Advanced features available when backend is running.'
-                  }
-                </p>
-              </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-4 xl:gap-6">
                 <ToolCard
                   icon={Brain}
-                  title="AI Document Chat"
-                  description="Chat with your PDFs - ask questions about content, get summaries, find specific information."
+                  title={t('tools.aiDocumentChat')}
+                  description={t('toolDescriptions.aiDocumentChat')}
                   status="available"
                   onClick={() => setActiveTool('ai-chat')}
                 />
                 <ToolCard
                   icon={Network}
-                  title="Smart Document Relationships"
-                  description="AI automatically detects related documents and suggests smart connections and merging opportunities."
+                  title={t('tools.smartDocumentRelationships')}
+                  description={t('toolDescriptions.smartDocumentRelationships')}
                   status="available"
                   onClick={() => setActiveTool('smart-relationships')}
                 />
                 <ToolCard
                   icon={Sparkles}
-                  title="Predictive Processing"
-                  description="AI learns your patterns and suggests operations before you even think of them."
+                  title={t('tools.predictiveProcessing')}
+                  description={t('toolDescriptions.predictiveProcessing')}
                   status="available"
                   onClick={() => setActiveTool('predictive-processing')}
                 />
                 <ToolCard
                   icon={Zap}
-                  title="Webhook Notifications"
-                  description="Get real-time notifications when your PDF operations complete."
+                  title={t('tools.webhookSettings')}
+                  description={t('toolDescriptions.webhookSettings')}
                   status="available"
                   onClick={() => setActiveTool('webhooks')}
                 />

@@ -1,11 +1,12 @@
 """
-Real AI Backend for DocNestly - ChatGPT-like intelligence using FREE models
+Real AI Backend for DocNestly - Advanced AI intelligence using FREE models
 """
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
+from contextlib import asynccontextmanager
 import PyPDF2
 import io
 import logging
@@ -33,18 +34,6 @@ try:
 except LookupError:
     nltk.download('stopwords')
 
-# Initialize FastAPI app
-app = FastAPI(title="DocNestly AI Backend", version="1.0.0")
-
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Your Next.js app
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Global AI models (loaded once at startup)
 class AIModels:
     def __init__(self):
@@ -60,7 +49,7 @@ class AIModels:
         if self.loaded:
             return
             
-        print("🤖 Loading AI models... This may take a few minutes on first run.")
+        print("Loading AI models... This may take a few minutes on first run.")
         
         try:
             # Document summarization model
@@ -92,14 +81,54 @@ class AIModels:
             self.embeddings = SentenceTransformer('all-MiniLM-L6-v2')
             
             self.loaded = True
-            print("✅ All AI models loaded successfully!")
+            print("All AI models loaded successfully!")
             
         except Exception as e:
-            print(f"❌ Error loading models: {e}")
+            print(f"Error loading models: {e}")
             raise e
 
 # Global models instance
 ai_models = AIModels()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load AI models on startup and cleanup on shutdown"""
+    # Startup
+    try:
+        print("Loading AI models... This may take a few minutes.")
+        await ai_models.load_models()
+        print("AI Backend ready with real advanced AI intelligence!")
+    except Exception as e:
+        print(f"AI models failed to load: {e}")
+        print("Continuing with fallback analysis...")
+    
+    yield
+    
+    # Shutdown (cleanup if needed)
+    print("Shutting down AI backend...")
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="DocNestly AI Backend",
+    description="Advanced AI intelligence for document processing",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # Next.js app (default port)
+        "http://localhost:3001",  # Next.js app (alternative port)
+        "http://127.0.0.1:3000",  # Alternative localhost format
+        "http://127.0.0.1:3001",  # Alternative localhost format
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Pydantic models for API
 class DocumentAnalysisResponse(BaseModel):
@@ -329,17 +358,6 @@ def determine_complexity(text: str, word_count: int) -> str:
 # In-memory storage for document contexts
 document_store: Dict[str, Dict[str, Any]] = {}
 
-@app.on_event("startup")
-async def startup_event():
-    """Load AI models on startup"""
-    try:
-        print("Loading AI models... This may take a few minutes.")
-        await ai_models.load_models()
-        print("AI Backend ready with real ChatGPT-like intelligence!")
-    except Exception as e:
-        print(f"AI models failed to load: {e}")
-        print("Continuing with fallback analysis...")
-
 @app.get("/")
 async def root():
     """Health check endpoint"""
@@ -537,7 +555,7 @@ def generate_suggestions(question: str, analysis: Dict[str, Any]) -> List[str]:
 if __name__ == "__main__":
     import uvicorn
     print("Starting DocNestly AI Backend...")
-    print("This will provide real ChatGPT-like intelligence using FREE models!")
+    print("This will provide real advanced AI intelligence using FREE models!")
     print("Server will be available at: http://localhost:8000")
     print("API docs will be at: http://localhost:8000/docs")
     print("Loading AI models... This may take 2-3 minutes on first startup.")

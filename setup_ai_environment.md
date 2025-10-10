@@ -82,4 +82,4 @@ print('✅ All models downloaded successfully!')
 Frontend (React/Next.js) ←→ AI Backend (Python/FastAPI) ←→ ML Models (Hugging Face)
 ```
 
-This will give you ChatGPT-level intelligence completely FREE!
+This will give you advanced AI intelligence completely FREE!

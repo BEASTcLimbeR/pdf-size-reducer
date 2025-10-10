@@ -170,26 +170,31 @@ export class AccuratePDFAnalyzer {
   // Method 1: Python backend with PyMuPDF (most accurate)
   private static async analyzePDFWithPython(file: File): Promise<AccuratePDFAnalysis | null> {
     try {
-      // Check if Python backend is available
-      const healthCheck = await fetch('http://localhost:8001/health', {
+      // Only run on client side
+      if (typeof window === 'undefined') {
+        throw new Error('Server-side execution not supported');
+      }
+
+      // Check if AI backend is available (using port 8000)
+      const healthCheck = await fetch('http://localhost:8000/', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(3000) // 3 second timeout
-      });
+        silent: true // Use silent mode to prevent error logging
+      } as any);
       
       if (!healthCheck.ok) {
-        throw new Error('Python backend not available');
+        throw new Error('AI backend not available');
       }
       
-      // Send PDF to Python backend for PyMuPDF analysis
+      // Use the main AI backend for analysis (fallback to client-side analysis)
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await fetch('http://localhost:8001/analyze-pdf-accurate', {
+      const response = await fetch('http://localhost:8000/analyze-document', {
         method: 'POST',
         body: formData,
-        signal: AbortSignal.timeout(10000) // 10 second timeout for analysis
-      });
+        silent: true // Use silent mode to prevent error logging
+      } as any);
       
       if (response.ok) {
         const result = await response.json();

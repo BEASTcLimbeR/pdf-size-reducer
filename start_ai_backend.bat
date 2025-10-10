@@ -1,5 +1,5 @@
 @echo off
-echo 🚀 Starting DocNestly AI Backend with REAL ChatGPT-like intelligence!
+echo 🚀 Starting DocNestly AI Backend with REAL advanced AI intelligence!
 echo.
 
 cd ai_backend

@@ -1,4 +1,4 @@
-// ChatGPT-5 Level AI - Most Advanced Document Intelligence System
+// Advanced AI - Most Advanced Document Intelligence System
 
 export interface AdvancedAIResponse {
   response: string;
@@ -51,24 +51,24 @@ export interface ConversationTurn {
   insights_generated: string[];
 }
 
-export class ChatGPT5AI {
-  private static instance: ChatGPT5AI;
+export class AdvancedAI {
+  private static instance: AdvancedAI;
   private conversationMemory: Map<string, ConversationTurn[]> = new Map();
   private documentContexts: Map<string, DocumentContext> = new Map();
   private learningPatterns: Map<string, any> = new Map();
 
   private constructor() {}
 
-  static getInstance(): ChatGPT5AI {
-    if (!ChatGPT5AI.instance) {
-      ChatGPT5AI.instance = new ChatGPT5AI();
+  static getInstance(): AdvancedAI {
+    if (!AdvancedAI.instance) {
+      AdvancedAI.instance = new AdvancedAI();
     }
-    return ChatGPT5AI.instance;
+    return AdvancedAI.instance;
   }
 
-  // Advanced document analysis with ChatGPT-5 level understanding
+  // Advanced document analysis with advanced AI understanding
   async analyzeDocumentAdvanced(file: File): Promise<DocumentContext> {
-    console.log('🧠 Starting ChatGPT-5 level document analysis...');
+    console.log('🧠 Starting advanced AI document analysis...');
     
     try {
       // Multi-stage analysis pipeline
@@ -89,7 +89,7 @@ export class ChatGPT5AI {
       const docId = `doc_${Date.now()}`;
       this.documentContexts.set(docId, documentContext);
       
-      console.log('✅ ChatGPT-5 level analysis complete!');
+      console.log('✅ Advanced AI analysis complete!');
       return documentContext;
       
     } catch (error) {
@@ -98,7 +98,7 @@ export class ChatGPT5AI {
     }
   }
 
-  // ChatGPT-5 level conversation with advanced reasoning
+  // Advanced AI conversation with advanced reasoning
   async generateAdvancedResponse(
     question: string, 
     documentId: string, 
@@ -107,7 +107,7 @@ export class ChatGPT5AI {
     const startTime = Date.now();
     
     try {
-      console.log('🧠 Generating ChatGPT-5 level response...');
+      console.log('🧠 Generating advanced AI response...');
       
       // Step 1: Advanced question understanding
       const questionAnalysis = await this.analyzeQuestionAdvanced(question);
@@ -156,7 +156,7 @@ export class ChatGPT5AI {
       };
       
     } catch (error) {
-      console.error('ChatGPT-5 response generation failed:', error);
+      console.error('Advanced AI response generation failed:', error);
       throw error;
     }
   }
@@ -245,7 +245,7 @@ export class ChatGPT5AI {
     };
   }
 
-  // Chain-of-thought reasoning like ChatGPT-5
+  // Chain-of-thought reasoning with advanced AI
   private async performChainOfThoughtReasoning(
     question: string, 
     context: DocumentContext, 
@@ -302,7 +302,7 @@ export class ChatGPT5AI {
     const emotional_prefix = this.getEmotionalPrefix(emotional_context);
     const complexity_adaptation = this.adaptToComplexity(question_category);
     
-    // Generate response based on intent with ChatGPT-5 level sophistication
+    // Generate response based on intent with advanced AI sophistication
     let response = '';
     
     switch (intent) {
@@ -336,7 +336,7 @@ export class ChatGPT5AI {
 
   // Deep analysis with multi-layer reasoning
   private async generateDeepAnalysis(question: string, context: DocumentContext, emotional_prefix: string): Promise<string> {
-    return `🔬 **Deep Analysis** (ChatGPT-5 Level Intelligence)
+    return `🔬 **Deep Analysis** (Advanced AI Intelligence)
 
 **Multi-Layer Document Analysis:**
 
@@ -360,7 +360,7 @@ export class ChatGPT5AI {
 • Actionable Insights: ${this.extractActionableInsights(context)}
 • Decision Support: ${this.generateDecisionSupport(context)}
 
-**ChatGPT-5 Reasoning:** This analysis employs advanced multi-layer reasoning, semantic understanding, and predictive intelligence to provide comprehensive insights beyond surface-level information.`;
+**Advanced AI Reasoning:** This analysis employs advanced multi-layer reasoning, semantic understanding, and predictive intelligence to provide comprehensive insights beyond surface-level information.`;
   }
 
   // Comparative analysis with advanced reasoning
@@ -652,4 +652,4 @@ interface DocumentMetadata {
   professional_score?: number;
 }
 
-export const chatGPT5AI = ChatGPT5AI.getInstance();
+export const advancedAI = AdvancedAI.getInstance();

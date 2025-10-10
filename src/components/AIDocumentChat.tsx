@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, Upload, FileText, Brain, Sparkles, Download, Search, BookOpen, Zap, User, Bot, Loader2, Trash2, Copy, ThumbsUp, ThumbsDown, Wifi, WifiOff } from 'lucide-react';
 import { AccurateAI, analyzeDocument as analyzeDocumentFile } from '@/utils/accurateAI';
 import { LanguageDetector } from '@/utils/languageDetector';
-import { chatGPT5AI } from '@/utils/chatgpt5AI';
+import { advancedAI } from '@/utils/advancedAI';
 import { enhancedSummarizer, SummarizationOptions, DocumentSummary } from '@/utils/enhancedSummarizer';
 
 interface ChatMessage {
@@ -36,7 +36,7 @@ interface DocumentContext {
     sentiment: string;
     confidence: number;
   };
-  enhancedSummary?: DocumentSummary; // QuillBot-style enhanced summary
+  enhancedSummary?: DocumentSummary; // Enhanced summary
   fileAnalysis?: any; // Detailed file analysis
 }
 
@@ -91,7 +91,7 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
     scrollToBottom();
   }, [messages]);
 
-  // Enhanced document analysis with QuillBot-style summarization
+  // Enhanced document analysis with advanced summarization
   const analyzeDocument = async (file: File): Promise<DocumentContext> => {
     setIsAnalyzing(true);
     setAnalysisProgress(0);
@@ -102,7 +102,7 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
       console.log('🔍 Analyzing file with enhanced summarizer...');
       const fileAnalysis = await enhancedSummarizer.analyzeFile(file);
       
-      // Step 2: Generate QuillBot-style summary
+      // Step 2: Generate enhanced summary
       setAnalysisProgress(50);
       console.log('📝 Generating enhanced summary...');
       const enhancedSummary = await enhancedSummarizer.generateSummary(fileAnalysis, summarizationOptions);
@@ -174,10 +174,10 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
       // Use Accurate AI with REAL content for precise responses
       const result = await AccurateAI.generateAccurateResponse(question, context.analysis, context.realContent);
       
-      // Add ChatGPT-5 level enhancements
+      // Add advanced AI enhancements
       const enhancedResponse = `${result.response}
 
-**🧠 ChatGPT-5 Level Enhancements:**
+**🧠 Advanced AI Enhancements:**
 • **Advanced Reasoning**: Multi-layer analysis with predictive insights
 • **Emotional Intelligence**: Response adapted to query tone and context
 • **Chain-of-Thought**: Sophisticated reasoning process applied
@@ -196,8 +196,8 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
         content: enhancedResponse,
         timestamp: new Date(),
         metadata: {
-          sources: [`ChatGPT-5 Level Analysis`, `Advanced Reasoning Engine`, `${result.model_used}`],
-          confidence: Math.min(0.98, result.confidence + 0.1), // Higher confidence for ChatGPT-5 level
+          sources: [`Advanced AI Analysis`, `Advanced Reasoning Engine`, `${result.model_used}`],
+          confidence: Math.min(0.98, result.confidence + 0.1), // Higher confidence for advanced AI
           suggestions: [
             "Analyze this from a strategic perspective",
             "What are the predictive implications?", 
@@ -241,13 +241,13 @@ export default function AIDocumentChat({ onReset }: AIDocumentChatProps) {
       const context = await analyzeDocument(file);
       setUploadedDoc(context);
       
-      // Add enhanced welcome message with QuillBot-style summary
+      // Add enhanced welcome message with advanced summary
       const welcomeMessage: ChatMessage = {
         id: Date.now().toString(),
         type: 'ai',
         content: `📄 **Enhanced Document Analysis Complete!**
 
-I've successfully analyzed "${file.name}" using QuillBot-style summarization technology.
+I've successfully analyzed "${file.name}" using advanced summarization technology.
 
 **📊 Document Overview:**
 • **Pages:** ${context.pages}
@@ -259,7 +259,7 @@ I've successfully analyzed "${file.name}" using QuillBot-style summarization tec
 **🎯 Key Topics Identified:**
 ${context.analysis.key_topics.map(topic => `• ${topic}`).join('\n')}
 
-**📝 Enhanced Summary (QuillBot-style):**
+**📝 Enhanced Summary:**
 ${context.enhancedSummary ? context.enhancedSummary.summary : context.analysis.summary}
 
 ${context.enhancedSummary ? `
@@ -356,7 +356,7 @@ ${context.enhancedSummary.keyPoints.slice(0, 5).map(point => `• ${point}`).joi
                 {backendStatus === 'available' && (
                   <span className="flex items-center text-sm text-purple-600 bg-purple-100 dark:bg-purple-900/20 px-2 py-1 rounded-full">
                     <Sparkles className="h-4 w-4 mr-1" />
-                    ChatGPT-5 Level AI
+                    Advanced AI
                   </span>
                 )}
                 {backendStatus === 'unavailable' && (
@@ -369,7 +369,7 @@ ${context.enhancedSummary.keyPoints.slice(0, 5).map(point => `• ${point}`).joi
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               {backendStatus === 'available' 
-                ? '🧠 ChatGPT-5 Level Intelligence Active - Advanced reasoning, emotional intelligence, and predictive analysis'
+                ? '🧠 Advanced AI Intelligence Active - Advanced reasoning, emotional intelligence, and predictive analysis'
                 : 'Smart AI system active - Intelligent analysis with context-aware responses and document understanding'
               }
             </p>
@@ -394,7 +394,7 @@ ${context.enhancedSummary.keyPoints.slice(0, 5).map(point => `• ${point}`).joi
           </div>
         </div>
 
-        {/* ChatGPT-5 Level Feature Cards */}
+        {/* Advanced AI Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
             <div className="flex items-center">
@@ -610,7 +610,7 @@ ${context.enhancedSummary.keyPoints.slice(0, 5).map(point => `• ${point}`).joi
             Ready to Chat with Your Documents?
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-            Upload PDF, Word, Excel, or text documents and get QuillBot-style intelligent summaries. 
+            Upload PDF, Word, Excel, or text documents and get advanced intelligent summaries. 
             Ask questions, get detailed analysis, find specific information - all powered by advanced AI.
           </p>
           <button

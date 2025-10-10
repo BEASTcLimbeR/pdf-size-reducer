@@ -53,7 +53,7 @@ python ../ai_backend/main.py
 
 ## What You'll Get:
 
-🤖 **Real ChatGPT-like AI** that:
+🤖 **Real Advanced AI** that:
 - Actually reads your PDF content
 - Understands context and meaning
 - Provides intelligent summaries
@@ -69,4 +69,4 @@ python ../ai_backend/main.py
 - **Backend not connecting:** Make sure it's running on port 8000
 - **Fallback mode:** AI works even without backend (smart simulation)
 
-Your DocNestly will have ChatGPT-level intelligence completely FREE! 🎉
+Your DocNestly will have advanced AI intelligence completely FREE! 🎉

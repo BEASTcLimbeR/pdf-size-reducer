@@ -103,16 +103,21 @@ export default function EnhancedPDFUploader({
     const validFiles: PDFFileWithPreview[] = [];
     
     for (const file of newFiles) {
+      // Validate that we have a proper File object
+      if (!file || typeof file !== 'object' || !file.name || typeof file.size !== 'number') {
+        console.error('Invalid file object received:', file);
+        continue;
+      }
+      
       const error = validatePDF(file);
-      const fileWithPreview: PDFFileWithPreview = {
-        ...file,
+      const fileWithPreview: PDFFileWithPreview = Object.assign(file, {
         id: Math.random().toString(36).substr(2, 9),
         status: error ? 'error' : 'pending',
         error: error || undefined,
         progress: 0,
         fileSize: formatFileSize(file.size),
         lastModifiedFormatted: new Date(file.lastModified).toLocaleDateString()
-      };
+      });
 
       // Generate preview
       if (!error && showPreview) {
@@ -225,7 +230,12 @@ export default function EnhancedPDFUploader({
         if (multiple && onFilesUpload) {
           onFilesUpload([file]);
         } else if (onFileUpload) {
-          onFileUpload(file);
+          // Ensure we're passing a proper File object
+          if (file && typeof file.arrayBuffer === 'function') {
+            onFileUpload(file);
+          } else {
+            console.error('Invalid file object being passed to onFileUpload:', file);
+          }
         }
       }
       
